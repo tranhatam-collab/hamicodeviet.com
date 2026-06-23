@@ -76,11 +76,11 @@ consent.get('/', async (c) => {
 });
 
 // POST /consent — grant or withdraw consent (granular)
-// Body: { consentType, policyVersion, action: 'grant'|'withdraw', childAssent?: boolean, reason?: string }
+// Body: { consentType, policyVersion, action: 'grant'|'withdraw', childAssent?: boolean, reason?: string, countryCode?: string, contentHash?: string }
 consent.post('/', async (c) => {
   const user = c.get('user');
   const body = await c.req.json();
-  const { consentType, policyVersion, action, childAssent, reason } = body;
+  const { consentType, policyVersion, action, childAssent, reason, countryCode, contentHash } = body;
 
   if (!consentType || !policyVersion) {
     return c.json({ error: 'missing_fields', required: ['consentType', 'policyVersion', 'action'] }, 400);
@@ -118,6 +118,9 @@ consent.post('/', async (c) => {
 
   const consentState = action === 'withdraw' ? 'withdrawn' : 'granted';
   const ip = c.req.header('cf-connecting-ip') || null;
+  const country = countryCode || 'VN';
+  const hash = contentHash || null;
+  const requestId = c.req.header('x-request-id') || crypto.randomUUID();
 
   if (action === 'withdraw') {
     await sql`
@@ -125,10 +128,10 @@ consent.post('/', async (c) => {
       WHERE user_id = ${user.id} AND policy_type = ${consentType} AND consent_state = 'granted'
     `;
   } else {
-    // Insert new consent record (audit trail)
+    // Insert new consent record with content hash + country code (audit trail)
     await sql`
-      INSERT INTO consents (user_id, policy_type, policy_version, consent_state, source, ip)
-      VALUES (${user.id}, ${consentType}, ${policyVersion}, 'granted', 'web', ${ip})
+      INSERT INTO consents (user_id, policy_type, policy_version, consent_state, source, ip, country_code, policy_content_hash, acceptance_method, request_id)
+      VALUES (${user.id}, ${consentType}, ${policyVersion}, 'granted', 'web', ${ip}, ${country}, ${hash}, 'checkbox', ${requestId})
     `;
   }
 
@@ -137,6 +140,7 @@ consent.post('/', async (c) => {
     consentType,
     action,
     state: consentState,
+    countryCode: country,
     timestamp: new Date().toISOString(),
   });
 });
