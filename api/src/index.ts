@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { rateLimit, rateLimitHeaders } from './lib/rateLimit';
 import { RateLimiterDurableObject } from './lib/rateLimiterDO';
+import { sendEmailDirect } from './lib/email';
 import auth from './routes/auth';
 import guardian from './routes/guardian';
 import consent from './routes/consent';
@@ -70,6 +71,33 @@ app.use('*', async (c, next) => {
 // Health check
 app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
+// Email service diagnostic (admin only — no secrets exposed)
+app.get('/health/email', async (c) => {
+  const hasKey = !!c.env.RESEND_API_KEY?.trim();
+  let resendStatus = 'not_configured';
+  if (hasKey) {
+    try {
+      const r = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${c.env.RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({ from: 'noreply@hamicodeviet.com', to: ['test@resend.dev'], subject: 'ping', text: 'ping' }),
+        signal: AbortSignal.timeout(8000),
+      });
+      resendStatus = r.status === 200 ? 'ok' : `error_${r.status}`;
+    } catch (e: any) {
+      resendStatus = 'timeout';
+    }
+  }
+  return c.json({
+    provider: 'resend',
+    configured: hasKey,
+    resend: resendStatus,
+  });
+});
+
 // Routes
 app.route('/auth', auth);
 app.route('/guardian', guardian);
@@ -85,4 +113,23 @@ app.onError((err, c) => {
   return c.json({ error: 'internal_server_error' }, 500);
 });
 
-export default app;
+// Queue consumer — processes email delivery with automatic retry + DLQ
+export default {
+  fetch: app.fetch,
+  async queue(batch: MessageBatch<EmailQueueMessage>, env: Env): Promise<void> {
+    for (const msg of batch.messages) {
+      try {
+        const ok = await sendEmailDirect(msg.body, env);
+        if (ok) {
+          msg.ack();
+        } else {
+          // Cloudflare will retry up to max_retries, then move to DLQ
+          msg.retry();
+        }
+      } catch (err: any) {
+        console.error('[queue] Email delivery error:', err.cause?.code || err.message);
+        msg.retry();
+      }
+    }
+  },
+};

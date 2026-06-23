@@ -19,6 +19,22 @@ APP_URL = "https://app.hamicodeviet.com"
 name = "RATE_LIMITER"
 class_name = "RateLimiterDurableObject"
 
+# Queues for email delivery with retry + DLQ
+[[queues.producers]]
+queue = "email-delivery"
+binding = "EMAIL_QUEUE"
+
+[[queues.consumers]]
+queue = "email-delivery"
+max_batch_size = 5
+max_batch_timeout = 10
+max_retries = 3
+dead_letter_queue = "email-dlq"
+
+[[queues.producers]]
+queue = "email-dlq"
+binding = "EMAIL_DLQ"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["RateLimiterDurableObject"]

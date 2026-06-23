@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck-api:
+    name: API TypeScript Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: api/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit
+
+  build-public-site:
+    name: Build Public Website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+
+  build-app:
+    name: Build App Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  security-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for secrets
+        run: |
+          # Check for common secret patterns
+          if grep -rE "(sk_live_[a-zA-Z0-9]{24,}|AKIA[A-Z0-9]{16}|ghp_[a-zA-Z0-9]{36}|-----BEGIN (RSA |EC )?PRIVATE KEY-----)" --include="*.ts" --include="*.js" --include="*.json" --include="*.toml" --include="*.env" . 2>/dev/null; then
+            echo "::error::Potential secret detected in source files"
+            exit 1
+          fi
+          echo "No secrets detected"
+      - name: Check .env files not tracked
+        run: |
+          if git ls-files | grep -qE "\.env$|\.env\."; then
+            echo "::error::.env file is tracked in git"
+            exit 1
+          fi
+          echo "No .env files tracked"
+
+  token-log-scan:
+    name: Token Logging Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check no token logging in API
+        run: |
+          # Ensure no console.log contains token, verifyToken, resetToken, or magic link
+          if grep -rnE "console\.(log|error|warn).*token.*=|console\.(log|error|warn).*verifyToken|console\.(log|error|warn).*resetToken|console\.(log|error|warn).*link=.*token" api/src/ --include="*.ts"; then
+            echo "::error::Token logging detected — SECURITY VIOLATION"
+            exit 1
+          fi
+          echo "No token logging detected"

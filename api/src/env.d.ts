@@ -2,9 +2,18 @@ interface Env {
   DATABASE_URL: string;
   JWT_SECRET: string;
   APP_URL: string;
-  MAIL_API_KEY: string;
-  MAIL_API_WORKSPACE_ID: string;
+  RESEND_API_KEY: string;
   RATE_LIMITER: DurableObjectNamespace;
+  EMAIL_QUEUE: Queue<EmailQueueMessage>;
+  EMAIL_DLQ: Queue<EmailQueueMessage>;
+}
+
+interface EmailQueueMessage {
+  type: 'verification' | 'password_reset';
+  to: string;
+  token: string;
+  lang: 'vi' | 'en';
+  attempts?: number;
 }
 
 interface AuthUser {

@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { getDb } from '../lib/db';
 import { hashPassword, verifyPassword } from '../lib/password';
 import { signJwt, verifyJwt, hashToken, generateToken } from '../lib/jwt';
-import { sendEmail, verificationEmailHtml, passwordResetEmailHtml, isEmailEnabled } from '../lib/email';
+import { enqueueEmail, isEmailEnabled } from '../lib/email';
 
 const auth = new Hono<{ Bindings: Env }>();
 
@@ -89,22 +89,18 @@ auth.post('/signup', async (c) => {
     VALUES (${user.id}, ${verifyTokenHash}, now() + interval '24 hours')
   `;
 
-  // Send verification email
-  const emailHtml = verificationEmailHtml(verifyToken, c.env.APP_URL, language);
-  const emailText = language === 'en'
-    ? `Verify your email: ${c.env.APP_URL}/verify-email?token=${verifyToken}`
-    : `Xác nhận email: ${c.env.APP_URL}/verify-email?token=${verifyToken}`;
-  const emailSent = await sendEmail({
+  // Send verification email via queue (with retry + DLQ)
+  const emailSent = await enqueueEmail({
+    type: 'verification',
     to: email,
-    subject: language === 'en' ? 'Verify your email — HaMi Code Viet' : 'Xác nhận email — HaMi Code Việt',
-    html: emailHtml,
-    text: emailText,
+    token: verifyToken,
+    lang: language,
   }, c.env);
 
   // SECURITY: Never log verification tokens. Fail closed — if email fails,
   // user must request resend later. Do NOT expose token in response or logs.
   if (!emailSent) {
-    console.error('[email] Verification email delivery failed for user_id:', user.id);
+    console.error('[email] Verification email enqueue failed for user_id:', user.id);
   }
 
   // Create session
@@ -301,15 +297,11 @@ auth.post('/forgot-password', async (c) => {
     VALUES (${user.id}, ${resetTokenHash}, now() + interval '1 hour', ${c.req.header('cf-connecting-ip') || null})
   `;
 
-  const emailHtml = passwordResetEmailHtml(resetToken, c.env.APP_URL, lang);
-  const emailText = lang === 'en'
-    ? `Reset your password: ${c.env.APP_URL}/reset-password?token=${resetToken}`
-    : `Đặt lại mật khẩu: ${c.env.APP_URL}/reset-password?token=${resetToken}`;
-  const emailSent = await sendEmail({
+  const emailSent = await enqueueEmail({
+    type: 'password_reset',
     to: email,
-    subject: lang === 'en' ? 'Reset your password — HaMi Code Viet' : 'Đặt lại mật khẩu — HaMi Code Việt',
-    html: emailHtml,
-    text: emailText,
+    token: resetToken,
+    lang,
   }, c.env);
 
   // SECURITY: Never log reset tokens. Fail closed — if email fails,
@@ -381,20 +373,16 @@ auth.post('/resend-verification', async (c) => {
     VALUES (${user.id}, ${verifyTokenHash}, now() + interval '24 hours')
   `;
 
-  const emailHtml = verificationEmailHtml(verifyToken, c.env.APP_URL, lang);
-  const emailText = lang === 'en'
-    ? `Verify your email: ${c.env.APP_URL}/verify-email?token=${verifyToken}`
-    : `Xác nhận email: ${c.env.APP_URL}/verify-email?token=${verifyToken}`;
-  const emailSent = await sendEmail({
+  const emailSent = await enqueueEmail({
+    type: 'verification',
     to: user.email,
-    subject: lang === 'en' ? 'Verify your email — HaMi Code Viet' : 'Xác nhận email — HaMi Code Việt',
-    html: emailHtml,
-    text: emailText,
+    token: verifyToken,
+    lang,
   }, c.env);
 
   // SECURITY: Never log verification tokens. Fail closed.
   if (!emailSent) {
-    console.error('[email] Resend verification email delivery failed for user_id:', user.id);
+    console.error('[email] Resend verification email enqueue failed for user_id:', user.id);
     return c.json({ error: 'email_service_unavailable', message: 'Email delivery is temporarily unavailable. Please try again later.' }, 503);
   }
 
