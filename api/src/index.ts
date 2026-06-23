@@ -2,10 +2,13 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { rateLimit, rateLimitHeaders } from './lib/rateLimit';
+import { RateLimiterDurableObject } from './lib/rateLimiterDO';
 import auth from './routes/auth';
 import guardian from './routes/guardian';
 import consent from './routes/consent';
 import countryPolicy from './routes/countryPolicy';
+
+export { RateLimiterDurableObject };
 
 const app = new Hono<AppBindings>();
 
@@ -34,7 +37,7 @@ app.use('*', cors({
   credentials: true,
 }));
 
-// Rate limiting middleware
+// Rate limiting middleware (Durable Object — globally consistent)
 app.use('*', async (c, next) => {
   // Skip rate limiting for health check and OPTIONS
   if (c.req.path === '/health' || c.req.method === 'OPTIONS') {
@@ -43,23 +46,21 @@ app.use('*', async (c, next) => {
   }
 
   const ip = c.req.header('cf-connecting-ip') || 'unknown';
-  const isAuth = c.req.path.startsWith('/auth/');
-  const cache = caches.default;
 
-  const { allowed, remaining, resetAt } = await rateLimit(ip, c.req.path, isAuth, cache);
-  const limit = isAuth ? 10 : 100;
+  const { allowed, remaining, resetAt, limit } = await rateLimit(ip, c.req.path, c.req.method, c.env);
 
   // Add rate limit headers
   const headers = rateLimitHeaders(remaining, resetAt, limit);
   Object.entries(headers).forEach(([k, v]) => c.header(k, v));
 
   if (!allowed) {
+    const retryAfter = resetAt - Math.floor(Date.now() / 1000);
     return c.json({
       error: 'rate_limited',
       message: 'Too many requests. Please try again later.',
-      retryAfter: resetAt - Math.floor(Date.now() / 1000),
+      retryAfter,
     }, 429, {
-      'Retry-After': String(resetAt - Math.floor(Date.now() / 1000)),
+      'Retry-After': String(retryAfter),
     });
   }
 

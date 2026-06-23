@@ -13,3 +13,12 @@ routes = [
 
 [vars]
 APP_URL = "https://app.hamicodeviet.com"
+
+# Durable Objects for globally-consistent rate limiting
+[[durable_objects.bindings]]
+name = "RATE_LIMITER"
+class_name = "RateLimiterDurableObject"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RateLimiterDurableObject"]

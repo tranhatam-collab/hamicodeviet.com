@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { getDb } from '../lib/db';
 import { hashPassword, verifyPassword } from '../lib/password';
 import { signJwt, verifyJwt, hashToken, generateToken } from '../lib/jwt';
-import { sendEmail, verificationEmailHtml, passwordResetEmailHtml } from '../lib/email';
+import { sendEmail, verificationEmailHtml, passwordResetEmailHtml, isEmailEnabled } from '../lib/email';
 
 const auth = new Hono<{ Bindings: Env }>();
 
@@ -101,9 +101,10 @@ auth.post('/signup', async (c) => {
     text: emailText,
   }, c.env);
 
-  // Fallback: log verification token if email fails (for dev/debugging)
+  // SECURITY: Never log verification tokens. Fail closed — if email fails,
+  // user must request resend later. Do NOT expose token in response or logs.
   if (!emailSent) {
-    console.log(`[verify-token-fallback] email=${email} token=${verifyToken} link=${c.env.APP_URL}/verify-email?token=${verifyToken}`);
+    console.error('[email] Verification email delivery failed for user_id:', user.id);
   }
 
   // Create session
@@ -128,6 +129,7 @@ auth.post('/signup', async (c) => {
     },
     token: sessionToken,
     requiresEmailVerification: true,
+    emailSent,
   }, 201);
 });
 
@@ -270,6 +272,11 @@ auth.post('/verify-email', async (c) => {
 
 // POST /auth/forgot-password
 auth.post('/forgot-password', async (c) => {
+  // Fail closed: if email delivery is not configured, return 503
+  if (!isEmailEnabled(c.env)) {
+    return c.json({ error: 'email_service_unavailable', message: 'Password reset is temporarily unavailable. Please contact support.' }, 503);
+  }
+
   const body = await c.req.json();
   const email = (body.email || '').toLowerCase().trim();
   if (!email) return c.json({ error: 'missing_email' }, 400);
@@ -285,6 +292,10 @@ auth.post('/forgot-password', async (c) => {
 
   const resetToken = generateToken();
   const resetTokenHash = await hashToken(resetToken);
+
+  // Invalidate all previous reset tokens for this user (single-use, new invalidates old)
+  await sql`UPDATE password_resets SET used_at = now() WHERE user_id = ${user.id} AND used_at IS NULL`;
+
   await sql`
     INSERT INTO password_resets (user_id, token_hash, expires_at, ip)
     VALUES (${user.id}, ${resetTokenHash}, now() + interval '1 hour', ${c.req.header('cf-connecting-ip') || null})
@@ -301,8 +312,10 @@ auth.post('/forgot-password', async (c) => {
     text: emailText,
   }, c.env);
 
+  // SECURITY: Never log reset tokens. Fail closed — if email fails,
+  // user won't receive reset link. Do NOT expose token in response or logs.
   if (!emailSent) {
-    console.log(`[reset-token-fallback] email=${email} token=${resetToken} link=${c.env.APP_URL}/reset-password?token=${resetToken}`);
+    console.error('[email] Password reset email delivery failed for user_id:', user.id);
   }
 
   return c.json({ success: true });
@@ -338,6 +351,11 @@ auth.post('/reset-password', async (c) => {
 
 // POST /auth/resend-verification
 auth.post('/resend-verification', async (c) => {
+  // Fail closed: if email delivery is not configured, return 503
+  if (!isEmailEnabled(c.env)) {
+    return c.json({ error: 'email_service_unavailable', message: 'Email verification is temporarily unavailable. Please contact support.' }, 503);
+  }
+
   const token = getBearerToken(c);
   if (!token) return c.json({ error: 'unauthorized' }, 401);
 
@@ -354,6 +372,10 @@ auth.post('/resend-verification', async (c) => {
 
   const verifyToken = generateToken();
   const verifyTokenHash = await hashToken(verifyToken);
+
+  // Invalidate all previous verification tokens for this user (single-use, new invalidates old)
+  await sql`UPDATE email_verifications SET used_at = now() WHERE user_id = ${user.id} AND used_at IS NULL`;
+
   await sql`
     INSERT INTO email_verifications (user_id, token_hash, expires_at)
     VALUES (${user.id}, ${verifyTokenHash}, now() + interval '24 hours')
@@ -370,8 +392,10 @@ auth.post('/resend-verification', async (c) => {
     text: emailText,
   }, c.env);
 
+  // SECURITY: Never log verification tokens. Fail closed.
   if (!emailSent) {
-    console.log(`[resend-verify-fallback] email=${user.email} token=${verifyToken} link=${c.env.APP_URL}/verify-email?token=${verifyToken}`);
+    console.error('[email] Resend verification email delivery failed for user_id:', user.id);
+    return c.json({ error: 'email_service_unavailable', message: 'Email delivery is temporarily unavailable. Please try again later.' }, 503);
   }
 
   return c.json({ success: true });

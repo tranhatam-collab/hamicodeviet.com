@@ -4,6 +4,7 @@ interface Env {
   APP_URL: string;
   MAIL_API_KEY: string;
   MAIL_API_WORKSPACE_ID: string;
+  RATE_LIMITER: DurableObjectNamespace;
 }
 
 interface AuthUser {

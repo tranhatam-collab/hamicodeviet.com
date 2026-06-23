@@ -1,6 +1,10 @@
 /**
  * Email sending via mail.iai.one API.
  * Sends transactional emails: verification, password reset, guardian invitation.
+ *
+ * SECURITY: This module never logs tokens, magic links, or PII in error messages.
+ * If email delivery fails, the system fails closed — tokens are not exposed
+ * in API responses or logs. Users must request resend when delivery is restored.
  */
 
 interface EmailParams {
@@ -14,16 +18,24 @@ const MAIL_API_BASE_URL = 'https://api.mail.iai.one/v1';
 const MAIL_SEND_PATHS = ['/send', '/v1/send', '/emails', '/v1/emails'];
 const FROM_EMAIL = 'HaMi Code Việt <noreply@hamicodeviet.com>';
 
+/**
+ * Check if email delivery is enabled and configured.
+ * Returns false if MAIL_API_KEY or MAIL_API_WORKSPACE_ID is missing.
+ */
+export function isEmailEnabled(env: Env): boolean {
+  return !!(env.MAIL_API_KEY?.trim() && env.MAIL_API_WORKSPACE_ID?.trim());
+}
+
 export async function sendEmail(params: EmailParams, env: Env): Promise<boolean> {
   const apiKey = (env.MAIL_API_KEY || '').trim();
   const workspaceId = (env.MAIL_API_WORKSPACE_ID || '').trim();
 
   if (!apiKey) {
-    console.log('[mail] MAIL_API_KEY missing, skipping email to:', params.to);
+    console.error('[mail] MAIL_API_KEY missing — email delivery disabled');
     return false;
   }
   if (!workspaceId) {
-    console.log('[mail] MAIL_API_WORKSPACE_ID missing, skipping email to:', params.to);
+    console.error('[mail] MAIL_API_WORKSPACE_ID missing — email delivery disabled');
     return false;
   }
 
@@ -53,7 +65,7 @@ export async function sendEmail(params: EmailParams, env: Env): Promise<boolean>
       });
 
       if (res.ok) {
-        console.log('[mail] Email sent to:', params.to, 'via', sendPath);
+        console.log('[mail] Email sent successfully via', sendPath);
         return true;
       }
 
@@ -62,17 +74,17 @@ export async function sendEmail(params: EmailParams, env: Env): Promise<boolean>
         continue;
       }
 
-      // Other errors: log and stop
+      // Other errors: log status only (no PII, no token)
       const raw = await res.text().catch(() => 'non-json');
       console.error('[mail] Send failed:', res.status, sendPath, raw.substring(0, 200));
       return false;
     } catch (err) {
-      console.error('[mail] Network error:', sendPath, err);
+      console.error('[mail] Network error:', sendPath);
       // Try next path
     }
   }
 
-  console.error('[mail] All send paths failed for:', params.to);
+  console.error('[mail] All send paths failed');
   return false;
 }
 
