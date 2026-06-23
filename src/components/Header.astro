@@ -1,0 +1,292 @@
+---
+import { nav } from '../data/i18n';
+---
+
+<header class="site-header" role="banner">
+  <div class="container header-inner">
+    <!-- Logo -->
+    <a href="/" class="logo" aria-label="HaMi Code Việt — Trang chủ / Home">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- H + M combined with code bracket -->
+        <rect width="36" height="36" rx="8" fill="#102A43"/>
+        <!-- < bracket left -->
+        <path d="M7 12L3 18L7 24" stroke="#00A8CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- > bracket right -->
+        <path d="M29 12L33 18L29 24" stroke="#00A8CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- H shape -->
+        <path d="M11 11V25M11 18H18M18 11V25" stroke="#F7FAFC" stroke-width="2.2" stroke-linecap="round"/>
+        <!-- M shape -->
+        <path d="M21 25V11L25 19L29 11V25" stroke="#FFC857" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- cursor dot -->
+        <circle cx="18" cy="30" r="2" fill="#20A779"/>
+      </svg>
+      <span class="logo-text">
+        <span class="logo-main">HaMi <span class="code-bracket">&lt;</span>CODE<span class="code-bracket">&gt;</span></span>
+        <span class="logo-sub" data-vi>Việt</span>
+        <span class="logo-sub" data-en>Viet</span>
+      </span>
+    </a>
+
+    <!-- Desktop nav -->
+    <nav class="nav-desktop" aria-label="Main navigation">
+      <ul class="nav-list" role="list">
+        <li><a href="/hoc-mien-phi" class="nav-link"><span data-vi>{nav.freeLearning.vi}</span><span data-en>{nav.freeLearning.en}</span></a></li>
+        <li><a href="/lo-trinh" class="nav-link"><span data-vi>{nav.tracks.vi}</span><span data-en>{nav.tracks.en}</span></a></li>
+        <li><a href="/khoa-hoc" class="nav-link"><span data-vi>{nav.courses.vi}</span><span data-en>{nav.courses.en}</span></a></li>
+        <li><a href="/codelab" class="nav-link"><span data-vi>{nav.codelab.vi}</span><span data-en>{nav.codelab.en}</span></a></li>
+        <li class="nav-dropdown">
+          <button class="nav-link nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true">
+            <span data-vi>Thêm</span><span data-en>More</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <ul class="nav-dropdown-menu" role="list">
+            <li><a href="/du-an" class="nav-link"><span data-vi>{nav.projects.vi}</span><span data-en>{nav.projects.en}</span></a></li>
+            <li><a href="/marketplace" class="nav-link"><span data-vi>{nav.marketplace.vi}</span><span data-en>{nav.marketplace.en}</span></a></li>
+            <li><a href="/phu-huynh" class="nav-link"><span data-vi>{nav.parents.vi}</span><span data-en>{nav.parents.en}</span></a></li>
+            <li><a href="/giao-vien" class="nav-link"><span data-vi>{nav.teachers.vi}</span><span data-en>{nav.teachers.en}</span></a></li>
+            <li><a href="/truong-hoc" class="nav-link"><span data-vi>{nav.schools.vi}</span><span data-en>{nav.schools.en}</span></a></li>
+            <li><a href="/hoc-bong" class="nav-link"><span data-vi>{nav.scholarship.vi}</span><span data-en>{nav.scholarship.en}</span></a></li>
+            <li><a href="/ve-chung-toi" class="nav-link"><span data-vi>{nav.about.vi}</span><span data-en>{nav.about.en}</span></a></li>
+            <li><a href="/an-toan" class="nav-link"><span data-vi>{nav.safety.vi}</span><span data-en>{nav.safety.en}</span></a></li>
+            <li><a href="/lien-he" class="nav-link"><span data-vi>{nav.contact.vi}</span><span data-en>{nav.contact.en}</span></a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Right controls -->
+    <div class="header-controls">
+      <!-- Language toggle -->
+      <div class="lang-toggle" role="group" aria-label="Language / Ngôn ngữ">
+        <button data-lang="vi" aria-label="Tiếng Việt">VI</button>
+        <button data-lang="en" aria-label="English">EN</button>
+      </div>
+
+      <!-- CTA -->
+      <a href="/danh-gia-dau-vao" class="btn btn--primary btn--sm">
+        <span data-vi>Bắt đầu</span>
+        <span data-en>Get started</span>
+      </a>
+
+      <!-- Mobile toggle -->
+      <button
+        class="nav-mobile-toggle"
+        aria-label="Mở menu / Open menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="mobile-menu" hidden aria-label="Mobile navigation">
+    <nav>
+      <ul class="mobile-nav-list" role="list">
+        <li><a href="/hoc-mien-phi"><span data-vi>{nav.freeLearning.vi}</span><span data-en>{nav.freeLearning.en}</span></a></li>
+        <li><a href="/lo-trinh"><span data-vi>{nav.tracks.vi}</span><span data-en>{nav.tracks.en}</span></a></li>
+        <li><a href="/khoa-hoc"><span data-vi>{nav.courses.vi}</span><span data-en>{nav.courses.en}</span></a></li>
+        <li><a href="/codelab"><span data-vi>{nav.codelab.vi}</span><span data-en>{nav.codelab.en}</span></a></li>
+        <li><a href="/du-an"><span data-vi>{nav.projects.vi}</span><span data-en>{nav.projects.en}</span></a></li>
+        <li><a href="/marketplace"><span data-vi>{nav.marketplace.vi}</span><span data-en>{nav.marketplace.en}</span></a></li>
+        <li><a href="/phu-huynh"><span data-vi>{nav.parents.vi}</span><span data-en>{nav.parents.en}</span></a></li>
+        <li><a href="/giao-vien"><span data-vi>{nav.teachers.vi}</span><span data-en>{nav.teachers.en}</span></a></li>
+        <li><a href="/truong-hoc"><span data-vi>{nav.schools.vi}</span><span data-en>{nav.schools.en}</span></a></li>
+        <li><a href="/hoc-bong"><span data-vi>{nav.scholarship.vi}</span><span data-en>{nav.scholarship.en}</span></a></li>
+        <li><a href="/ve-chung-toi"><span data-vi>{nav.about.vi}</span><span data-en>{nav.about.en}</span></a></li>
+        <li><a href="/an-toan"><span data-vi>{nav.safety.vi}</span><span data-en>{nav.safety.en}</span></a></li>
+        <li><a href="/lien-he"><span data-vi>{nav.contact.vi}</span><span data-en>{nav.contact.en}</span></a></li>
+        <li class="mobile-cta">
+          <a href="/danh-gia-dau-vao" class="btn btn--primary">
+            <span data-vi>Bắt đầu miễn phí</span>
+            <span data-en>Start free</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(8, 24, 38, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 168, 204, 0.15);
+    height: var(--header-height);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    height: 100%;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25em;
+    line-height: 1;
+  }
+
+  .logo-main {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #F7FAFC;
+    letter-spacing: -0.01em;
+  }
+
+  .logo-main .code-bracket { color: #00A8CC; }
+
+  .logo-sub {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #FFC857;
+  }
+
+  .nav-desktop { flex: 1; }
+
+  .nav-list {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    list-style: none;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    padding: 0.4em 0.75em;
+    border-radius: var(--radius-full);
+    color: rgba(247, 250, 252, 0.8);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .nav-link:hover,
+  .nav-link[aria-current="page"] {
+    color: #F7FAFC;
+    background: rgba(0, 168, 204, 0.12);
+  }
+
+  .nav-dropdown { position: relative; }
+
+  .nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: #102A43;
+    border: 1px solid rgba(0, 168, 204, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--space-sm);
+    list-style: none;
+    min-width: 200px;
+    box-shadow: var(--shadow-lg);
+    z-index: 200;
+  }
+
+  .nav-dropdown:hover .nav-dropdown-menu,
+  .nav-dropdown:focus-within .nav-dropdown-menu {
+    display: block;
+  }
+
+  .nav-dropdown-menu .nav-link {
+    display: block;
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+  }
+
+  .header-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  /* Mobile menu */
+  .mobile-menu {
+    background: #102A43;
+    border-top: 1px solid rgba(0, 168, 204, 0.15);
+    padding: var(--space-md) 0 var(--space-lg);
+    position: absolute;
+    width: 100%;
+    top: var(--header-height);
+    left: 0;
+  }
+
+  .mobile-menu[hidden] { display: none; }
+
+  .mobile-nav-list {
+    list-style: none;
+    padding: 0 var(--space-lg);
+  }
+
+  .mobile-nav-list a {
+    display: block;
+    padding: var(--space-md) 0;
+    color: rgba(247, 250, 252, 0.85);
+    font-weight: 500;
+    border-bottom: 1px solid rgba(247, 250, 252, 0.08);
+    text-decoration: none;
+  }
+
+  .mobile-nav-list a:hover { color: #00A8CC; }
+
+  .mobile-cta {
+    padding-top: var(--space-lg) !important;
+    border-bottom: none !important;
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector('.nav-mobile-toggle') as HTMLButtonElement;
+  const menu = document.getElementById('mobile-menu') as HTMLElement;
+
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!open));
+    menu.hidden = open;
+  });
+
+  // Dropdown keyboard accessibility
+  document.querySelectorAll('.nav-dropdown-trigger').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+    });
+  });
+
+  // Highlight active nav
+  const current = window.location.pathname;
+  document.querySelectorAll('.nav-link, .mobile-nav-list a').forEach((link) => {
+    const href = (link as HTMLAnchorElement).getAttribute('href');
+    if (href && (current === href || (href !== '/' && current.startsWith(href)))) {
+      link.setAttribute('aria-current', 'page');
+    }
+  });
+</script>

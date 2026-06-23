@@ -1,0 +1,257 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { lessons } from '../../data/lessons';
+import { tracks } from '../../data/tracks';
+import { ui } from '../../data/i18n';
+import type { Lesson } from '../../data/lessons';
+
+const title = '30 Bài học miễn phí / 30 Free lessons';
+const description =
+  '30 bài học lập trình, công nghệ và AI song ngữ Việt–Anh hoàn toàn miễn phí. Lọc theo lộ trình và bắt đầu học ngay.';
+
+function truncate(text: string, max = 120): string {
+  if (text.length <= max) return text;
+  const trimmed = text.slice(0, max);
+  const lastSpace = trimmed.lastIndexOf(' ');
+  return trimmed.slice(0, lastSpace > 0 ? lastSpace : max) + '…';
+}
+
+const lessonCards: (Lesson & { shortDesc: { vi: string; en: string } })[] = lessons.map((lesson) => ({
+  ...lesson,
+  shortDesc: {
+    vi: truncate(lesson.description.vi, 120),
+    en: truncate(lesson.description.en, 120),
+  },
+}));
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="hero hero--compact" aria-labelledby="free-lessons-title">
+    <div class="container">
+      <div class="hero-content text-center">
+        <p class="eyebrow" style="color:#FFC857">
+          <span data-vi>Học miễn phí</span>
+          <span data-en>Free learning</span>
+        </p>
+        <h1 id="free-lessons-title">
+          <span data-vi>30 Bài học miễn phí</span>
+          <span data-en>30 Free lessons</span>
+        </h1>
+        <p class="hero-sub hero-sub--center">
+          <span data-vi>
+            Bắt đầu từ Scratch, HTML/CSS, JavaScript, Python đến AI, SaaS và startup — hoàn toàn miễn phí, song ngữ Việt–Anh.
+          </span>
+          <span data-en>
+            Start from Scratch, HTML/CSS, JavaScript, Python all the way to AI, SaaS, and startup — completely free, bilingual Viet–English.
+          </span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="lessons-list-title">
+    <div class="container">
+      <h2 id="lessons-list-title" class="sr-only">
+        <span data-vi>Danh sách bài học</span>
+        <span data-en>Lesson list</span>
+      </h2>
+
+      <div class="filter-bar" role="group" aria-label="Lọc theo lộ trình / Filter by track">
+        <button class="filter-btn active" data-track="all" type="button" aria-pressed="true">
+          <span data-vi>Tất cả</span>
+          <span data-en>All</span>
+        </button>
+        {tracks.map((track) => (
+          <button class="filter-btn" data-track={track.id} type="button" aria-pressed="false">
+            <span data-vi>{track.name.vi}</span>
+            <span data-en>{track.name.en}</span>
+          </button>
+        ))}
+      </div>
+
+      <div class="lessons-grid">
+        {lessonCards.map((lesson) => (
+          <a href={`/bai-hoc/${lesson.slug}`} class="card lesson-card" data-track={lesson.trackId}>
+            <div class="lesson-card-meta">
+              <span class="badge badge--blue">
+                <span data-vi>{ui.lessonNumber.vi} {lesson.number}</span>
+                <span data-en>{ui.lessonNumber.en} {lesson.number}</span>
+              </span>
+              <span class="badge badge--navy">{lesson.duration} <span data-vi>phút</span><span data-en>min</span></span>
+            </div>
+            <h3 class="lesson-card-title">
+              <span data-vi>{lesson.title.vi}</span>
+              <span data-en>{lesson.title.en}</span>
+            </h3>
+            <p class="lesson-card-desc">
+              <span data-vi>{lesson.shortDesc.vi}</span>
+              <span data-en>{lesson.shortDesc.en}</span>
+            </p>
+            <div class="lesson-card-tags">
+              {lesson.tags.map((tag) => (
+                <span class="badge badge--navy">{tag}</span>
+              ))}
+            </div>
+            <div class="lesson-card-footer">
+              <span class="badge badge--green">
+                <span data-vi>{ui.free.vi}</span>
+                <span data-en>{ui.free.en}</span>
+              </span>
+              <span class="badge badge--navy">{lesson.level}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    (function () {
+      function setupFilters() {
+        const buttons = document.querySelectorAll('.filter-btn');
+        const cards = document.querySelectorAll('.lesson-card');
+
+        buttons.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const filter = btn.getAttribute('data-track');
+
+            buttons.forEach((b) => {
+              b.classList.remove('active');
+              b.setAttribute('aria-pressed', 'false');
+            });
+            btn.classList.add('active');
+            btn.setAttribute('aria-pressed', 'true');
+
+            cards.forEach((card) => {
+              const cardTrack = card.getAttribute('data-track');
+              if (!filter || filter === 'all' || cardTrack === filter) {
+                card.classList.remove('hidden');
+              } else {
+                card.classList.add('hidden');
+              }
+            });
+          });
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupFilters);
+      } else {
+        setupFilters();
+      }
+    })();
+  </script>
+</BaseLayout>
+
+<style>
+  .hero--compact {
+    padding: var(--space-2xl) 0;
+  }
+
+  .hero-sub--center {
+    max-width: 640px;
+    margin: var(--space-lg) auto 0;
+  }
+
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
+  }
+
+  .filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .filter-btn:hover {
+    border-color: var(--color-tech-blue);
+    color: var(--color-tech-blue);
+  }
+
+  .filter-btn.active {
+    background: var(--color-tech-blue);
+    border-color: var(--color-tech-blue);
+    color: white;
+  }
+
+  .lessons-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+
+  @media (max-width: 900px) {
+    .lessons-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 600px) {
+    .lessons-grid { grid-template-columns: 1fr; }
+  }
+
+  .lesson-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    text-decoration: none;
+    color: var(--color-text);
+  }
+
+  .lesson-card.hidden { display: none; }
+
+  .lesson-card-meta {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .lesson-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .lesson-card-desc {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    flex: 1;
+    margin: 0;
+  }
+
+  .lesson-card-tags {
+    display: flex;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+  }
+
+  .lesson-card-footer {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: auto;
+    flex-wrap: wrap;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

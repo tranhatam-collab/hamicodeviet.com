@@ -1,0 +1,28 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="HaMi Code Việt — App">
+  <div class="auth-container">
+    <div class="auth-card" style="text-align:center">
+      <div class="auth-logo">
+        <a href="/">HaMi <span class="code">&lt;CODE&gt;</span> Việt</a>
+      </div>
+      <h1 class="auth-title">Nền tảng học tập</h1>
+      <p class="auth-subtitle">Học ngôn ngữ. Học lập trình. Làm ra sản phẩm thật.</p>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:24px">
+        <a href="/login" class="btn btn--primary btn--block btn--lg">Đăng nhập</a>
+        <a href="/signup" class="btn btn--secondary btn--block btn--lg">Tạo tài khoản mới</a>
+        <a href="https://hamicodeviet.com" class="btn btn--secondary btn--block">← Về trang chủ</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser } from '../lib/api';
+    const user = await getCurrentUser();
+    if (user) {
+      window.location.href = '/dashboard';
+    }
+  </script>
+</AppLayout>

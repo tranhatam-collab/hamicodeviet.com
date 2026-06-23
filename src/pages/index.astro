@@ -1,0 +1,711 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { tracks } from '../data/tracks';
+import { products } from '../data/products';
+import { lessons } from '../data/lessons';
+---
+
+<BaseLayout
+  title="HaMi Code Việt — Học ngôn ngữ. Học lập trình. Làm ra sản phẩm thật."
+  description="Nền tảng giáo dục công nghệ song ngữ Việt–Anh dành cho người học 8–24 tuổi. Học lập trình, xây sản phẩm thật, xác minh năng lực."
+>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-content">
+          <p class="eyebrow" style="color:#FFC857">
+            <span data-vi>🇻🇳 Nền tảng giáo dục công nghệ song ngữ</span>
+            <span data-en>🇻🇳 Bilingual technology education platform</span>
+          </p>
+          <h1 id="hero-heading">
+            <span data-vi>Học ngôn ngữ.<br/>Học lập trình.<br/><span style="color:#00A8CC">Làm ra sản phẩm thật.</span></span>
+            <span data-en>Learn languages.<br/>Learn to code.<br/><span style="color:#00A8CC">Build real products.</span></span>
+          </h1>
+          <p class="hero-sub">
+            <span data-vi>HaMi Code Việt giúp người học 8–24 tuổi tiếp cận lập trình, tiếng Anh và AI — rồi tạo ra sản phẩm số có thể nhìn thấy, sử dụng và kiểm chứng.</span>
+            <span data-en>HaMi Code Viet helps learners aged 8–24 access coding, English, and AI — then build digital products that are visible, usable, and verifiable.</span>
+          </p>
+          <div class="hero-actions">
+            <a href="/danh-gia-dau-vao" class="btn btn--primary btn--lg">
+              <span data-vi>Bắt đầu miễn phí</span>
+              <span data-en>Start learning free</span>
+            </a>
+            <a href="/lo-trinh" class="btn btn--secondary btn--lg" style="border-color:rgba(0,168,204,0.5);color:#F7FAFC">
+              <span data-vi>Khám phá lộ trình</span>
+              <span data-en>Explore tracks</span>
+            </a>
+          </div>
+          <div class="hero-stats" aria-label="Thống kê / Statistics">
+            <div class="hero-stat">
+              <span class="hero-stat-num">30</span>
+              <span class="hero-stat-label" data-vi>bài học miễn phí</span>
+              <span class="hero-stat-label" data-en>free lessons</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-num">5</span>
+              <span class="hero-stat-label" data-vi>lộ trình theo tuổi</span>
+              <span class="hero-stat-label" data-en>age-based tracks</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-num">8–24</span>
+              <span class="hero-stat-label" data-vi>tuổi</span>
+              <span class="hero-stat-label" data-en>years old</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-num">0đ</span>
+              <span class="hero-stat-label" data-vi>để bắt đầu</span>
+              <span class="hero-stat-label" data-en>to get started</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="code-window">
+            <div class="code-window-bar">
+              <span class="dot dot--red"></span>
+              <span class="dot dot--yellow"></span>
+              <span class="dot dot--green"></span>
+              <span class="window-title">hamicodeviet.py</span>
+            </div>
+            <pre class="code-window-body"><code><span class="c-comment"># Bài học 13 — Python / Lesson 13</span>
+<span class="c-keyword">def</span> <span class="c-fn">gioi_thieu</span>(ten, tuoi):
+    <span class="c-string">"""Giới thiệu bản thân"""</span>
+    <span class="c-keyword">return</span> <span class="c-string">f"Xin chào! Tôi là {'{'}ten{'}'}, {'{'}tuoi{'}'} tuổi."</span>
+
+<span class="c-comment"># Build your first product!</span>
+san_pham = gioi_thieu(<span class="c-string">"Hà Mi"</span>, <span class="c-num">16</span>)
+<span class="c-fn">print</span>(san_pham)
+<span class="c-comment"># → Xin chào! Tôi là Hà Mi, 16 tuổi.</span>
+</code></pre>
+          </div>
+          <div class="hero-product-badge">
+            <span class="badge badge--green" style="font-size:0.9rem;padding:0.5em 1em">
+              <span data-vi>✓ Sản phẩm đầu tiên hoàn thành!</span>
+              <span data-en>✓ First product done!</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BIG IDEA ===== -->
+  <section class="section section--dark" aria-labelledby="bigidea-heading">
+    <div class="container text-center">
+      <p class="eyebrow" style="color:#FFC857;margin-bottom:var(--space-md)">
+        <span data-vi>Mục tiêu chiến dịch</span>
+        <span data-en>Campaign goal</span>
+      </p>
+      <h2 id="bigidea-heading" style="font-size:clamp(2rem,5vw,3.5rem);color:#F7FAFC;letter-spacing:-0.02em">
+        <span data-vi>MỖI NGƯỜI HỌC —<br/><span style="color:#00A8CC">MỘT SẢN PHẨM THẬT</span></span>
+        <span data-en>EVERY LEARNER —<br/><span style="color:#00A8CC">ONE REAL PRODUCT</span></span>
+      </h2>
+      <p style="color:rgba(247,250,252,0.75);font-size:1.15rem;max-width:640px;margin:var(--space-xl) auto 0">
+        <span data-vi>Không tính điểm thi. Không chứng nhận vô nghĩa. Bằng chứng duy nhất là sản phẩm bạn tự tay xây.</span>
+        <span data-en>No exam points. No empty certificates. The only evidence is the product you built yourself.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== 5 AGE TRACKS ===== -->
+  <section class="section" aria-labelledby="tracks-heading">
+    <div class="container">
+      <div class="section-header text-center">
+        <p class="eyebrow">
+          <span data-vi>5 lộ trình theo độ tuổi</span>
+          <span data-en>5 age-based tracks</span>
+        </p>
+        <h2 id="tracks-heading">
+          <span data-vi>Học đúng cấp độ của bạn</span>
+          <span data-en>Learn at your level</span>
+        </h2>
+        <p class="section-desc">
+          <span data-vi>Hệ thống không chỉ phân lớp theo tuổi — còn đánh giá trình độ ngôn ngữ, tư duy logic, kinh nghiệm lập trình và mục tiêu học.</span>
+          <span data-en>The system doesn't just group by age — it also assesses language level, logical thinking, coding experience, and learning goals.</span>
+        </p>
+      </div>
+      <div class="tracks-grid">
+        {tracks.map((track) => (
+          <a href={`/lo-trinh/${track.slug}`} class="track-card" style={`--track-color: ${track.color}`}>
+            <div class="track-age">{track.ageRange} <span data-vi>tuổi</span><span data-en>yrs</span></div>
+            <div class="track-icon" aria-hidden="true">{track.icon}</div>
+            <h3 class="track-name">{track.name.vi}</h3>
+            <p class="track-focus">
+              <span data-vi>{track.focus.vi}</span>
+              <span data-en>{track.focus.en}</span>
+            </p>
+            <div class="track-outcomes">
+              {track.outcomes.slice(0, 2).map(o => (
+                <div class="track-outcome">
+                  <span class="track-outcome-dot" aria-hidden="true">→</span>
+                  <span data-vi>{o.vi}</span>
+                  <span data-en>{o.en}</span>
+                </div>
+              ))}
+            </div>
+            <span class="track-cta" aria-hidden="true">
+              <span data-vi>Xem lộ trình →</span>
+              <span data-en>View track →</span>
+            </span>
+          </a>
+        ))}
+      </div>
+      <div class="text-center mt-xl">
+        <a href="/danh-gia-dau-vao" class="btn btn--accent btn--lg">
+          <span data-vi>Làm bài đánh giá để nhận lộ trình phù hợp</span>
+          <span data-en>Take the assessment to get your recommended track</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FREE LESSONS PREVIEW ===== -->
+  <section class="section section--alt" aria-labelledby="lessons-heading">
+    <div class="container">
+      <div class="section-header text-center">
+        <p class="eyebrow">
+          <span data-vi>30 bài học miễn phí</span>
+          <span data-en>30 free lessons</span>
+        </p>
+        <h2 id="lessons-heading">
+          <span data-vi>Bắt đầu học ngay hôm nay</span>
+          <span data-en>Start learning today</span>
+        </h2>
+      </div>
+      <div class="grid grid--3">
+        {lessons.slice(0, 6).map((lesson) => (
+          <a href={`/bai-hoc/${lesson.slug}`} class="card lesson-card">
+            <div class="lesson-card-meta">
+              <span class="badge badge--blue">
+                <span data-vi>Bài {lesson.number}</span>
+                <span data-en>Lesson {lesson.number}</span>
+              </span>
+              <span class="badge badge--navy">{lesson.duration} <span data-vi>phút</span><span data-en>min</span></span>
+            </div>
+            <h3 class="lesson-card-title">
+              <span data-vi>{lesson.title.vi}</span>
+              <span data-en>{lesson.title.en}</span>
+            </h3>
+            <p class="lesson-card-desc">
+              <span data-vi>{lesson.description.vi}</span>
+              <span data-en>{lesson.description.en}</span>
+            </p>
+            <div class="lesson-card-footer">
+              <span class="badge badge--green">
+                <span data-vi>Miễn phí</span>
+                <span data-en>Free</span>
+              </span>
+              {lesson.codeLanguage && <span class="badge badge--navy">{lesson.codeLanguage}</span>}
+            </div>
+          </a>
+        ))}
+      </div>
+      <div class="text-center mt-xl">
+        <a href="/hoc-mien-phi" class="btn btn--primary btn--lg">
+          <span data-vi>Xem tất cả 30 bài học miễn phí</span>
+          <span data-en>View all 30 free lessons</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 8 PRODUCTS ===== -->
+  <section class="section" aria-labelledby="products-heading">
+    <div class="container">
+      <div class="section-header text-center">
+        <p class="eyebrow">
+          <span data-vi>Hệ sinh thái sản phẩm</span>
+          <span data-en>Product ecosystem</span>
+        </p>
+        <h2 id="products-heading">
+          <span data-vi>Một hệ thống hoàn chỉnh từ học đến thương mại hóa</span>
+          <span data-en>A complete system from learning to commercialization</span>
+        </h2>
+        <p class="section-desc">
+          <span data-vi>Từ bài học miễn phí đến học viện trả phí, phòng thực hành, studio sáng tạo, marketplace và hồ sơ năng lực.</span>
+          <span data-en>From free lessons to paid academy, code lab, creative studio, marketplace, and skill portfolio.</span>
+        </p>
+      </div>
+      <div class="grid grid--4">
+        {products.map((product) => (
+          <div class="card product-card">
+            <div class="product-icon" aria-hidden="true">{product.icon}</div>
+            <div class="product-status">
+              {product.status === 'live' && (
+                <span class="badge badge--green" data-vi>Đang hoạt động</span>
+              )}
+              {product.status === 'live' && (
+                <span class="badge badge--green" data-en>Live</span>
+              )}
+              {product.status === 'pilot' && (
+                <span class="badge badge--yellow" data-vi>Thử nghiệm</span>
+              )}
+              {product.status === 'pilot' && (
+                <span class="badge badge--yellow" data-en>Pilot</span>
+              )}
+              {product.status === 'coming-soon' && (
+                <span class="badge badge--navy" data-vi>Sắp ra mắt</span>
+              )}
+              {product.status === 'coming-soon' && (
+                <span class="badge badge--navy" data-en>Coming soon</span>
+              )}
+            </div>
+            <h3 class="product-name">{product.name}</h3>
+            <p class="product-tagline">
+              <span data-vi>{product.tagline.vi}</span>
+              <span data-en>{product.tagline.en}</span>
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOR WHOM ===== -->
+  <section class="section section--dark" aria-labelledby="audience-heading">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2 id="audience-heading" style="color:#F7FAFC">
+          <span data-vi>HaMi Code Việt dành cho ai?</span>
+          <span data-en>Who is HaMi Code Viet for?</span>
+        </h2>
+      </div>
+      <div class="grid grid--4">
+        <div class="audience-card">
+          <div class="audience-icon" aria-hidden="true">👧</div>
+          <h3 data-vi>Trẻ em & học sinh</h3>
+          <h3 data-en>Kids & students</h3>
+          <p>
+            <span data-vi>Em không chỉ chơi game. Em có thể tạo ra game của mình.</span>
+            <span data-en>You don't just play games. You can build your own.</span>
+          </p>
+        </div>
+        <div class="audience-card">
+          <div class="audience-icon" aria-hidden="true">🧑‍💻</div>
+          <h3 data-vi>Sinh viên & người trẻ</h3>
+          <h3 data-en>Students & youth</h3>
+          <p>
+            <span data-vi>Đừng chỉ học công cụ. Hãy xây sản phẩm có thể chứng minh năng lực.</span>
+            <span data-en>Don't just learn tools. Build products that prove your skills.</span>
+          </p>
+        </div>
+        <div class="audience-card">
+          <div class="audience-icon" aria-hidden="true">👨‍👩‍👧</div>
+          <h3 data-vi>Phụ huynh</h3>
+          <h3 data-en>Parents</h3>
+          <p>
+            <span data-vi>Con học công nghệ để chuyển từ tiêu thụ sang sáng tạo.</span>
+            <span data-en>Your child learns tech to move from consuming to creating.</span>
+          </p>
+        </div>
+        <div class="audience-card">
+          <div class="audience-icon" aria-hidden="true">🏫</div>
+          <h3 data-vi>Giáo viên & trường học</h3>
+          <h3 data-en>Teachers & schools</h3>
+          <p>
+            <span data-vi>Học liệu, CodeLab, AI hỗ trợ và hệ thống đánh giá có kiểm soát.</span>
+            <span data-en>Content, CodeLab, AI support, and a controlled assessment system.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VALUE CHAIN ===== -->
+  <section class="section section--alt" aria-labelledby="chain-heading">
+    <div class="container">
+      <div class="section-header text-center">
+        <p class="eyebrow">
+          <span data-vi>Chuỗi giá trị cốt lõi</span>
+          <span data-en>Core value chain</span>
+        </p>
+        <h2 id="chain-heading">
+          <span data-vi>Từ khám phá đến thương mại hóa</span>
+          <span data-en>From discovery to commercialization</span>
+        </h2>
+      </div>
+      <div class="chain" role="list" aria-label="Value chain steps">
+        {[
+          { vi: 'Khám phá', en: 'Discover' },
+          { vi: 'Học', en: 'Learn' },
+          { vi: 'Thực hành', en: 'Practice' },
+          { vi: 'Tạo sản phẩm', en: 'Create' },
+          { vi: 'Đánh giá', en: 'Assess' },
+          { vi: 'Xác minh', en: 'Verify' },
+          { vi: 'Xuất bản', en: 'Publish' },
+          { vi: 'Thương mại hóa', en: 'Monetize' },
+        ].map((step, i) => (
+          <div class="chain-step" role="listitem">
+            <div class="chain-num">{i + 1}</div>
+            <div class="chain-label">
+              <span data-vi>{step.vi}</span>
+              <span data-en>{step.en}</span>
+            </div>
+            {i < 7 && <div class="chain-arrow" aria-hidden="true">→</div>}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="section" style="background:linear-gradient(135deg,#081826 0%,#102A43 100%)" aria-labelledby="cta-heading">
+    <div class="container text-center">
+      <h2 id="cta-heading" style="color:#F7FAFC">
+        <span data-vi>Sẵn sàng tạo sản phẩm đầu tiên?</span>
+        <span data-en>Ready to build your first product?</span>
+      </h2>
+      <p style="color:rgba(247,250,252,0.75);font-size:1.1rem;margin:var(--space-lg) 0 var(--space-xl)">
+        <span data-vi>Làm bài đánh giá đầu vào để nhận lộ trình phù hợp với bạn — miễn phí, không cần tài khoản.</span>
+        <span data-en>Take the intake assessment to get your personalized track — free, no account needed.</span>
+      </p>
+      <div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap">
+        <a href="/danh-gia-dau-vao" class="btn btn--accent btn--lg">
+          <span data-vi>Làm bài đánh giá ngay</span>
+          <span data-en>Take the assessment now</span>
+        </a>
+        <a href="/hoc-mien-phi" class="btn btn--secondary btn--lg" style="border-color:rgba(0,168,204,0.5);color:#F7FAFC">
+          <span data-vi>Xem bài học miễn phí</span>
+          <span data-en>Browse free lessons</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2xl);
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: rgba(247, 250, 252, 0.8);
+    margin: var(--space-lg) 0;
+    max-width: 520px;
+    line-height: 1.7;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-xl);
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: var(--space-xl);
+    flex-wrap: wrap;
+  }
+
+  .hero-stat { text-align: center; }
+
+  .hero-stat-num {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #00A8CC;
+    line-height: 1;
+  }
+
+  .hero-stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(247, 250, 252, 0.6);
+    margin-top: 0.25em;
+  }
+
+  /* Code window */
+  .code-window {
+    background: #0D1F2D;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(0, 168, 204, 0.2);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg), 0 0 40px rgba(0, 168, 204, 0.08);
+  }
+
+  .code-window-bar {
+    background: #1A3048;
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot--red { background: #FF5F57; }
+  .dot--yellow { background: #FEBC2E; }
+  .dot--green { background: #28C840; }
+
+  .window-title {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: rgba(247, 250, 252, 0.4);
+    font-family: var(--font-mono);
+  }
+
+  .code-window-body {
+    padding: var(--space-lg);
+    font-size: 0.88rem;
+    background: transparent;
+    color: #E2E8F0;
+    line-height: 1.7;
+  }
+
+  .c-comment { color: #486581; }
+  .c-keyword { color: #00A8CC; }
+  .c-fn { color: #FFC857; }
+  .c-string { color: #20A779; }
+  .c-num { color: #FF9F43; }
+
+  .hero-product-badge {
+    text-align: center;
+    margin-top: var(--space-md);
+  }
+
+  /* Section headers */
+  .section-header {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .section-header h2 { margin: var(--space-sm) 0 var(--space-md); }
+
+  .section-desc {
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Tracks */
+  .tracks-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-md);
+  }
+
+  @media (max-width: 1100px) {
+    .tracks-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 700px) {
+    .tracks-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 460px) {
+    .tracks-grid { grid-template-columns: 1fr; }
+  }
+
+  .track-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .track-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--track-color, var(--color-tech-blue));
+  }
+
+  .track-card:hover {
+    border-color: var(--track-color, var(--color-tech-blue));
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .track-age {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .track-icon {
+    font-size: 1.75rem;
+    margin: var(--space-xs) 0;
+  }
+
+  .track-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-navy);
+  }
+
+  .track-focus {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .track-outcomes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: auto;
+  }
+
+  .track-outcome {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    display: flex;
+    gap: 0.3em;
+  }
+
+  .track-outcome-dot { color: var(--track-color); }
+
+  .track-cta {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-tech-blue);
+    margin-top: var(--space-sm);
+  }
+
+  /* Lesson cards */
+  .lesson-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    text-decoration: none;
+    color: var(--color-text);
+  }
+
+  .lesson-card-meta {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .lesson-card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .lesson-card-desc {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    flex: 1;
+    margin: 0;
+  }
+
+  .lesson-card-footer {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: auto;
+    flex-wrap: wrap;
+  }
+
+  /* Products */
+  .product-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    text-align: center;
+  }
+
+  .product-icon { font-size: 2.5rem; margin-bottom: var(--space-xs); }
+  .product-status { display: flex; justify-content: center; }
+  .product-name { font-size: 1rem; font-weight: 700; }
+
+  .product-tagline {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* Audience */
+  .audience-card {
+    background: rgba(247, 250, 252, 0.06);
+    border: 1px solid rgba(0, 168, 204, 0.12);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+  }
+
+  .audience-icon { font-size: 2.5rem; margin-bottom: var(--space-md); }
+
+  .audience-card h3 {
+    color: #F7FAFC;
+    font-size: 1.1rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .audience-card p {
+    color: rgba(247, 250, 252, 0.7);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  /* Value chain */
+  .chain {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: center;
+  }
+
+  .chain-step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .chain-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-tech-blue);
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .chain-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-navy);
+    white-space: nowrap;
+  }
+
+  .chain-arrow {
+    color: var(--color-text-muted);
+    font-size: 1.2rem;
+    margin-left: var(--space-sm);
+  }
+
+  @media (max-width: 600px) {
+    .chain { flex-direction: column; align-items: flex-start; }
+    .chain-arrow { display: none; }
+  }
+</style>

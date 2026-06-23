@@ -1,0 +1,177 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Liên hệ / Contact"
+  description="Liên hệ với HaMi Code Việt — hỗ trợ học viên, phụ huynh, trường học và báo cáo an toàn."
+>
+
+<section style="background:linear-gradient(135deg,#081826 0%,#102A43 100%);color:#F7FAFC;padding:4rem 0" aria-labelledby="contact-hero">
+  <div class="container text-center">
+    <h1 id="contact-hero" style="color:#F7FAFC">
+      <span data-vi>Liên hệ với chúng tôi</span>
+      <span data-en>Contact us</span>
+    </h1>
+    <p style="color:rgba(247,250,252,0.8);font-size:1.05rem;max-width:520px;margin:1rem auto 0">
+      <span data-vi>Chúng tôi sẵn sàng hỗ trợ học viên, phụ huynh, giáo viên và trường học.</span>
+      <span data-en>We are ready to support learners, parents, teachers, and schools.</span>
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="contact-channels">
+      <div class="channel-card">
+        <div class="channel-icon">📚</div>
+        <h2>
+          <span data-vi>Học viên &amp; Phụ huynh</span>
+          <span data-en>Learners &amp; Parents</span>
+        </h2>
+        <p>
+          <span data-vi>Câu hỏi về khóa học, lộ trình, tài khoản con và nội dung học tập.</span>
+          <span data-en>Questions about courses, tracks, child accounts, and learning content.</span>
+        </p>
+        <a href="mailto:learn@hamicodeviet.com" class="btn btn--primary">learn@hamicodeviet.com</a>
+      </div>
+      <div class="channel-card">
+        <div class="channel-icon">🏫</div>
+        <h2>
+          <span data-vi>Trường học &amp; Giáo viên</span>
+          <span data-en>Schools &amp; Teachers</span>
+        </h2>
+        <p>
+          <span data-vi>Câu hỏi về school license, teacher account, lesson plan và tích hợp LMS.</span>
+          <span data-en>Questions about school licenses, teacher accounts, lesson plans, and LMS integration.</span>
+        </p>
+        <a href="mailto:schools@hamicodeviet.com" class="btn btn--primary">schools@hamicodeviet.com</a>
+      </div>
+      <div class="channel-card">
+        <div class="channel-icon">🛡️</div>
+        <h2>
+          <span data-vi>Báo cáo an toàn</span>
+          <span data-en>Safety reports</span>
+        </h2>
+        <p>
+          <span data-vi>Nội dung không phù hợp, vi phạm bảo mật hoặc sự cố liên quan đến trẻ em.</span>
+          <span data-en>Inappropriate content, security vulnerabilities, or incidents involving children.</span>
+        </p>
+        <a href="mailto:safety@hamicodeviet.com" class="btn btn--primary">safety@hamicodeviet.com</a>
+      </div>
+    </div>
+
+    <div class="contact-form-wrapper">
+      <h2 class="text-center">
+        <span data-vi>Gửi tin nhắn</span>
+        <span data-en>Send a message</span>
+      </h2>
+      <p class="text-center text-muted" style="margin-bottom:2rem">
+        <span data-vi>Tính năng gửi form sẽ được kích hoạt sau khi hệ thống backend hoàn thiện.</span>
+        <span data-en>Form submission will be enabled after the backend system is ready.</span>
+      </p>
+      <form class="contact-form" action="" method="POST" aria-label="Contact form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">
+              <span data-vi>Họ và tên</span>
+              <span data-en>Full name</span>
+            </label>
+            <input type="text" id="name" name="name" autocomplete="name" placeholder="Nguyễn Văn A" disabled />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" autocomplete="email" placeholder="email@example.com" disabled />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="subject">
+            <span data-vi>Chủ đề</span>
+            <span data-en>Subject</span>
+          </label>
+          <select id="subject" name="subject" disabled>
+            <option value="" data-vi>Chọn chủ đề...</option>
+            <option value="" data-en>Select subject...</option>
+            <option value="learn" data-vi>Câu hỏi về khóa học</option>
+            <option value="learn" data-en>Course question</option>
+            <option value="school" data-vi>Trường học / Giáo viên</option>
+            <option value="school" data-en>School / Teacher</option>
+            <option value="safety" data-vi>Báo cáo an toàn</option>
+            <option value="safety" data-en>Safety report</option>
+            <option value="other" data-vi>Khác</option>
+            <option value="other" data-en>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">
+            <span data-vi>Nội dung</span>
+            <span data-en>Message</span>
+          </label>
+          <textarea id="message" name="message" rows="5" placeholder="..." disabled></textarea>
+        </div>
+        <button type="submit" class="btn btn--primary" disabled>
+          <span data-vi>Gửi tin nhắn</span>
+          <span data-en>Send message</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+</BaseLayout>
+
+<style>
+  .contact-channels {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+  @media (max-width: 800px) { .contact-channels { grid-template-columns: 1fr; } }
+  .channel-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+  .channel-icon { font-size: 2.5rem; }
+  .channel-card h2 { font-size: 1.1rem; margin: 0; }
+  .channel-card p { font-size: 0.9rem; color: var(--color-text-muted); margin: 0; }
+  .contact-form-wrapper {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-navy);
+  }
+  input, select, textarea {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--color-text);
+    background: var(--color-surface-alt);
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+</style>

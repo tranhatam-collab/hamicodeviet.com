@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+  <rect width="36" height="36" rx="8" fill="#102A43"/>
+  <!-- < bracket -->
+  <path d="M7 12L3 18L7 24" stroke="#00A8CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- > bracket -->
+  <path d="M29 12L33 18L29 24" stroke="#00A8CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- H shape -->
+  <path d="M11 11V25M11 18H18M18 11V25" stroke="#F7FAFC" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- M shape -->
+  <path d="M21 25V11L25 19L29 11V25" stroke="#FFC857" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- cursor dot -->
+  <circle cx="18" cy="30" r="2" fill="#20A779"/>
+</svg>

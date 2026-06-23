@@ -1,0 +1,51 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Xác nhận email — HaMi Code Việt">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <a href="/">HaMi <span class="code">&lt;CODE&gt;</span> Việt</a>
+      </div>
+      <div id="content">
+        <h1 class="auth-title">Đang xác nhận...</h1>
+        <p class="auth-subtitle">Vui lòng đợi.</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { apiFetch } from '../lib/api';
+
+    const content = document.getElementById('content')!;
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+
+    if (!token) {
+      content.innerHTML = `
+        <h1 class="auth-title">Liên kết không hợp lệ</h1>
+        <p class="auth-subtitle">Thiếu token xác nhận.</p>
+        <a href="/login" class="btn btn--primary btn--block">Về đăng nhập</a>
+      `;
+    } else {
+      try {
+        await apiFetch('/auth/verify-email', {
+          method: 'POST',
+          body: JSON.stringify({ token }),
+        });
+        content.innerHTML = `
+          <h1 class="auth-title">Email đã xác nhận!</h1>
+          <p class="auth-subtitle">Tài khoản của bạn đã sẵn sàng.</p>
+          <a href="/dashboard" class="btn btn--primary btn--block btn--lg">Vào dashboard</a>
+        `;
+      } catch (err) {
+        content.innerHTML = `
+          <h1 class="auth-title">Xác nhận thất bại</h1>
+          <p class="auth-subtitle">Liên kết đã hết hạn hoặc không hợp lệ.</p>
+          <a href="/verify-email-pending" class="btn btn--secondary btn--block">Gửi lại email</a>
+        `;
+      }
+    }
+  </script>
+</AppLayout>

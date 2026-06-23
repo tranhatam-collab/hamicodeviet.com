@@ -1,0 +1,144 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { products } from '../../data/products';
+
+const title = 'Portfolio / Portfolio';
+const description = 'HaMi Verify — hồ sơ và xác minh năng lực của người học HaMi Code Việt. / HaMi Verify — learner profile and skill verification on HaMi Code Viet.';
+
+const verify = products.find((p) => p.id === 'hami-verify');
+
+const sampleProjects = [
+  { title: { vi: 'Game đuổi bắt Scratch', en: 'Scratch chase game' }, tech: 'Scratch', level: 'Creative Explorer' },
+  { title: { vi: 'Trang web giới thiệu bản thân', en: 'Personal intro website' }, tech: 'HTML/CSS', level: 'Junior Builder' },
+  { title: { vi: 'Bot đoán số Python', en: 'Python number guessing bot' }, tech: 'Python', level: 'Young Creator' },
+];
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="hero">
+    <div class="container text-center">
+      <p class="eyebrow" style="color: var(--color-creative-yellow);">
+        <span data-vi>Xác minh năng lực</span>
+        <span data-en>Skill verification</span>
+      </p>
+      <h1>
+        <span data-vi>HaMi Verify — Hồ sơ & Xác minh năng lực</span>
+        <span data-en>HaMi Verify — Profile & Skill Verification</span>
+      </h1>
+      <p class="hero-subtitle">
+        <span data-vi>Bằng chứng năng lực dựa trên sản phẩm thực, không phải thời gian xem video.</span>
+        <span data-en>Evidence-based skills from real products, not video watch time.</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="text-center mb-xl">
+        <span data-vi>Tính năng portfolio</span>
+        <span data-en>Portfolio features</span>
+      </h2>
+      <div class="grid grid--3">
+        {verify?.features.map((feature) => (
+          <div class="card feature-card">
+            <h3><span data-vi>{feature.vi}</span><span data-en>{feature.en}</span></h3>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <h2 class="text-center mb-xl">
+        <span data-vi>Portfolio mẫu</span>
+        <span data-en>Sample portfolio</span>
+      </h2>
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="profile-avatar">HM</div>
+          <div class="profile-info">
+            <h3>Hà Mi</h3>
+            <p>
+              <span data-vi>Lộ trình: Young Creator</span>
+              <span data-en>Track: Young Creator</span>
+            </p>
+            <span class="badge badge--green">Verified</span>
+          </div>
+        </div>
+        <div class="profile-projects">
+          <h4>
+            <span data-vi>Dự án đã hoàn thành</span>
+            <span data-en>Completed projects</span>
+          </h4>
+          <div class="grid grid--3">
+            {sampleProjects.map((project) => (
+              <div class="card project-card">
+                <h5>
+                  <span data-vi>{project.title.vi}</span>
+                  <span data-en>{project.title.en}</span>
+                </h5>
+                <p class="project-tech">{project.tech}</p>
+                <p class="project-level">{project.level}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="development-card">
+        <h2 class="text-center mb-lg">
+          <span data-vi>Tính năng đang được xây dựng</span>
+          <span data-en>Feature in development</span>
+        </h2>
+        <p class="text-center">
+          <span data-vi>HaMi Verify đang trong giai đoạn thử nghiệm. Dự kiến ra mắt đầy đủ: Q2 2026.</span>
+          <span data-en>HaMi Verify is in pilot. Full launch expected: Q2 2026.</span>
+        </p>
+        <div class="text-center mt-lg">
+          <span class="badge badge--blue">Q2 2026</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--dark">
+    <div class="container text-center">
+      <h2>
+        <span data-vi>Học miễn phí ngay</span>
+        <span data-en>Start learning free</span>
+      </h2>
+      <p class="mb-xl">
+        <span data-vi>Bắt đầu xây dựng dự án đầu tiên cho portfolio của bạn.</span>
+        <span data-en>Start building your first project for your portfolio.</span>
+      </p>
+      <a href="/hoc-mien-phi" class="btn btn--primary btn--lg">
+        <span data-vi>Học miễn phí ngay</span>
+        <span data-en>Learn free now</span>
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-subtitle { max-width: 720px; margin: 0 auto; }
+  .feature-card { text-align: center; }
+  .feature-card h3 { font-size: 1.1rem; color: var(--color-navy); }
+  .profile-card { max-width: 900px; margin: 0 auto; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--space-2xl); }
+  .profile-header { display: flex; gap: var(--space-lg); align-items: center; margin-bottom: var(--space-xl); padding-bottom: var(--space-xl); border-bottom: 1px solid var(--color-border); }
+  .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--color-navy); color: var(--color-creative-yellow); display: grid; place-items: center; font-size: 1.75rem; font-weight: 800; flex-shrink: 0; }
+  .profile-info h3 { margin-bottom: var(--space-sm); }
+  .profile-info p { margin-bottom: var(--space-sm); color: var(--color-text-muted); }
+  .profile-projects h4 { margin-bottom: var(--space-lg); }
+  .project-card { padding: var(--space-lg); }
+  .project-card h5 { margin-bottom: var(--space-sm); font-size: 1rem; }
+  .project-tech { font-size: 0.85rem; color: var(--color-tech-blue); font-weight: 600; margin-bottom: var(--space-xs); }
+  .project-level { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 0; }
+  .development-card { max-width: 720px; margin: 0 auto; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-xl); }
+  .development-card p { margin-bottom: 0; color: var(--color-text-muted); }
+  @media (max-width: 600px) { .profile-header { flex-direction: column; text-align: center; } }
+</style>

@@ -1,0 +1,133 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Dành cho giáo viên / For Teachers"
+  description="Tài nguyên, lesson plan, AI hỗ trợ và hệ thống đánh giá cho giáo viên công nghệ và lập trình."
+>
+
+<section style="background:linear-gradient(135deg,#081826 0%,#102A43 100%);color:#F7FAFC;padding:5rem 0" aria-labelledby="teacher-hero">
+  <div class="container">
+    <div style="max-width:640px">
+      <p class="eyebrow" style="color:#FFC857">HaMi Schools</p>
+      <h1 id="teacher-hero" style="color:#F7FAFC">
+        <span data-vi>Dành cho giáo viên</span>
+        <span data-en>For teachers</span>
+      </h1>
+      <p style="color:rgba(247,250,252,0.8);font-size:1.1rem;margin:1rem 0 2rem">
+        <span data-vi>HaMi Code Việt cung cấp học liệu, CodeLab, AI Copilot và hệ thống đánh giá để giáo viên triển khai giáo dục công nghệ song ngữ có kiểm soát.</span>
+        <span data-en>HaMi Code Viet provides learning content, CodeLab, AI Copilot, and assessment systems for teachers to deliver controlled bilingual technology education.</span>
+      </p>
+      <a href="#dang-ky" class="btn btn--accent btn--lg">
+        <span data-vi>Đăng ký tài khoản giáo viên</span>
+        <span data-en>Register teacher account</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="teacher-resources">
+  <div class="container">
+    <h2 id="teacher-resources" class="text-center">
+      <span data-vi>Tài nguyên cho giáo viên</span>
+      <span data-en>Teacher resources</span>
+    </h2>
+    <div class="grid grid--4" style="margin-top:2rem">
+      {[
+        { icon: '📝', vi: 'Lesson plan mẫu', en: 'Sample lesson plans', desc_vi: 'Kế hoạch bài giảng theo chuẩn, theo lộ trình và độ tuổi.', desc_en: 'Structured lesson plans by track and age level.' },
+        { icon: '🎨', vi: 'Template bài giảng', en: 'Lesson templates', desc_vi: 'Slide, worksheet và tài liệu có thể chỉnh sửa.', desc_en: 'Editable slides, worksheets, and materials.' },
+        { icon: '📊', vi: 'Rubric đánh giá', en: 'Assessment rubrics', desc_vi: 'Tiêu chí đánh giá rõ ràng theo mục tiêu học.', desc_en: 'Clear assessment criteria aligned to learning goals.' },
+        { icon: '🤖', vi: 'Hướng dẫn dùng AI', en: 'AI usage guide', desc_vi: 'Hướng dẫn tích hợp AI vào bài giảng có trách nhiệm.', desc_en: 'Responsible AI integration guides for classrooms.' },
+      ].map(r => (
+        <div class="card" style="text-align:center">
+          <div style="font-size:2.25rem;margin-bottom:1rem">{r.icon}</div>
+          <h3 style="font-size:1rem;margin-bottom:0.5rem">
+            <span data-vi>{r.vi}</span>
+            <span data-en>{r.en}</span>
+          </h3>
+          <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0">
+            <span data-vi>{r.desc_vi}</span>
+            <span data-en>{r.desc_en}</span>
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="section section--alt" aria-labelledby="teacher-ai">
+  <div class="container">
+    <div style="max-width:700px;margin:0 auto;text-align:center">
+      <h2 id="teacher-ai">
+        <span data-vi>🤖 Teacher Copilot AI</span>
+        <span data-en>🤖 Teacher Copilot AI</span>
+      </h2>
+      <p>
+        <span data-vi>Teacher Copilot hỗ trợ giáo viên chuẩn bị bài giảng, tạo bài tập biến thể, giải thích khái niệm song ngữ và tạo báo cáo tiến độ. AI luôn ở chế độ hỗ trợ — giáo viên là người quyết định cuối cùng.</span>
+        <span data-en>Teacher Copilot helps teachers prepare lessons, generate variant exercises, explain bilingual concepts, and create progress reports. AI is always in support mode — teachers make all final decisions.</span>
+      </p>
+      <div class="grid grid--3" style="margin-top:2rem;text-align:left">
+        {[
+          { vi: 'Tạo bản nháp bài học', en: 'Draft lesson content' },
+          { vi: 'Tạo bài tập biến thể', en: 'Generate variant exercises' },
+          { vi: 'Giải thích song ngữ Việt–Anh', en: 'Bilingual Viet–English explanations' },
+          { vi: 'Chấm bài sơ bộ theo rubric', en: 'Preliminary rubric-based grading' },
+          { vi: 'Tạo báo cáo tiến độ học viên', en: 'Generate learner progress reports' },
+          { vi: 'Gợi ý bài học tiếp theo', en: 'Suggest next lessons' },
+        ].map(f => (
+          <div style="display:flex;gap:0.5rem;align-items:flex-start;padding:0.75rem;background:var(--color-surface);border-radius:10px;border:1px solid var(--color-border)">
+            <span style="color:var(--color-tech-blue);font-weight:700;flex-shrink:0">→</span>
+            <span style="font-size:0.9rem">
+              <span data-vi>{f.vi}</span>
+              <span data-en>{f.en}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="dang-ky" aria-labelledby="teacher-register">
+  <div class="container">
+    <div style="max-width:560px;margin:0 auto">
+      <h2 id="teacher-register" class="text-center">
+        <span data-vi>Đăng ký tài khoản giáo viên thử nghiệm</span>
+        <span data-en>Register for a pilot teacher account</span>
+      </h2>
+      <p class="text-center text-muted" style="margin-bottom:2rem">
+        <span data-vi>Đang mở đăng ký thử nghiệm — chúng tôi sẽ liên hệ trong 3–5 ngày làm việc.</span>
+        <span data-en>Pilot registration is open — we will contact you within 3–5 business days.</span>
+      </p>
+      <form style="display:flex;flex-direction:column;gap:1.25rem" aria-label="Teacher registration form">
+        <div style="display:flex;flex-direction:column;gap:0.4rem">
+          <label for="t-name" style="font-weight:600;font-size:0.9rem"><span data-vi>Họ và tên</span><span data-en>Full name</span></label>
+          <input type="text" id="t-name" name="name" autocomplete="name" style="border:1px solid var(--color-border);border-radius:10px;padding:0.75rem 1rem;font-size:1rem" disabled />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem">
+          <label for="t-email" style="font-weight:600;font-size:0.9rem">Email</label>
+          <input type="email" id="t-email" name="email" autocomplete="email" style="border:1px solid var(--color-border);border-radius:10px;padding:0.75rem 1rem;font-size:1rem" disabled />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem">
+          <label for="t-school" style="font-weight:600;font-size:0.9rem"><span data-vi>Tên trường</span><span data-en>School name</span></label>
+          <input type="text" id="t-school" name="school" style="border:1px solid var(--color-border);border-radius:10px;padding:0.75rem 1rem;font-size:1rem" disabled />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem">
+          <label for="t-subject" style="font-weight:600;font-size:0.9rem"><span data-vi>Môn dạy</span><span data-en>Subject taught</span></label>
+          <input type="text" id="t-subject" name="subject" style="border:1px solid var(--color-border);border-radius:10px;padding:0.75rem 1rem;font-size:1rem" disabled />
+        </div>
+        <button type="submit" class="btn btn--primary" disabled>
+          <span data-vi>Đăng ký thử nghiệm</span>
+          <span data-en>Register for pilot</span>
+        </button>
+        <p class="text-muted" style="font-size:0.82rem;text-align:center;margin:0">
+          <span data-vi>Hệ thống đăng ký sẽ được kích hoạt sau khi Teacher Portal hoàn thiện.</span>
+          <span data-en>Registration will be enabled after the Teacher Portal is ready.</span>
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+
+</BaseLayout>

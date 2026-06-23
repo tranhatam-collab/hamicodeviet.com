@@ -1,0 +1,377 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { lessons } from '../../data/lessons';
+import { tracks } from '../../data/tracks';
+import { ui } from '../../data/i18n';
+import type { Lesson } from '../../data/lessons';
+
+export function getStaticPaths() {
+  return lessons.map((lesson) => ({
+    params: { slug: lesson.slug },
+    props: { lesson },
+  }));
+}
+
+interface Props {
+  lesson: Lesson;
+}
+
+const { lesson } = Astro.props;
+const track = tracks.find((t) => t.id === lesson.trackId)!;
+const sortedLessons = [...lessons].sort((a, b) => a.number - b.number);
+const currentIndex = sortedLessons.findIndex((l) => l.slug === lesson.slug);
+const prevLesson = currentIndex > 0 ? sortedLessons[currentIndex - 1] : null;
+const nextLesson = currentIndex < sortedLessons.length - 1 ? sortedLessons[currentIndex + 1] : null;
+
+const title = `Bài ${lesson.number} / Lesson ${lesson.number}: ${lesson.title.vi} / ${lesson.title.en}`;
+const description = `${lesson.description.vi} ${lesson.description.en}`;
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="hero hero--compact" aria-labelledby="lesson-title">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol class="breadcrumb-list">
+          <li>
+            <a href="/hoc-mien-phi">
+              <span data-vi>Học miễn phí</span>
+              <span data-en>Free lessons</span>
+            </a>
+          </li>
+          <li>
+            <a href={`/lo-trinh/${track.slug}`}>
+              <span data-vi>{track.name.vi}</span>
+              <span data-en>{track.name.en}</span>
+            </a>
+          </li>
+          <li aria-current="page">
+            <span data-vi>Bài {lesson.number}: {lesson.title.vi}</span>
+            <span data-en>Lesson {lesson.number}: {lesson.title.en}</span>
+          </li>
+        </ol>
+      </nav>
+
+      <div class="hero-content">
+        <div class="lesson-badges">
+          <span class="badge badge--navy">{ui.level.vi}: {lesson.level}</span>
+          <span class="badge badge--blue">{lesson.duration} <span data-vi>phút</span><span data-en>min</span></span>
+          <span class="badge badge--green">
+            <span data-vi>{ui.free.vi}</span>
+            <span data-en>{ui.free.en}</span>
+          </span>
+          <span class="badge" style={`background:${track.color}22;color:${track.color}`}>
+            <span data-vi>{track.name.vi}</span>
+            <span data-en>{track.name.en}</span>
+          </span>
+        </div>
+
+        <h1 id="lesson-title">
+          <span data-vi>{lesson.title.vi}</span>
+          <span data-en>{lesson.title.en}</span>
+        </h1>
+
+        <p class="hero-sub">
+          <span data-vi>{lesson.buildOutput.vi}</span>
+          <span data-en>{lesson.buildOutput.en}</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="objectives-title">
+    <div class="container">
+      <div class="lesson-content">
+        <h2 id="objectives-title">
+          <span data-vi>{ui.whatYouWillLearn.vi}</span>
+          <span data-en>{ui.whatYouWillLearn.en}</span>
+        </h2>
+        <ul class="objective-list">
+          {lesson.objectives.map((objective) => (
+            <li>
+              <span class="objective-dot" style={`color: ${track.color}`}>✓</span>
+              <span data-vi>{objective.vi}</span>
+              <span data-en>{objective.en}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" aria-labelledby="build-title">
+    <div class="container">
+      <div class="lesson-content">
+        <h2 id="build-title">
+          <span data-vi>{ui.whatYouWillBuild.vi}</span>
+          <span data-en>{ui.whatYouWillBuild.en}</span>
+        </h2>
+        <div class="build-card" style={`border-left-color: ${track.color}`}>
+          <p>
+            <span data-vi>{lesson.buildOutput.vi}</span>
+            <span data-en>{lesson.buildOutput.en}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {lesson.codeSnippet && (
+    <section class="section" aria-labelledby="code-title">
+      <div class="container">
+        <div class="lesson-content">
+          <h2 id="code-title">
+            <span data-vi>Code mẫu</span>
+            <span data-en>Sample code</span>
+          </h2>
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <span class="code-language">{lesson.codeLanguage}</span>
+              <button class="copy-btn" type="button">
+                <span data-vi>Sao chép</span>
+                <span data-en>Copy</span>
+              </button>
+            </div>
+            <pre class="code-block"><code class={`language-${lesson.codeLanguage}`}>{lesson.codeSnippet}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section" aria-label="Điều hướng bài học / Lesson navigation">
+    <div class="container">
+      <div class="lesson-nav">
+        {prevLesson ? (
+          <a href={`/bai-hoc/${prevLesson.slug}`} class="btn btn--ghost">
+            <span aria-hidden="true">←</span>
+            <span data-vi>{ui.prev.vi}: Bài {prevLesson.number}</span>
+            <span data-en>{ui.prev.en}: Lesson {prevLesson.number}</span>
+          </a>
+        ) : <span />}
+        {nextLesson ? (
+          <a href={`/bai-hoc/${nextLesson.slug}`} class="btn btn--ghost">
+            <span data-vi>{ui.next.vi}: Bài {nextLesson.number}</span>
+            <span data-en>{ui.next.en}: Lesson {nextLesson.number}</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        ) : <span />}
+      </div>
+
+      <div class="text-center mt-xl">
+        <a href="/hoc-mien-phi" class="btn btn--primary btn--lg">
+          <span data-vi>Xem thêm bài học</span>
+          <span data-en>View more lessons</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    (function () {
+      function escapeHtml(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function highlightCode(code) {
+        const keywords = [
+          'let', 'const', 'var', 'function', 'return', 'import', 'from', 'def', 'class', 'if', 'else', 'elif',
+          'for', 'while', 'try', 'except', 'async', 'await', 'new', 'this', 'true', 'false', 'undefined', 'null',
+          'None', 'True', 'False', 'print', 'export', 'default', 'require', 'module', 'continue', 'break', 'pass',
+          'with', 'as', 'in', 'is', 'not', 'and', 'or', 'yield', 'lambda', 'finally', 'raise', 'del', 'global',
+          'nonlocal', 'then', 'when', 'repeat', 'move', 'turn', 'say'
+        ];
+        const keywordSet = new Set(keywords);
+        const tokenRe = new RegExp(
+          '("(?:[^"\\\\]|\\\\.)*")|(\'(?:[^\'\\\\]|\\\\.)*\')|(`(?:[^`\\\\]|\\\\.)*`)|(#.*)|(\\/\\/.*)|(\\/\\*[\\s\\S]*?\\*\\/)|(' +
+          '\\b(?:' + keywords.join('|') + ')\\b)|' +
+          '(\\b\\d+(?:\\.\\d+)?\\b)',
+          'g'
+        );
+
+        return code.replace(tokenRe, (match, ...groups) => {
+          const escaped = escapeHtml(match);
+          if (groups[0] || groups[1] || groups[2]) return '<span class="token-string">' + escaped + '</span>';
+          if (groups[3] || groups[4] || groups[5]) return '<span class="token-comment">' + escaped + '</span>';
+          if (groups[6] && keywordSet.has(match)) return '<span class="token-keyword">' + escaped + '</span>';
+          if (groups[7]) return '<span class="token-number">' + escaped + '</span>';
+          return escaped;
+        });
+      }
+
+      const codeEl = document.querySelector('.code-block code');
+      if (codeEl) {
+        codeEl.innerHTML = highlightCode(codeEl.textContent || '');
+      }
+
+      const btn = document.querySelector('.copy-btn');
+      const pre = document.querySelector('.code-block');
+      if (!btn || !pre) return;
+
+      const originalHTML = btn.innerHTML;
+
+      btn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(pre.textContent || '');
+          btn.innerHTML = '<span data-vi>Đã sao chép!</span><span data-en>Copied!</span>';
+        } catch (err) {
+          btn.innerHTML = '<span data-vi>Lỗi sao chép</span><span data-en>Copy error</span>';
+        }
+        setTimeout(() => {
+          btn.innerHTML = originalHTML;
+        }, 2000);
+      });
+    })();
+  </script>
+</BaseLayout>
+
+<style>
+  .hero--compact {
+    padding: var(--space-2xl) 0;
+  }
+
+  .breadcrumb {
+    margin-bottom: var(--space-lg);
+  }
+
+  .breadcrumb-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: 0;
+    margin: 0;
+    font-size: 0.85rem;
+    color: rgba(247, 250, 252, 0.7);
+  }
+
+  .breadcrumb-list a {
+    color: rgba(247, 250, 252, 0.85);
+    text-decoration: none;
+  }
+
+  .breadcrumb-list a:hover {
+    color: #FFC857;
+  }
+
+  .breadcrumb-list li:not(:last-child)::after {
+    content: '›';
+    margin-left: var(--space-sm);
+    color: rgba(247, 250, 252, 0.4);
+  }
+
+  .hero-content { max-width: 760px; }
+  .hero h1 { color: var(--color-text-light); }
+  .hero p { color: rgba(247, 250, 252, 0.85); }
+
+  .lesson-badges {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-md);
+  }
+
+  .lesson-content {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .objective-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: 0;
+    margin: 0;
+  }
+
+  .objective-list li {
+    display: flex;
+    gap: 0.6em;
+    align-items: baseline;
+    font-size: 1rem;
+    color: var(--color-text);
+  }
+
+  .objective-dot { font-weight: 700; }
+
+  .build-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-left: 5px solid var(--color-tech-blue);
+    border-radius: var(--radius-md);
+    padding: var(--space-xl);
+    font-size: 1.05rem;
+  }
+
+  .build-card p { margin: 0; }
+
+  .code-block-wrapper {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .code-block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    background: var(--color-surface-alt);
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .code-language {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .copy-btn {
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .copy-btn:hover {
+    border-color: var(--color-tech-blue);
+    color: var(--color-tech-blue);
+  }
+
+  .code-block {
+    margin: 0;
+    background: var(--color-bg-dark);
+    color: var(--color-text-light);
+    padding: var(--space-lg);
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .token-comment { color: #486581; }
+  .token-keyword { color: #00A8CC; }
+  .token-string { color: #20A779; }
+  .token-number { color: #FF9F43; }
+
+  .lesson-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 600px) {
+    .lesson-nav { flex-direction: column; }
+    .lesson-nav a { width: 100%; justify-content: center; }
+  }
+</style>

@@ -1,0 +1,51 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Xác nhận email — HaMi Code Việt">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <a href="/">HaMi <span class="code">&lt;CODE&gt;</span> Việt</a>
+      </div>
+      <h1 class="auth-title">Kiểm tra email của bạn</h1>
+      <p class="auth-subtitle">
+        Chúng tôi đã gửi link xác nhận đến email của bạn. Nhấn vào link để hoàn tất.
+      </p>
+
+      <div id="alert" class="alert alert--info">
+        Email xác nhận đã được gửi. Vui lòng kiểm tra hộp thư (và thư mục spam).
+      </div>
+
+      <button id="resend-btn" class="btn btn--secondary btn--block">
+        Gửi lại email xác nhận
+      </button>
+
+      <p class="auth-footer">
+        <a href="/dashboard">Vào dashboard</a> hoặc <a href="/login">Đăng nhập lại</a>
+      </p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { apiFetch } from '../lib/api';
+
+    const resendBtn = document.getElementById('resend-btn') as HTMLButtonElement;
+    const alert = document.getElementById('alert') as HTMLDivElement;
+
+    resendBtn.addEventListener('click', async () => {
+      resendBtn.disabled = true;
+      resendBtn.textContent = 'Đang gửi...';
+      try {
+        await apiFetch('/auth/resend-verification', { method: 'POST' });
+        alert.textContent = 'Email xác nhận mới đã được gửi!';
+        alert.className = 'alert alert--success';
+      } catch (err: any) {
+        alert.textContent = err.message === 'already_verified' ? 'Email đã được xác nhận.' : 'Không thể gửi lại. Vui lòng thử lại sau.';
+        alert.className = 'alert alert--error';
+      }
+      resendBtn.disabled = false;
+      resendBtn.textContent = 'Gửi lại email xác nhận';
+    });
+  </script>
+</AppLayout>

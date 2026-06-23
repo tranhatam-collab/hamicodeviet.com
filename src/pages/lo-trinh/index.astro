@@ -1,0 +1,238 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { tracks } from '../../data/tracks';
+import { ui } from '../../data/i18n';
+
+const title = 'Lộ trình học / Learning Tracks';
+const description =
+  '5 lộ trình học lập trình song ngữ Việt–Anh cho người học 8–24 tuổi. Chọn lộ trình phù hợp và bắt đầu tạo sản phẩm thật.';
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="hero hero--compact" aria-labelledby="tracks-title">
+    <div class="container">
+      <div class="hero-content text-center">
+        <p class="eyebrow" style="color:#FFC857">
+          <span data-vi>{tracks.length} lộ trình theo độ tuổi</span>
+          <span data-en>{tracks.length} age-based tracks</span>
+        </p>
+        <h1 id="tracks-title">
+          <span data-vi>Lộ trình học</span>
+          <span data-en>Learning Tracks</span>
+        </h1>
+        <p class="hero-sub hero-sub--center">
+          <span data-vi>
+            Từ Creative Explorer 8 tuổi đến Builder & Entrepreneur 24 tuổi — mỗi lộ trình đều kết hợp lập trình, tiếng Anh và sản phẩm thực tế.
+          </span>
+          <span data-en>
+            From Creative Explorer at age 8 to Builder & Entrepreneur at age 24 — every track blends coding, English, and real-world products.
+          </span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="tracks-list-title">
+    <div class="container">
+      <h2 id="tracks-list-title" class="sr-only">
+        <span data-vi>Danh sách lộ trình</span>
+        <span data-en>Track list</span>
+      </h2>
+
+      <div class="tracks-grid">
+        {tracks.map((track) => (
+          <a href={`/lo-trinh/${track.slug}`} class="track-card" style={`--track-color: ${track.color}`}>
+            <div class="track-age">{track.ageRange} <span data-vi>tuổi</span><span data-en>yrs</span></div>
+            <div class="track-icon" aria-hidden="true">{track.icon}</div>
+            <h3 class="track-name">
+              <span data-vi>{track.name.vi}</span>
+              <span data-en>{track.name.en}</span>
+            </h3>
+            <p class="track-focus">
+              <span data-vi>{track.focus.vi}</span>
+              <span data-en>{track.focus.en}</span>
+            </p>
+
+            <div class="track-section">
+              <span class="track-section-label">
+                <span data-vi>Kỹ năng</span>
+                <span data-en>Skills</span>
+              </span>
+              <ul class="track-list">
+                {track.skills.slice(0, 3).map((skill) => (
+                  <li>
+                    <span data-vi>{skill.vi}</span>
+                    <span data-en>{skill.en}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div class="track-section">
+              <span class="track-section-label">
+                <span data-vi>Sản phẩm</span>
+                <span data-en>Outcomes</span>
+              </span>
+              <ul class="track-list">
+                {track.outcomes.slice(0, 2).map((outcome) => (
+                  <li>
+                    <span data-vi>{outcome.vi}</span>
+                    <span data-en>{outcome.en}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <span class="track-cta">
+              <span data-vi>{ui.viewDetails.vi} →</span>
+              <span data-en>{ui.viewDetails.en} →</span>
+            </span>
+          </a>
+        ))}
+      </div>
+
+      <div class="text-center mt-xl">
+        <a href="/danh-gia-dau-vao" class="btn btn--accent btn--lg">
+          <span data-vi>{ui.takeAssessment.vi}</span>
+          <span data-en>{ui.takeAssessment.en}</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero--compact {
+    padding: var(--space-2xl) 0;
+  }
+
+  .hero--compact .hero-content {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .hero-sub--center {
+    max-width: 600px;
+    margin: var(--space-lg) auto 0;
+  }
+
+  .tracks-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+
+  @media (max-width: 900px) {
+    .tracks-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 600px) {
+    .tracks-grid { grid-template-columns: 1fr; }
+  }
+
+  .track-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-top: 4px solid var(--track-color, var(--color-tech-blue));
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: all var(--transition-base);
+  }
+
+  .track-card:hover {
+    border-color: var(--track-color, var(--color-tech-blue));
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .track-age {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .track-icon {
+    font-size: 1.75rem;
+    margin: var(--space-xs) 0;
+  }
+
+  .track-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-navy);
+  }
+
+  .track-focus {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin: 0 0 var(--space-sm);
+  }
+
+  .track-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .track-section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-navy);
+  }
+
+  .track-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  .track-list li {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: flex;
+    gap: 0.4em;
+    align-items: baseline;
+  }
+
+  .track-list li::before {
+    content: '•';
+    color: var(--track-color, var(--color-tech-blue));
+  }
+
+  .track-cta {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-tech-blue);
+    margin-top: auto;
+    padding-top: var(--space-sm);
+  }
+
+  .track-card:hover .track-cta {
+    color: var(--color-primary-dark);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

@@ -1,0 +1,38 @@
+{
+  "project": "HaMi Code Việt",
+  "domain": "hamicodeviet.com",
+  "version": "1.0",
+  "date": "23/06/2026",
+  "status": "strategy_spec_ready; production_not_verified",
+  "core_release_scope": [
+    "public_bilingual_web",
+    "age_aware_auth",
+    "guardian_consent",
+    "learning_mvp",
+    "project_flow",
+    "privacy_safety",
+    "monitoring"
+  ],
+  "feature_flagged": [
+    "ai_tutor",
+    "codelab",
+    "payments",
+    "portfolio_public",
+    "marketplace",
+    "school_platform"
+  ],
+  "minimum_content": {
+    "paths": 5,
+    "lessons": 30,
+    "demos": 100,
+    "capstones": 10,
+    "parent_guides": 5,
+    "teacher_guides": 5
+  },
+  "release_verdicts": [
+    "PASS - GO-LIVE VERIFIED",
+    "CONDITIONAL PASS - CORE LIVE, RESTRICTED MODULES DISABLED",
+    "HOLD - NOT READY FOR GO-LIVE",
+    "FAIL - CRITICAL BLOCKERS"
+  ]
+}

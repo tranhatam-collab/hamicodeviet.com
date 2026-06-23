@@ -1,0 +1,430 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { tracks } from '../../data/tracks';
+
+const title = 'Bài đánh giá đầu vào / Intake Assessment';
+const description = 'Làm bài đánh giá 8 câu hỏi để HaMi Code Việt gợi ý lộ trình học phù hợp nhất. / Take the 8-question assessment to get a recommended learning track.';
+
+const questionData = [
+  {
+    id: 'age',
+    vi: 'Bạn bao nhiêu tuổi?',
+    en: 'How old are you?',
+    options: [
+      { vi: '8–10', en: '8–10', value: '8-10' },
+      { vi: '11–13', en: '11–13', value: '11-13' },
+      { vi: '14–17', en: '14–17', value: '14-17' },
+      { vi: '18–20', en: '18–20', value: '18-20' },
+      { vi: '21–24', en: '21–24', value: '21-24' },
+    ],
+  },
+  {
+    id: 'experience',
+    vi: 'Bạn đã từng lập trình chưa?',
+    en: 'Have you coded before?',
+    options: [
+      { vi: 'Chưa bao giờ', en: 'Never', value: '0' },
+      { vi: 'Một chút', en: 'A little', value: '1' },
+      { vi: 'Vài tháng', en: 'Several months', value: '2' },
+      { vi: 'Hơn 1 năm', en: 'Over a year', value: '3' },
+    ],
+  },
+  {
+    id: 'english',
+    vi: 'Trình độ tiếng Anh của bạn?',
+    en: 'Your English level?',
+    options: [
+      { vi: 'Chưa biết', en: 'None', value: '0' },
+      { vi: 'Cơ bản (A1–A2)', en: 'Basic (A1–A2)', value: '1' },
+      { vi: 'Trung cấp (B1–B2)', en: 'Intermediate (B1–B2)', value: '2' },
+      { vi: 'Tốt (C1+)', en: 'Good (C1+)', value: '3' },
+    ],
+  },
+  {
+    id: 'goal',
+    vi: 'Bạn muốn tạo ra gì?',
+    en: 'What do you want to create?',
+    options: [
+      { vi: 'Game', en: 'Game', value: 'game' },
+      { vi: 'Website', en: 'Website', value: 'web' },
+      { vi: 'Ứng dụng / App', en: 'App', value: 'app' },
+      { vi: 'AI tool', en: 'AI tool', value: 'ai' },
+      { vi: 'Chưa biết', en: 'Not sure', value: 'unsure' },
+    ],
+  },
+  {
+    id: 'hours',
+    vi: 'Bạn có bao nhiêu giờ/tuần để học?',
+    en: 'Hours per week?',
+    options: [
+      { vi: 'Dưới 2 giờ', en: '<2h', value: '1' },
+      { vi: '2–5 giờ', en: '2–5h', value: '2' },
+      { vi: '5–10 giờ', en: '5–10h', value: '3' },
+      { vi: '10+ giờ', en: '10+h', value: '4' },
+    ],
+  },
+  {
+    id: 'objective',
+    vi: 'Mục tiêu của bạn?',
+    en: 'Your goal?',
+    options: [
+      { vi: 'Học cho vui', en: 'For fun', value: 'fun' },
+      { vi: 'Xây portfolio', en: 'Portfolio', value: 'portfolio' },
+      { vi: 'Tìm việc', en: 'Job', value: 'job' },
+      { vi: 'Khởi nghiệp', en: 'Startup', value: 'startup' },
+    ],
+  },
+  {
+    id: 'htmlcss',
+    vi: 'Bạn đã biết HTML/CSS chưa?',
+    en: 'Do you know HTML/CSS?',
+    options: [
+      { vi: 'Chưa', en: 'No', value: '0' },
+      { vi: 'Cơ bản', en: 'Basic', value: '1' },
+      { vi: 'Khá tốt', en: 'Good', value: '2' },
+    ],
+  },
+  {
+    id: 'device',
+    vi: 'Thiết bị bạn dùng?',
+    en: 'Your device?',
+    options: [
+      { vi: 'Điện thoại', en: 'Phone only', value: 'phone' },
+      { vi: 'Máy tính', en: 'Computer', value: 'computer' },
+      { vi: 'Cả hai', en: 'Both', value: 'both' },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="hero">
+    <div class="container text-center">
+      <p class="eyebrow" style="color: var(--color-creative-yellow);">
+        <span data-vi>8 câu hỏi — 1 phút</span>
+        <span data-en>8 questions — 1 minute</span>
+      </p>
+      <h1>
+        <span data-vi>Bài đánh giá đầu vào</span>
+        <span data-en>Intake Assessment</span>
+      </h1>
+      <p class="hero-subtitle">
+        <span data-vi>Trả lời nhanh để chúng tôi gợi ý lộ trình phù hợp nhất.</span>
+        <span data-en>Answer quickly so we can recommend the best track for you.</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="section" style="background: var(--color-surface-alt);">
+    <div class="container">
+      <div class="assessment-wrapper">
+        <div class="progress-header">
+          <span class="progress-text" id="progress-text">
+            <span data-vi>0 / 8</span>
+            <span data-en>0 / 8</span>
+          </span>
+          <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemax="8">
+            <div class="progress-bar__fill" id="progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div id="question-card" class="card question-card">
+          <h2 id="question-title" class="question-title"></h2>
+          <div id="question-options" class="options"></div>
+          <div class="question-nav">
+            <button type="button" id="prev-btn" class="btn btn--ghost" disabled>
+              <span data-vi>Trước</span>
+              <span data-en>Previous</span>
+            </button>
+            <button type="button" id="next-btn" class="btn btn--primary" disabled>
+              <span data-vi>Tiếp</span>
+              <span data-en>Next</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="result-card" class="card result-card" hidden>
+          <div class="result-icon" id="result-icon">✦</div>
+          <h2>
+            <span data-vi>Lộ trình đề xuất</span>
+            <span data-en>Recommended track</span>
+          </h2>
+          <h3 id="result-track-name"></h3>
+          <p id="result-track-desc"></p>
+          <div class="result-actions">
+            <a id="result-track-link" href="#" class="btn btn--primary">
+              <span data-vi>Bắt đầu lộ trình này</span>
+              <span data-en>Start this track</span>
+            </a>
+            <a href="/hoc-mien-phi" class="btn btn--secondary">
+              <span data-vi>Xem bài học miễn phí</span>
+              <span data-en>See free lessons</span>
+            </a>
+          </div>
+          <button type="button" id="retry-btn" class="btn btn--ghost mt-lg">
+            <span data-vi>Làm lại</span>
+            <span data-en>Retry</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script is:inline>
+  const questions = [
+    {
+      id: 'age',
+      vi: 'Bạn bao nhiêu tuổi?',
+      en: 'How old are you?',
+      options: [
+        { vi: '8–10', en: '8–10', value: '8-10' },
+        { vi: '11–13', en: '11–13', value: '11-13' },
+        { vi: '14–17', en: '14–17', value: '14-17' },
+        { vi: '18–20', en: '18–20', value: '18-20' },
+        { vi: '21–24', en: '21–24', value: '21-24' },
+      ],
+    },
+    {
+      id: 'experience',
+      vi: 'Bạn đã từng lập trình chưa?',
+      en: 'Have you coded before?',
+      options: [
+        { vi: 'Chưa bao giờ', en: 'Never', value: '0' },
+        { vi: 'Một chút', en: 'A little', value: '1' },
+        { vi: 'Vài tháng', en: 'Several months', value: '2' },
+        { vi: 'Hơn 1 năm', en: 'Over a year', value: '3' },
+      ],
+    },
+    {
+      id: 'english',
+      vi: 'Trình độ tiếng Anh của bạn?',
+      en: 'Your English level?',
+      options: [
+        { vi: 'Chưa biết', en: 'None', value: '0' },
+        { vi: 'Cơ bản (A1–A2)', en: 'Basic (A1–A2)', value: '1' },
+        { vi: 'Trung cấp (B1–B2)', en: 'Intermediate (B1–B2)', value: '2' },
+        { vi: 'Tốt (C1+)', en: 'Good (C1+)', value: '3' },
+      ],
+    },
+    {
+      id: 'goal',
+      vi: 'Bạn muốn tạo ra gì?',
+      en: 'What do you want to create?',
+      options: [
+        { vi: 'Game', en: 'Game', value: 'game' },
+        { vi: 'Website', en: 'Website', value: 'web' },
+        { vi: 'Ứng dụng / App', en: 'App', value: 'app' },
+        { vi: 'AI tool', en: 'AI tool', value: 'ai' },
+        { vi: 'Chưa biết', en: 'Not sure', value: 'unsure' },
+      ],
+    },
+    {
+      id: 'hours',
+      vi: 'Bạn có bao nhiêu giờ/tuần để học?',
+      en: 'Hours per week?',
+      options: [
+        { vi: 'Dưới 2 giờ', en: '<2h', value: '1' },
+        { vi: '2–5 giờ', en: '2–5h', value: '2' },
+        { vi: '5–10 giờ', en: '5–10h', value: '3' },
+        { vi: '10+ giờ', en: '10+h', value: '4' },
+      ],
+    },
+    {
+      id: 'objective',
+      vi: 'Mục tiêu của bạn?',
+      en: 'Your goal?',
+      options: [
+        { vi: 'Học cho vui', en: 'For fun', value: 'fun' },
+        { vi: 'Xây portfolio', en: 'Portfolio', value: 'portfolio' },
+        { vi: 'Tìm việc', en: 'Job', value: 'job' },
+        { vi: 'Khởi nghiệp', en: 'Startup', value: 'startup' },
+      ],
+    },
+    {
+      id: 'htmlcss',
+      vi: 'Bạn đã biết HTML/CSS chưa?',
+      en: 'Do you know HTML/CSS?',
+      options: [
+        { vi: 'Chưa', en: 'No', value: '0' },
+        { vi: 'Cơ bản', en: 'Basic', value: '1' },
+        { vi: 'Khá tốt', en: 'Good', value: '2' },
+      ],
+    },
+    {
+      id: 'device',
+      vi: 'Thiết bị bạn dùng?',
+      en: 'Your device?',
+      options: [
+        { vi: 'Điện thoại', en: 'Phone only', value: 'phone' },
+        { vi: 'Máy tính', en: 'Computer', value: 'computer' },
+        { vi: 'Cả hai', en: 'Both', value: 'both' },
+      ],
+    },
+  ];
+
+  const tracks = [
+    { slug: 'creative-explorer', age: '8–10', name: { vi: 'Creative Explorer', en: 'Creative Explorer' }, desc: { vi: 'Khơi dậy sự tò mò và tư duy sáng tạo qua Scratch và kể chuyện tương tác.', en: 'Spark curiosity and creative thinking through Scratch and interactive storytelling.' }, icon: '✦' },
+    { slug: 'junior-builder', age: '11–13', name: { vi: 'Junior Builder', en: 'Junior Builder' }, desc: { vi: 'Xây dựng website đầu tiên, làm game với JavaScript và học an toàn số.', en: 'Build your first website, create games with JavaScript, and learn digital safety.' }, icon: '⚡' },
+    { slug: 'young-creator', age: '14–17', name: { vi: 'Young Creator', en: 'Young Creator' }, desc: { vi: 'Python, web động, game 2D, Git và AI literacy — bắt đầu portfolio kỹ thuật.', en: 'Python, dynamic web, 2D games, Git, and AI literacy — start your technical portfolio.' }, icon: '◆' },
+    { slug: 'product-developer', age: '18–20', name: { vi: 'Product Developer', en: 'Product Developer' }, desc: { vi: 'Full-stack, API, database, AI Agent và triển khai sản phẩm thực.', en: 'Full-stack, API, database, AI Agent integration, and real product deployment.' }, icon: '⬡' },
+    { slug: 'builder-entrepreneur', age: '21–24', name: { vi: 'Builder & Entrepreneur', en: 'Builder & Entrepreneur' }, desc: { vi: 'SaaS, cloud, bảo mật, thương mại hóa sản phẩm và khởi nghiệp.', en: 'SaaS, cloud, security, product commercialization, and startup.' }, icon: '◈' },
+  ];
+
+  let current = 0;
+  const answers = {};
+
+  const questionCard = document.getElementById('question-card');
+  const resultCard = document.getElementById('result-card');
+  const titleEl = document.getElementById('question-title');
+  const optionsEl = document.getElementById('question-options');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const progressFill = document.getElementById('progress-fill');
+  const progressText = document.getElementById('progress-text');
+  const retryBtn = document.getElementById('retry-btn');
+
+  function getLang() {
+    return document.documentElement.getAttribute('data-lang') || 'vi';
+  }
+
+  function render() {
+    const q = questions[current];
+    const lang = getLang();
+    titleEl.textContent = q[lang];
+    optionsEl.innerHTML = '';
+
+    q.options.forEach((opt) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'option-btn';
+      btn.textContent = opt[lang];
+      if (answers[q.id] === opt.value) btn.classList.add('selected');
+      btn.addEventListener('click', () => selectOption(q.id, opt.value, btn));
+      optionsEl.appendChild(btn);
+    });
+
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = !answers[q.id];
+    if (current === questions.length - 1) {
+      nextBtn.querySelector('[data-vi]').textContent = 'Nộp bài';
+      nextBtn.querySelector('[data-en]').textContent = 'Submit';
+    } else {
+      nextBtn.querySelector('[data-vi]').textContent = 'Tiếp';
+      nextBtn.querySelector('[data-en]').textContent = 'Next';
+    }
+
+    const progress = ((current) / questions.length) * 100;
+    progressFill.style.width = `${progress}%`;
+    progressFill.setAttribute('aria-valuenow', current);
+    progressText.querySelector('[data-vi]').textContent = `${current} / ${questions.length}`;
+    progressText.querySelector('[data-en]').textContent = `${current} / ${questions.length}`;
+  }
+
+  function selectOption(qid, value, btn) {
+    answers[qid] = value;
+    optionsEl.querySelectorAll('.option-btn').forEach((b) => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    nextBtn.disabled = false;
+  }
+
+  function next() {
+    if (current < questions.length - 1) {
+      current++;
+      render();
+    } else {
+      showResult();
+    }
+  }
+
+  function prev() {
+    if (current > 0) {
+      current--;
+      render();
+    }
+  }
+
+  function calculateTrack() {
+    const ageMap = {
+      '8-10': 'creative-explorer',
+      '11-13': 'junior-builder',
+      '14-17': 'young-creator',
+      '18-20': 'product-developer',
+      '21-24': 'builder-entrepreneur',
+    };
+    const base = ageMap[answers.age] || 'young-creator';
+
+    const experience = parseInt(answers.experience || '0', 10);
+    const objective = answers.objective;
+
+    if (experience >= 2 && answers.age === '11-13') return 'junior-builder';
+    if (experience >= 3 && answers.age === '14-17') return 'young-creator';
+    if (objective === 'startup' && ['18-20', '21-24'].includes(answers.age)) return 'builder-entrepreneur';
+    if (objective === 'job' && ['18-20', '21-24'].includes(answers.age)) return 'product-developer';
+    if (answers.goal === 'ai' && experience >= 2) {
+      if (answers.age === '14-17') return 'young-creator';
+      if (answers.age === '18-20') return 'product-developer';
+      if (answers.age === '21-24') return 'builder-entrepreneur';
+    }
+    return base;
+  }
+
+  function showResult() {
+    questionCard.hidden = true;
+    resultCard.hidden = false;
+    progressFill.style.width = '100%';
+    progressText.querySelector('[data-vi]').textContent = `${questions.length} / ${questions.length}`;
+    progressText.querySelector('[data-en]').textContent = `${questions.length} / ${questions.length}`;
+
+    const slug = calculateTrack();
+    const track = tracks.find((t) => t.slug === slug);
+    const lang = getLang();
+
+    document.getElementById('result-icon').textContent = track.icon;
+    document.getElementById('result-track-name').textContent = track.name[lang];
+    document.getElementById('result-track-desc').textContent = track.desc[lang];
+    document.getElementById('result-track-link').href = `/lo-trinh/${track.slug}`;
+  }
+
+  function reset() {
+    current = 0;
+    Object.keys(answers).forEach((k) => delete answers[k]);
+    questionCard.hidden = false;
+    resultCard.hidden = true;
+    render();
+  }
+
+  nextBtn.addEventListener('click', next);
+  prevBtn.addEventListener('click', prev);
+  retryBtn.addEventListener('click', reset);
+
+  document.documentElement.addEventListener('click', (e) => {
+    if (e.target.closest('.lang-toggle button')) {
+      setTimeout(render, 50);
+    }
+  });
+
+  render();
+</script>
+
+<style>
+  .hero-subtitle { max-width: 600px; margin: 0 auto; }
+  .assessment-wrapper { max-width: 720px; margin: 0 auto; }
+  .progress-header { margin-bottom: var(--space-lg); }
+  .progress-text { display: block; margin-bottom: var(--space-sm); font-weight: 600; color: var(--color-text-muted); }
+  .question-card { min-height: 420px; display: flex; flex-direction: column; }
+  .question-title { font-size: 1.5rem; margin-bottom: var(--space-xl); }
+  .options { display: flex; flex-direction: column; gap: var(--space-md); flex: 1; }
+  .option-btn {
+    display: block; width: 100%; text-align: left; padding: var(--space-md) var(--space-lg);
+    border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface);
+    font-size: 1rem; cursor: pointer; transition: all var(--transition-fast); color: var(--color-text);
+  }
+  .option-btn:hover { border-color: var(--color-tech-blue); background: rgba(0, 168, 204, 0.05); }
+  .option-btn.selected { border-color: var(--color-tech-blue); background: rgba(0, 168, 204, 0.1); font-weight: 600; }
+  .question-nav { display: flex; justify-content: space-between; margin-top: var(--space-xl); }
+  .result-card { text-align: center; max-width: 640px; margin: 0 auto; }
+  .result-icon { font-size: 3rem; margin-bottom: var(--space-md); }
+  .result-actions { display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap; margin-top: var(--space-xl); }
+  [hidden] { display: none !important; }
+</style>

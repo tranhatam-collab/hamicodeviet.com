@@ -1,0 +1,123 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Dashboard — HaMi Code Việt">
+  <div id="dashboard-root">
+    <div class="auth-container">
+      <div class="auth-card">
+        <h1 class="auth-title">Đang tải...</h1>
+        <p class="auth-subtitle">Vui lòng đợi.</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, clearToken } from '../lib/api';
+
+    const root = document.getElementById('dashboard-root')!;
+
+    async function renderDashboard() {
+      const user = await getCurrentUser();
+
+      if (!user) {
+        window.location.href = '/login';
+        return;
+      }
+
+      const initials = user.displayName
+        ?.split(' ')
+        .map((s: string) => s[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2) || '?';
+
+      const emailVerifiedBadge = user.emailVerified
+        ? '<span style="color:var(--color-success);font-size:0.8rem">✓ Đã xác nhận</span>'
+        : '<span style="color:var(--color-error);font-size:0.8rem">⚠ Chưa xác nhận</span>';
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav>
+              <ul class="sidebar-nav">
+                <li><a href="/dashboard" class="active">📊 Dashboard</a></li>
+                <li><a href="/courses">📚 Khóa học</a></li>
+                <li><a href="/codelab">💻 CodeLab</a></li>
+                <li><a href="/projects">📁 Dự án</a></li>
+                <li><a href="/portfolio">🏆 Portfolio</a></li>
+                <li><a href="/settings">⚙️ Cài đặt</a></li>
+                <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+              </ul>
+            </nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header">
+              <h1 class="dashboard-title">Xin chào, ${user.displayName}!</h1>
+              <div class="user-menu">
+                <span style="font-size:0.85rem;color:var(--color-text-muted)">${user.email}</span>
+                <div class="user-avatar">${initials}</div>
+              </div>
+            </div>
+
+            ${!user.emailVerified ? `
+              <div class="alert alert--info" style="margin-bottom:24px">
+                📧 Email chưa xác nhận. <a href="/verify-email-pending">Gửi lại email xác nhận</a>
+              </div>
+            ` : ''}
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Khóa học đang học</div>
+                <div class="stat-value">0</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Bài đã hoàn thành</div>
+                <div class="stat-value">0</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Dự án</div>
+                <div class="stat-value">0</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Chứng nhận</div>
+                <div class="stat-value">0</div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-bottom:24px">
+              <h2 style="margin-bottom:16px;font-size:1.2rem">Bắt đầu hành trình</h2>
+              <p style="color:var(--color-text-muted);margin-bottom:20px">
+                Chào mừng bạn đến HaMi Code Việt! Bắt đầu với bài học đầu tiên hoặc làm bài đánh giá đầu vào để chúng tôi gợi ý lộ trình phù hợp.
+              </p>
+              <div style="display:flex;gap:12px;flex-wrap:wrap">
+                <a href="https://hamicodeviet.com/hoc-mien-phi" class="btn btn--primary">Học miễn phí</a>
+                <a href="https://hamicodeviet.com/danh-gia-dau-vao" class="btn btn--secondary">Đánh giá đầu vào</a>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 style="margin-bottom:16px;font-size:1.2rem">Thông tin tài khoản</h2>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:0.9rem">
+                <div><strong>Email:</strong> ${user.email} ${emailVerifiedBadge}</div>
+                <div><strong>Ngôn ngữ:</strong> ${user.language === 'vi' ? 'Tiếng Việt' : 'English'}</div>
+                <div><strong>Vai trò:</strong> ${user.roles.map((r: string) => r).join(', ')}</div>
+                <div><strong>Năm sinh:</strong> ${user.birthYear || 'Chưa đặt'}</div>
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      const logoutBtn = document.getElementById('logout-btn')!;
+      logoutBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        clearToken();
+        window.location.href = '/login';
+      });
+    }
+
+    renderDashboard();
+  </script>
+</AppLayout>

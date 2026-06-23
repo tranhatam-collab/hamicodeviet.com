@@ -1,0 +1,104 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Đăng ký — HaMi Code Việt">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <a href="/">HaMi <span class="code">&lt;CODE&gt;</span> Việt</a>
+      </div>
+      <h1 class="auth-title">Tạo tài khoản</h1>
+      <p class="auth-subtitle">Bắt đầu hành trình học lập trình song ngữ</p>
+
+      <div id="alert" class="alert alert--info" style="display:none;"></div>
+
+      <form id="signup-form">
+        <div class="form-group">
+          <label class="form-label" for="displayName">Tên hiển thị</label>
+          <input class="form-input" type="text" id="displayName" name="displayName" required maxlength="100" placeholder="Nguyễn Văn A" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input class="form-input" type="email" id="email" name="email" required autocomplete="email" placeholder="ban@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Mật khẩu</label>
+          <input class="form-input" type="password" id="password" name="password" required minlength="8" autocomplete="new-password" placeholder="Tối thiểu 8 ký tự" />
+          <p class="form-hint">Mật khẩu tối thiểu 8 ký tự</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="birthYear">Năm sinh</label>
+          <input class="form-input" type="number" id="birthYear" name="birthYear" min="1980" max="2020" placeholder="2005" />
+          <p class="form-hint">Nếu bạn dưới 13 tuổi, chúng tôi sẽ yêu cầu email phụ huynh.</p>
+        </div>
+        <div class="form-group" id="guardian-group" style="display:none;">
+          <label class="form-label" for="guardianEmail">Email phụ huynh/người giám hộ</label>
+          <input class="form-input" type="email" id="guardianEmail" name="guardianEmail" placeholder="phuhuynh@email.com" />
+          <p class="form-hint">Chúng tôi sẽ gửi email xác nhận đến phụ huynh của bạn.</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="language">Ngôn ngữ</label>
+          <select class="form-input" id="language" name="language">
+            <option value="vi">Tiếng Việt</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn--primary btn--block btn--lg">Tạo tài khoản</button>
+      </form>
+
+      <p class="auth-footer">
+        Đã có tài khoản? <a href="/login">Đăng nhập</a>
+      </p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { apiFetch, setToken } from '../lib/api';
+
+    const form = document.getElementById('signup-form') as HTMLFormElement;
+    const alert = document.getElementById('alert') as HTMLDivElement;
+    const birthYearInput = document.getElementById('birthYear') as HTMLInputElement;
+    const guardianGroup = document.getElementById('guardian-group') as HTMLDivElement;
+
+    birthYearInput.addEventListener('input', () => {
+      const year = parseInt(birthYearInput.value, 10);
+      const age = new Date().getFullYear() - year;
+      guardianGroup.style.display = age < 13 && age > 0 ? 'block' : 'none';
+    });
+
+    function showAlert(msg: string, type: string = 'error') {
+      alert.textContent = msg;
+      alert.className = `alert alert--${type}`;
+      alert.style.display = 'block';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const body = Object.fromEntries(formData.entries());
+
+      try {
+        const data = await apiFetch('/auth/signup', {
+          method: 'POST',
+          body: JSON.stringify(body),
+        });
+        setToken(data.token);
+        if (data.requiresEmailVerification) {
+          window.location.href = '/verify-email-pending';
+        } else {
+          window.location.href = '/dashboard';
+        }
+      } catch (err: any) {
+        const messages: Record<string, string> = {
+          email_exists: 'Email đã được sử dụng. Vui lòng đăng nhập hoặc dùng email khác.',
+          password_too_short: 'Mật khẩu phải có ít nhất 8 ký tự.',
+          invalid_email: 'Email không hợp lệ.',
+          invalid_display_name: 'Tên hiển thị không hợp lệ.',
+          guardian_required: 'Người học dưới 13 tuổi cần email phụ huynh.',
+        };
+        showAlert(messages[err.message] || 'Đăng ký thất bại. Vui lòng thử lại.');
+      }
+    });
+  </script>
+</AppLayout>

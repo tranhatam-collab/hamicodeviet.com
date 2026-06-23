@@ -1,0 +1,261 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { tracks } from '../../data/tracks';
+import { lessons } from '../../data/lessons';
+import { ui } from '../../data/i18n';
+import type { AgeTrack } from '../../data/tracks';
+
+export function getStaticPaths() {
+  return tracks.map((track) => ({
+    params: { slug: track.slug },
+    props: { track },
+  }));
+}
+
+interface Props {
+  track: AgeTrack;
+}
+
+const { track } = Astro.props;
+const trackLessons = lessons.filter((l) => l.trackId === track.id).sort((a, b) => a.number - b.number);
+const title = `${track.name.vi} / ${track.name.en}`;
+const description = `${track.description.vi} ${track.description.en}`;
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="hero" style={`background: linear-gradient(135deg, ${track.color} 0%, var(--color-navy) 100%);`} aria-labelledby="track-title">
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-content">
+          <span class="badge badge--yellow track-age-badge">
+            {ui.ageRange.vi}: {track.ageRange} <span data-vi>tuổi</span><span data-en>yrs</span>
+          </span>
+          <h1 id="track-title">
+            <span data-vi>{track.name.vi}</span>
+            <span data-en>{track.name.en}</span>
+          </h1>
+          <p class="hero-sub">
+            <span data-vi>{track.focus.vi}</span>
+            <span data-en>{track.focus.en}</span>
+          </p>
+          <a href="/danh-gia-dau-vao" class="btn btn--accent btn--lg">
+            <span data-vi>{ui.takeAssessment.vi}</span>
+            <span data-en>{ui.takeAssessment.en}</span>
+          </a>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="track-hero-icon" style={`color: ${track.color}`}>{track.icon}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="skills-title">
+    <div class="container">
+      <div class="two-col">
+        <div class="info-card">
+          <h2 id="skills-title">
+            <span data-vi>Kỹ năng đạt được</span>
+            <span data-en>Skills you will gain</span>
+          </h2>
+          <ul class="info-list">
+            {track.skills.map((skill) => (
+              <li>
+                <span class="info-dot" aria-hidden="true" style={`color: ${track.color}`}>✦</span>
+                <span data-vi>{skill.vi}</span>
+                <span data-en>{skill.en}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <h2 id="outcomes-title">
+            <span data-vi>Sản phẩm đầu ra</span>
+            <span data-en>Outcomes</span>
+          </h2>
+          <ul class="info-list">
+            {track.outcomes.map((outcome) => (
+              <li>
+                <span class="info-dot" aria-hidden="true" style={`color: ${track.color}`}>→</span>
+                <span data-vi>{outcome.vi}</span>
+                <span data-en>{outcome.en}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" aria-labelledby="track-lessons-title">
+    <div class="container">
+      <div class="section-header">
+        <p class="eyebrow">
+          <span data-vi>{trackLessons.length} bài học</span>
+          <span data-en>{trackLessons.length} lessons</span>
+        </p>
+        <h2 id="track-lessons-title">
+          <span data-vi>Bài học trong lộ trình</span>
+          <span data-en>Lessons in this track</span>
+        </h2>
+      </div>
+
+      <div class="lessons-grid">
+        {trackLessons.map((lesson) => (
+          <a href={`/bai-hoc/${lesson.slug}`} class="card lesson-card" style={`--track-color: ${track.color}`}>
+            <div class="lesson-card-meta">
+              <span class="badge badge--blue">
+                <span data-vi>{ui.lessonNumber.vi} {lesson.number}</span>
+                <span data-en>{ui.lessonNumber.en} {lesson.number}</span>
+              </span>
+              <span class="badge badge--navy">{lesson.duration} <span data-vi>phút</span><span data-en>min</span></span>
+            </div>
+            <h3 class="lesson-card-title">
+              <span data-vi>{lesson.title.vi}</span>
+              <span data-en>{lesson.title.en}</span>
+            </h3>
+            <p class="lesson-card-desc">
+              <span data-vi>{lesson.description.vi}</span>
+              <span data-en>{lesson.description.en}</span>
+            </p>
+            <div class="lesson-card-footer">
+              <span class="badge badge--green">
+                <span data-vi>{ui.free.vi}</span>
+                <span data-en>{ui.free.en}</span>
+              </span>
+              <span class="badge badge--navy">{lesson.level}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <div class="text-center mt-xl">
+        <a href="/danh-gia-dau-vao" class="btn btn--accent btn--lg">
+          <span data-vi>{ui.takeAssessment.vi}</span>
+          <span data-en>{ui.takeAssessment.en}</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2xl);
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
+  }
+
+  .track-age-badge {
+    margin-bottom: var(--space-md);
+    font-size: 0.85rem;
+  }
+
+  .hero h1 { color: var(--color-text-light); }
+  .hero p { color: rgba(247, 250, 252, 0.85); }
+
+  .track-hero-icon {
+    font-size: 8rem;
+    line-height: 1;
+    text-align: right;
+    opacity: 0.5;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+  }
+
+  @media (max-width: 900px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+
+  .info-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+  }
+
+  .info-card h2 { margin-bottom: var(--space-lg); }
+
+  .info-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: 0;
+    margin: 0;
+  }
+
+  .info-list li {
+    display: flex;
+    gap: 0.6em;
+    align-items: baseline;
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+  }
+
+  .info-dot { font-weight: 700; }
+
+  .section-header { margin-bottom: var(--space-2xl); }
+  .section-header h2 { margin: var(--space-sm) 0 0; }
+
+  .lessons-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+
+  @media (max-width: 900px) {
+    .lessons-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 600px) {
+    .lessons-grid { grid-template-columns: 1fr; }
+  }
+
+  .lesson-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    text-decoration: none;
+    color: var(--color-text);
+    border-top: 4px solid var(--track-color, var(--color-tech-blue));
+  }
+
+  .lesson-card-meta {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .lesson-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .lesson-card-desc {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    flex: 1;
+    margin: 0;
+  }
+
+  .lesson-card-footer {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: auto;
+    flex-wrap: wrap;
+  }
+</style>

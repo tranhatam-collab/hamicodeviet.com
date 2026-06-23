@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { products } from '../../data/products';
+import { lessons } from '../../data/lessons';
+const codelab = products.find(p => p.id === 'hami-codelab')!;
+const sampleLessons = lessons.filter(l => l.codeSnippet).slice(0, 2);
+---
+
+<BaseLayout
+  title="HaMi CodeLab — Phòng thực hành lập trình"
+  description="Viết và chạy code trực tiếp trên trình duyệt với HaMi CodeLab. Sandbox an toàn, preview trực tiếp, chấm bài tự động."
+>
+
+<section style="background:linear-gradient(135deg,#081826 0%,#102A43 100%);color:#F7FAFC;padding:5rem 0" aria-labelledby="codelab-hero">
+  <div class="container">
+    <div style="max-width:640px">
+      <p class="eyebrow" style="color:#20A779">HaMi CodeLab</p>
+      <h1 id="codelab-hero" style="color:#F7FAFC">
+        <span data-vi>Phòng thực hành lập trình</span>
+        <span data-en>The coding lab</span>
+      </h1>
+      <p style="color:rgba(247,250,252,0.8);font-size:1.1rem;margin:1rem 0 2rem">
+        <span data-vi>Viết và chạy HTML, CSS, JavaScript, Python ngay trên trình duyệt — không cần cài đặt. Sandbox cô lập an toàn, preview trực tiếp và giải thích lỗi song ngữ.</span>
+        <span data-en>Write and run HTML, CSS, JavaScript, Python directly in your browser — no installation needed. Isolated safe sandbox, live preview, and bilingual error explanations.</span>
+      </p>
+      <div style="display:inline-flex;align-items:center;gap:0.75rem;background:rgba(32,167,121,0.15);border:1px solid rgba(32,167,121,0.3);border-radius:9999px;padding:0.5rem 1.25rem">
+        <span style="color:#20A779;font-size:1.25rem">⚙️</span>
+        <span style="color:#F7FAFC;font-weight:600">
+          <span data-vi>Đang xây dựng — Ra mắt Q3 2026</span>
+          <span data-en>Under construction — Launching Q3 2026</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="codelab-features">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2 id="codelab-features">
+        <span data-vi>Tính năng CodeLab</span>
+        <span data-en>CodeLab features</span>
+      </h2>
+    </div>
+    <div class="grid grid--3">
+      {codelab.features.map(f => (
+        <div class="card" style="text-align:center">
+          <div style="font-size:2rem;margin-bottom:0.75rem">⌨️</div>
+          <h3 style="font-size:1rem">
+            <span data-vi>{f.vi}</span>
+            <span data-en>{f.en}</span>
+          </h3>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="section section--alt" aria-labelledby="code-demos">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2 id="code-demos">
+        <span data-vi>Ví dụ code — Học ngay hôm nay</span>
+        <span data-en>Code examples — Learn today</span>
+      </h2>
+      <p class="section-desc">
+        <span data-vi>Trong khi CodeLab đang xây dựng, hãy bắt đầu với các bài học miễn phí.</span>
+        <span data-en>While CodeLab is being built, start with the free lessons.</span>
+      </p>
+    </div>
+    {sampleLessons.map(lesson => (
+      <div style="margin-bottom:2rem">
+        <h3>
+          <span data-vi>Bài {lesson.number}: {lesson.title.vi}</span>
+          <span data-en>Lesson {lesson.number}: {lesson.title.en}</span>
+        </h3>
+        <pre style="background:#0D1F2D;color:#E2E8F0;padding:1.5rem;border-radius:12px;overflow-x:auto;font-size:0.88rem;line-height:1.7"><code>{lesson.codeSnippet}</code></pre>
+        <a href={`/bai-hoc/${lesson.slug}`} class="btn btn--secondary btn--sm" style="margin-top:0.75rem">
+          <span data-vi>Xem bài học đầy đủ →</span>
+          <span data-en>See full lesson →</span>
+        </a>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section class="section" style="background:linear-gradient(135deg,#081826 0%,#102A43 100%)" aria-labelledby="codelab-cta">
+  <div class="container text-center">
+    <h2 id="codelab-cta" style="color:#F7FAFC">
+      <span data-vi>Bắt đầu học trong khi chờ CodeLab</span>
+      <span data-en>Start learning while CodeLab is being built</span>
+    </h2>
+    <p style="color:rgba(247,250,252,0.75);margin:1rem 0 2rem">
+      <span data-vi>30 bài học miễn phí với code mẫu có thể copy và chạy ngay.</span>
+      <span data-en>30 free lessons with sample code you can copy and run right away.</span>
+    </p>
+    <a href="/hoc-mien-phi" class="btn btn--primary btn--lg">
+      <span data-vi>Xem bài học miễn phí →</span>
+      <span data-en>Browse free lessons →</span>
+    </a>
+  </div>
+</section>
+
+</BaseLayout>

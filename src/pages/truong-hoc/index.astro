@@ -1,0 +1,129 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { products } from '../../data/products';
+const schools = products.find(p => p.id === 'hami-schools')!;
+---
+
+<BaseLayout
+  title="Dành cho trường học / For Schools — HaMi Schools"
+  description="Giải pháp giáo dục công nghệ song ngữ cho trường học: teacher dashboard, quản lý lớp, school license."
+>
+
+<section style="background:linear-gradient(135deg,#081826 0%,#102A43 100%);color:#F7FAFC;padding:5rem 0" aria-labelledby="schools-hero">
+  <div class="container">
+    <div style="max-width:640px">
+      <p class="eyebrow" style="color:#FFC857">HaMi Schools</p>
+      <h1 id="schools-hero" style="color:#F7FAFC">
+        <span data-vi>Giải pháp cho trường học</span>
+        <span data-en>School solutions</span>
+      </h1>
+      <p style="color:rgba(247,250,252,0.8);font-size:1.1rem;margin:1rem 0 2rem">
+        <span data-vi>Triển khai giáo dục công nghệ song ngữ có kiểm soát tại trường với Teacher Dashboard, quản lý lớp học, báo cáo phụ huynh và school license linh hoạt.</span>
+        <span data-en>Deploy controlled bilingual technology education at school with Teacher Dashboard, class management, parent reports, and flexible school licensing.</span>
+      </p>
+      <a href="/lien-he" class="btn btn--accent btn--lg">
+        <span data-vi>Liên hệ tư vấn</span>
+        <span data-en>Contact for consultation</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="schools-features">
+  <div class="container">
+    <h2 id="schools-features" class="text-center">
+      <span data-vi>Tính năng HaMi Schools</span>
+      <span data-en>HaMi Schools features</span>
+    </h2>
+    <div class="grid grid--4" style="margin-top:2rem">
+      {schools.features.map(f => (
+        <div class="card" style="text-align:center">
+          <div style="font-size:2rem;margin-bottom:0.75rem">🏫</div>
+          <h3 style="font-size:0.95rem">
+            <span data-vi>{f.vi}</span>
+            <span data-en>{f.en}</span>
+          </h3>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="section section--alt" aria-labelledby="schools-pricing">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2 id="schools-pricing">
+        <span data-vi>School License</span>
+        <span data-en>School License</span>
+      </h2>
+      <p class="section-desc">
+        <span data-vi>Định giá theo số học sinh, giáo viên và mức hỗ trợ. Liên hệ để nhận báo giá chính thức.</span>
+        <span data-en>Pricing based on number of students, teachers, and support level. Contact for official quote.</span>
+      </p>
+    </div>
+    <div class="pricing-grid">
+      {[
+        { label_vi: 'Trường nhỏ', label_en: 'Small school', students_vi: 'Dưới 50 học sinh', students_en: 'Under 50 students', price_vi: 'Liên hệ báo giá', price_en: 'Contact for pricing', features: ['Teacher dashboard', '1 lớp thử nghiệm / 1 pilot class', 'Kho học liệu / Content library', 'Báo cáo cơ bản / Basic reports'] },
+        { label_vi: 'Trường trung', label_en: 'Medium school', students_vi: '50–200 học sinh', students_en: '50–200 students', price_vi: 'Liên hệ báo giá', price_en: 'Contact for pricing', features: ['Teacher dashboard', 'Không giới hạn lớp / Unlimited classes', 'AI quota mở rộng / Extended AI quota', 'Báo cáo phụ huynh / Parent reports', 'Hỗ trợ ưu tiên / Priority support'] },
+        { label_vi: 'Trường lớn', label_en: 'Large school', students_vi: '200+ học sinh', students_en: '200+ students', price_vi: 'Liên hệ báo giá', price_en: 'Contact for pricing', features: ['Tất cả tính năng / All features', 'Tích hợp LMS / LMS integration', 'Xuất báo cáo / Report export', 'Tùy chỉnh theo trường / School customization', 'SLA support'] },
+      ].map(tier => (
+        <div class="pricing-card card">
+          <h3>
+            <span data-vi>{tier.label_vi}</span>
+            <span data-en>{tier.label_en}</span>
+          </h3>
+          <p class="pricing-students">
+            <span data-vi>{tier.students_vi}</span>
+            <span data-en>{tier.students_en}</span>
+          </p>
+          <p class="pricing-price">
+            <span data-vi>{tier.price_vi}</span>
+            <span data-en>{tier.price_en}</span>
+          </p>
+          <ul class="pricing-features">
+            {tier.features.map(f => <li>{f}</li>)}
+          </ul>
+          <a href="/lien-he" class="btn btn--primary" style="width:100%;justify-content:center">
+            <span data-vi>Liên hệ →</span>
+            <span data-en>Contact →</span>
+          </a>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="schools-pilot">
+  <div class="container text-center" style="max-width:640px">
+    <h2 id="schools-pilot">
+      <span data-vi>Trường nào đã thử nghiệm?</span>
+      <span data-en>Which schools have piloted?</span>
+    </h2>
+    <p style="color:var(--color-text-muted);font-size:1.05rem;margin:1rem 0 2rem">
+      <span data-vi>Chúng tôi đang tuyển trường thử nghiệm pilot. Tham gia để nhận School License miễn phí trong giai đoạn thử nghiệm và được ưu tiên hỗ trợ.</span>
+      <span data-en>We are recruiting pilot schools. Join to receive a free School License during the pilot phase and receive priority support.</span>
+    </p>
+    <a href="/lien-he" class="btn btn--accent btn--lg">
+      <span data-vi>Đăng ký trường thử nghiệm</span>
+      <span data-en>Register as pilot school</span>
+    </a>
+  </div>
+</section>
+
+</BaseLayout>
+
+<style>
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  @media (max-width: 800px) { .pricing-grid { grid-template-columns: 1fr; } }
+  .pricing-card { display: flex; flex-direction: column; gap: 1rem; }
+  .pricing-students { font-size: 0.9rem; color: var(--color-text-muted); margin: 0; }
+  .pricing-price { font-size: 1.25rem; font-weight: 700; color: var(--color-tech-blue); margin: 0; }
+  .pricing-features { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+  .pricing-features li { font-size: 0.88rem; color: var(--color-text-muted); padding-left: 1.25rem; position: relative; }
+  .pricing-features li::before { content: '✓'; position: absolute; left: 0; color: var(--color-success); font-weight: 700; }
+</style>

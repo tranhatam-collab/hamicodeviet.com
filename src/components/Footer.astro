@@ -1,0 +1,179 @@
+---
+import { nav, ui } from '../data/i18n';
+---
+
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Brand column -->
+      <div class="footer-brand">
+        <a href="/" class="footer-logo" aria-label="HaMi Code Việt">
+          <svg width="32" height="32" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="36" height="36" rx="8" fill="#102A43"/>
+            <path d="M7 12L3 18L7 24" stroke="#00A8CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M29 12L33 18L29 24" stroke="#00A8CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11 11V25M11 18H18M18 11V25" stroke="#F7FAFC" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M21 25V11L25 19L29 11V25" stroke="#FFC857" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="18" cy="30" r="2" fill="#20A779"/>
+          </svg>
+          <span class="footer-logo-text">HaMi <span style="color:#00A8CC">&lt;</span>CODE<span style="color:#00A8CC">&gt;</span> <span style="color:#FFC857" data-vi>Việt</span><span style="color:#FFC857" data-en>Viet</span></span>
+        </a>
+        <p class="footer-tagline">
+          <span data-vi>Học ngôn ngữ. Học lập trình.<br/>Làm ra sản phẩm thật.</span>
+          <span data-en>Learn languages. Learn to code.<br/>Build real products.</span>
+        </p>
+        <p class="footer-meta">
+          <span data-vi>{ui.founder.vi}</span>
+          <span data-en>{ui.founder.en}</span>
+        </p>
+        <p class="footer-meta" style="margin-top:0">
+          <span data-vi>{ui.operatedBy.vi}</span>
+          <span data-en>{ui.operatedBy.en}</span>
+        </p>
+      </div>
+
+      <!-- Learn column -->
+      <div>
+        <h3 class="footer-heading" data-vi>Học tập</h3>
+        <h3 class="footer-heading" data-en>Learning</h3>
+        <ul class="footer-links" role="list">
+          <li><a href="/hoc-mien-phi"><span data-vi>{nav.freeLearning.vi}</span><span data-en>{nav.freeLearning.en}</span></a></li>
+          <li><a href="/lo-trinh"><span data-vi>{nav.tracks.vi}</span><span data-en>{nav.tracks.en}</span></a></li>
+          <li><a href="/khoa-hoc"><span data-vi>{nav.courses.vi}</span><span data-en>{nav.courses.en}</span></a></li>
+          <li><a href="/codelab"><span data-vi>{nav.codelab.vi}</span><span data-en>{nav.codelab.en}</span></a></li>
+          <li><a href="/du-an"><span data-vi>{nav.projects.vi}</span><span data-en>{nav.projects.en}</span></a></li>
+          <li><a href="/hoc-bong"><span data-vi>{nav.scholarship.vi}</span><span data-en>{nav.scholarship.en}</span></a></li>
+        </ul>
+      </div>
+
+      <!-- Community column -->
+      <div>
+        <h3 class="footer-heading" data-vi>Cộng đồng</h3>
+        <h3 class="footer-heading" data-en>Community</h3>
+        <ul class="footer-links" role="list">
+          <li><a href="/phu-huynh"><span data-vi>{nav.parents.vi}</span><span data-en>{nav.parents.en}</span></a></li>
+          <li><a href="/giao-vien"><span data-vi>{nav.teachers.vi}</span><span data-en>{nav.teachers.en}</span></a></li>
+          <li><a href="/truong-hoc"><span data-vi>{nav.schools.vi}</span><span data-en>{nav.schools.en}</span></a></li>
+          <li><a href="/marketplace"><span data-vi>{nav.marketplace.vi}</span><span data-en>{nav.marketplace.en}</span></a></li>
+        </ul>
+      </div>
+
+      <!-- Company column -->
+      <div>
+        <h3 class="footer-heading" data-vi>Công ty</h3>
+        <h3 class="footer-heading" data-en>Company</h3>
+        <ul class="footer-links" role="list">
+          <li><a href="/ve-chung-toi"><span data-vi>{nav.about.vi}</span><span data-en>{nav.about.en}</span></a></li>
+          <li><a href="/an-toan"><span data-vi>{nav.safety.vi}</span><span data-en>{nav.safety.en}</span></a></li>
+          <li><a href="/lien-he"><span data-vi>{nav.contact.vi}</span><span data-en>{nav.contact.en}</span></a></li>
+          <li><a href="/chinh-sach-bao-mat"><span data-vi>Chính sách bảo mật</span><span data-en>Privacy policy</span></a></li>
+          <li><a href="/dieu-khoan"><span data-vi>Điều khoản sử dụng</span><span data-en>Terms of use</span></a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="footer-bottom">
+      <p class="footer-copyright">
+        &copy; 2026 <span data-vi>{ui.copyright.vi}</span><span data-en>{ui.copyright.en}</span>.
+        <span data-vi>Bảo lưu mọi quyền.</span>
+        <span data-en>All rights reserved.</span>
+      </p>
+      <div class="footer-badges">
+        <span class="badge badge--navy" style="background:rgba(0,168,204,0.12);color:#00A8CC">
+          <span data-vi>🇻🇳 Xây dựng tại Việt Nam</span>
+          <span data-en>🇻🇳 Built in Vietnam</span>
+        </span>
+        <span class="badge badge--navy" style="background:rgba(32,167,121,0.12);color:#20A779">
+          <span data-vi>Hướng tới WCAG 2.2 AA</span>
+          <span data-en>Targeting WCAG 2.2 AA</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    text-decoration: none;
+    margin-bottom: var(--space-md);
+  }
+
+  .footer-logo-text {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #F7FAFC;
+  }
+
+  .footer-tagline {
+    color: rgba(247, 250, 252, 0.75);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: var(--space-md);
+  }
+
+  .footer-meta {
+    color: rgba(247, 250, 252, 0.45);
+    font-size: 0.78rem;
+    line-height: 1.5;
+    margin-bottom: var(--space-sm);
+  }
+
+  .footer-heading {
+    color: #F7FAFC;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--space-md);
+  }
+
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .footer-links a {
+    color: rgba(247, 250, 252, 0.65);
+    font-size: 0.9rem;
+    transition: color var(--transition-fast);
+    text-decoration: none;
+  }
+
+  .footer-links a:hover { color: #00A8CC; }
+
+  .footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid rgba(247, 250, 252, 0.08);
+  }
+
+  .footer-copyright {
+    color: rgba(247, 250, 252, 0.45);
+    font-size: 0.82rem;
+    margin: 0;
+  }
+
+  .footer-badges {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 768px) {
+    .footer-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

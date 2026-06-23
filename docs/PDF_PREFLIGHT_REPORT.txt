@@ -1,0 +1,6 @@
+PDF: /mnt/data/HAMICODEVIET_FULL_DOSSIER_2026/HAMICODEVIET_FULL_PROJECT_DOSSIER_2026.pdf
+Pages: 25
+Encrypted: False
+Openable (PyMuPDF): True
+Likely scanned: False
+XFA present: False

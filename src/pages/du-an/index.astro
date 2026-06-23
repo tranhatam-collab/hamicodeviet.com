@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = 'Dự án / Projects';
+const description = 'Thư viện dự án mẫu HaMi Code Việt — từ Scratch đến AI tool. / HaMi Code Viet project library — from Scratch to AI tools.';
+
+const projects = [
+  { title: { vi: 'Trò chơi đuổi bắt Scratch', en: 'Scratch chase game' }, age: '8–10', tech: 'Scratch', duration: { vi: '30 phút', en: '30 minutes' }, color: '#FFC857' },
+  { title: { vi: 'Trang web giới thiệu bản thân', en: 'Personal intro website' }, age: '11–13', tech: 'HTML/CSS', duration: { vi: '45 phút', en: '45 minutes' }, color: '#00A8CC' },
+  { title: { vi: 'Game quiz toán học', en: 'Math quiz game' }, age: '11–13', tech: 'JavaScript', duration: { vi: '60 phút', en: '60 minutes' }, color: '#00A8CC' },
+  { title: { vi: 'Blog cá nhân', en: 'Personal blog' }, age: '14–17', tech: 'HTML/CSS/JS', duration: { vi: '2 giờ', en: '2 hours' }, color: '#20A779' },
+  { title: { vi: 'Bot đoán số Python', en: 'Python number guessing bot' }, age: '14–17', tech: 'Python', duration: { vi: '40 phút', en: '40 minutes' }, color: '#20A779' },
+  { title: { vi: 'Todo app full-stack', en: 'Full-stack todo app' }, age: '18–20', tech: 'Node.js/SQLite', duration: { vi: '3 giờ', en: '3 hours' }, color: '#102A43' },
+  { title: { vi: 'Chatbot song ngữ', en: 'Bilingual chatbot' }, age: '18–20', tech: 'JS/OpenAI API', duration: { vi: '2 giờ', en: '2 hours' }, color: '#102A43' },
+  { title: { vi: 'SaaS dashboard', en: 'SaaS dashboard' }, age: '21–24', tech: 'React/Next.js', duration: { vi: '4 giờ', en: '4 hours' }, color: '#081826' },
+  { title: { vi: 'AI writing tool', en: 'AI writing tool' }, age: '21–24', tech: 'Python/OpenAI', duration: { vi: '3 giờ', en: '3 hours' }, color: '#081826' },
+];
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="hero">
+    <div class="container text-center">
+      <p class="eyebrow" style="color: var(--color-creative-yellow);">
+        <span data-vi>Học qua sản phẩm</span>
+        <span data-en>Learn through products</span>
+      </p>
+      <h1>
+        <span data-vi>Thư viện dự án</span>
+        <span data-en>Project Library</span>
+      </h1>
+      <p class="hero-subtitle">
+        <span data-vi>9 dự án mẫu giúp bạn hình dung con đường từ dòng code đầu tiên đến sản phẩm hoàn chỉnh.</span>
+        <span data-en>Nine sample projects to visualize the journey from the first line of code to a complete product.</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="grid grid--3">
+        {projects.map((project, index) => (
+          <div class="card project-card">
+            <div class="project-number" style={`background: ${project.color}; color: ${project.color === '#FFC857' ? '#102A43' : '#F7FAFC'}`}>
+              {String(index + 1).padStart(2, '0')}
+            </div>
+            <h3>
+              <span data-vi>{project.title.vi}</span>
+              <span data-en>{project.title.en}</span>
+            </h3>
+            <div class="project-meta">
+              <span class="badge badge--navy">
+                <span data-vi>Độ tuổi {project.age}</span>
+                <span data-en>Age {project.age}</span>
+              </span>
+              <span class="badge badge--blue">{project.tech}</span>
+              <span class="badge badge--green">
+                <span data-vi>{project.duration.vi}</span>
+                <span data-en>{project.duration.en}</span>
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--dark">
+    <div class="container text-center">
+      <h2>
+        <span data-vi>Bắt đầu với bài học miễn phí</span>
+        <span data-en>Start with free lessons</span>
+      </h2>
+      <p class="mb-xl">
+        <span data-vi>Tìm bài học phù hợp độ tuổi và lộ trình của bạn, hoàn toàn miễn phí.</span>
+        <span data-en>Find a lesson matching your age and track, completely free.</span>
+      </p>
+      <a href="/hoc-mien-phi" class="btn btn--primary btn--lg">
+        <span data-vi>Xem bài học</span>
+        <span data-en>View lessons</span>
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-subtitle { max-width: 680px; margin: 0 auto; }
+  .project-card { position: relative; overflow: hidden; }
+  .project-number { position: absolute; top: 0; right: 0; width: 44px; height: 44px; border-bottom-left-radius: var(--radius-md); display: grid; place-items: center; font-weight: 800; font-size: 0.9rem; }
+  .project-card h3 { margin-top: var(--space-md); margin-bottom: var(--space-md); font-size: 1.15rem; }
+  .project-meta { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+</style>

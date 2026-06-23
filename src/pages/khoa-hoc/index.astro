@@ -1,0 +1,183 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = 'Khóa học / Courses';
+const description = 'Khóa học HaMi Academy — tự học, cohort, mentoring 1:1 và chương trình trường học. / HaMi Academy courses — self-paced, cohort, 1:1 mentoring, and school programs.';
+
+const courseTypes = [
+  {
+    title: { vi: 'Tự học', en: 'Self-paced' },
+    desc: { vi: 'Truy cập bài học và dự án mẫu mọi lúc, học theo tốc độ của bạn.', en: 'Access lessons and project templates anytime, learn at your own pace.' },
+  },
+  {
+    title: { vi: 'Cohort', en: 'Cohort' },
+    desc: { vi: 'Học theo lịch với nhóm nhỏ, có mentor hỗ trợ và Demo Day cuối khóa.', en: 'Learn on a schedule with a small group, mentor support, and a Demo Day.' },
+  },
+  {
+    title: { vi: '1:1 Mentoring', en: '1:1 Mentoring' },
+    desc: { vi: 'Lộ trình cá nhân hóa, gặp mentor định kỳ, review code và dự án.', en: 'Personalized track, regular mentor meetings, code and project reviews.' },
+  },
+  {
+    title: { vi: 'School Program', en: 'School Program' },
+    desc: { vi: 'Chương trình dành cho trường học với teacher dashboard và báo cáo.', en: 'School program with teacher dashboard and reports.' },
+  },
+];
+
+const pricing = [
+  {
+    name: { vi: 'Family Pass', en: 'Family Pass' },
+    price: { vi: '199.000đ / tháng', en: '199.000 VND / month' },
+    features: [
+      { vi: 'Tất cả bài học tự học', en: 'All self-paced lessons' },
+      { vi: '5 tài khoản con', en: '5 child accounts' },
+      { vi: 'Parent Portal', en: 'Parent Portal' },
+      { vi: 'Thử thách hàng tuần', en: 'Weekly challenges' },
+    ],
+    cta: { vi: 'Đăng ký', en: 'Sign up' },
+    accent: false,
+  },
+  {
+    name: { vi: 'Creator Pass', en: 'Creator Pass' },
+    price: { vi: '499.000đ / tháng', en: '499.000 VND / month' },
+    features: [
+      { vi: 'Truy cập CodeLab', en: 'CodeLab access' },
+      { vi: 'Project review cơ bản', en: 'Basic project review' },
+      { vi: 'Bài học nâng cao', en: 'Advanced lessons' },
+      { vi: 'Hỗ trợ cộng đồng ưu tiên', en: 'Priority community support' },
+    ],
+    cta: { vi: 'Đăng ký', en: 'Sign up' },
+    accent: true,
+  },
+  {
+    name: { vi: 'Cohort', en: 'Cohort' },
+    price: { vi: '1.49 – 2.99 triệu / chương trình', en: '1.49 – 2.99 million VND / program' },
+    features: [
+      { vi: 'Lịch học cố định', en: 'Fixed schedule' },
+      { vi: 'Mentor hỗ trợ', en: 'Mentor support' },
+      { vi: 'Demo Day', en: 'Demo Day' },
+      { vi: 'Chứng nhận hoàn thành', en: 'Completion certificate' },
+    ],
+    cta: { vi: 'Tìm hiểu', en: 'Learn more' },
+    accent: false,
+  },
+  {
+    name: { vi: '1:1 Mentoring', en: '1:1 Mentoring' },
+    price: { vi: 'Liên hệ báo giá', en: 'Contact for pricing' },
+    features: [
+      { vi: 'Lộ trình cá nhân', en: 'Personal track' },
+      { vi: 'Buổi mentor định kỳ', en: 'Regular mentor sessions' },
+      { vi: 'Code review chuyên sâu', en: 'In-depth code review' },
+      { vi: 'Hỗ trợ portfolio', en: 'Portfolio support' },
+    ],
+    cta: { vi: 'Liên hệ', en: 'Contact' },
+    accent: false,
+  },
+];
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="hero">
+    <div class="container text-center">
+      <p class="eyebrow" style="color: var(--color-creative-yellow);">
+        <span data-vi>HaMi Academy</span>
+        <span data-en>HaMi Academy</span>
+      </p>
+      <h1>
+        <span data-vi>Khóa học HaMi Academy</span>
+        <span data-en>HaMi Academy Courses</span>
+      </h1>
+      <p class="hero-subtitle">
+        <span data-vi>Từ tự học đến cohort và mentoring — chọn hình thức phù hợp với mục tiêu của bạn.</span>
+        <span data-en>From self-paced to cohort and mentoring — choose the format that fits your goals.</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="text-center mb-xl">
+        <span data-vi>4 loại khóa học</span>
+        <span data-en>4 course types</span>
+      </h2>
+      <div class="grid grid--2">
+        {courseTypes.map((type) => (
+          <div class="card type-card">
+            <h3>
+              <span data-vi>{type.title.vi}</span>
+              <span data-en>{type.title.en}</span>
+            </h3>
+            <p>
+              <span data-vi>{type.desc.vi}</span>
+              <span data-en>{type.desc.en}</span>
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <h2 class="text-center mb-xl">
+        <span data-vi>Bảng giá</span>
+        <span data-en>Pricing</span>
+      </h2>
+      <div class="grid grid--4">
+        {pricing.map((plan) => (
+          <div class={`card pricing-card ${plan.accent ? 'pricing-card--accent' : ''}`}>
+            <h3>
+              <span data-vi>{plan.name.vi}</span>
+              <span data-en>{plan.name.en}</span>
+            </h3>
+            <p class="price">
+              <span data-vi>{plan.price.vi}</span>
+              <span data-en>{plan.price.en}</span>
+            </p>
+            <ul class="feature-list">
+              {plan.features.map((feature) => (
+                <li><span data-vi>{feature.vi}</span><span data-en>{feature.en}</span></li>
+              ))}
+            </ul>
+            <a href="/lien-he" class={`btn ${plan.accent ? 'btn--accent' : 'btn--primary'} btn--sm`}>
+              <span data-vi>{plan.cta.vi}</span>
+              <span data-en>{plan.cta.en}</span>
+            </a>
+          </div>
+        ))}
+      </div>
+      <p class="text-center mt-xl notice">
+        <span data-vi>Đang mở đăng ký thử nghiệm cohort đầu tiên.</span>
+        <span data-en>First cohort pilot registration is opening soon.</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="section section--dark">
+    <div class="container text-center">
+      <h2>
+        <span data-vi>Chưa biết bắt đầu từ đâu?</span>
+        <span data-en>Not sure where to start?</span>
+      </h2>
+      <p class="mb-xl">
+        <span data-vi>Làm bài đánh giá đầu vào để nhận lộ trình phù hợp nhất.</span>
+        <span data-en>Take the intake assessment to get your recommended track.</span>
+      </p>
+      <a href="/danh-gia-dau-vao" class="btn btn--primary btn--lg">
+        <span data-vi>Làm bài đánh giá</span>
+        <span data-en>Take assessment</span>
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-subtitle { max-width: 680px; margin: 0 auto; }
+  .type-card h3 { margin-bottom: var(--space-sm); }
+  .pricing-card { text-align: center; border-width: 2px; }
+  .pricing-card--accent { border-color: var(--color-creative-yellow); background: rgba(255, 200, 87, 0.06); }
+  .price { font-size: 1.1rem; font-weight: 700; color: var(--color-tech-blue); margin: var(--space-md) 0; }
+  .pricing-card--accent .price { color: var(--color-navy); }
+  .feature-list { list-style: none; text-align: left; margin: var(--space-lg) 0; }
+  .feature-list li { padding: var(--space-sm) 0; border-bottom: 1px solid var(--color-border); font-size: 0.9rem; }
+  .notice { color: var(--color-text-muted); font-weight: 500; }
+</style>

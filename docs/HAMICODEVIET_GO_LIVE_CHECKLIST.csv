@@ -1,0 +1,11 @@
+﻿ID,Gate,Requirement,Priority,Default Status,Evidence Required
+"G1","Product","No placeholders or broken core routes","P0","Not Started","URLs/screenshots/E2E"
+"G2","Functional","Auth guardian learning flows pass","P0","Not Started","E2E report"
+"G3","Security","0 P0 and 0 unresolved P1","P0","Not Started","Security report"
+"G4","Child Safety","Consent privacy report-abuse AI restrictions pass","P0","Not Started","Policy + tests"
+"G5","Data Protection","Export deletion retention incident flow","P0","Not Started","Live evidence"
+"G6","Accessibility","No blocker in automated/manual audit","P1","Not Started","Audit report"
+"G7","Performance","Core routes within budgets","P1","Not Started","Lighthouse/RUM"
+"G8","SEO","Canonical hreflang sitemap noindex","P1","Not Started","Crawler report"
+"G9","Operations","Monitoring backup restore rollback","P0","Not Started","Runbook + restore evidence"
+"G10","Production","SHA deployment ID live E2E evidence","P0","Not Started","Evidence packet"

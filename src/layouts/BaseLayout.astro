@@ -1,0 +1,103 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: 'vi' | 'en';
+  ogImage?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = 'HaMi Code Việt — Học ngôn ngữ. Học lập trình. Làm ra sản phẩm thật.',
+  lang = 'vi',
+  ogImage = '/og-default.png',
+  noindex = false,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang={lang} data-lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} | HaMi Code Việt</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={`${title} | HaMi Code Việt`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site)} />
+    <meta property="og:locale" content={lang === 'vi' ? 'vi_VN' : 'en_US'} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${title} | HaMi Code Việt`} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(ogImage, Astro.site)} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Theme color -->
+    <meta name="theme-color" content="#102A43" />
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">
+      <span data-vi>Bỏ qua đến nội dung chính</span>
+      <span data-en>Skip to main content</span>
+    </a>
+    <Header />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      // Language toggle logic
+      const LANG_KEY = 'hmcv-lang';
+      const saved = localStorage.getItem(LANG_KEY) as 'vi' | 'en' | null;
+      if (saved) {
+        document.documentElement.setAttribute('data-lang', saved);
+        document.documentElement.setAttribute('lang', saved);
+      }
+
+      function setLang(lang: string) {
+        document.documentElement.setAttribute('data-lang', lang);
+        document.documentElement.setAttribute('lang', lang);
+        localStorage.setItem(LANG_KEY, lang);
+        document.querySelectorAll('.lang-toggle button').forEach((btn) => {
+          btn.classList.toggle('active', (btn as HTMLElement).dataset.lang === lang);
+        });
+      }
+
+      document.querySelectorAll('.lang-toggle button').forEach((btn) => {
+        const currentLang = document.documentElement.getAttribute('data-lang') ?? 'vi';
+        btn.classList.toggle('active', (btn as HTMLElement).dataset.lang === currentLang);
+        btn.addEventListener('click', () => {
+          setLang((btn as HTMLElement).dataset.lang ?? 'vi');
+        });
+      });
+    </script>
+  </body>
+</html>
