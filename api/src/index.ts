@@ -8,6 +8,10 @@ import auth from './routes/auth';
 import guardian from './routes/guardian';
 import consent from './routes/consent';
 import countryPolicy from './routes/countryPolicy';
+import courses from './routes/courses';
+import progress from './routes/progress';
+import payments from './routes/payments';
+import admin from './routes/admin';
 
 export { RateLimiterDurableObject };
 
@@ -40,8 +44,8 @@ app.use('*', cors({
 
 // Rate limiting middleware (Durable Object — globally consistent)
 app.use('*', async (c, next) => {
-  // Skip rate limiting for health check and OPTIONS
-  if (c.req.path === '/health' || c.req.method === 'OPTIONS') {
+  // Skip rate limiting for health check, webhooks, and OPTIONS
+  if (c.req.path === '/health' || c.req.path === '/payments/webhook' || c.req.method === 'OPTIONS') {
     await next();
     return;
   }
@@ -103,6 +107,10 @@ app.route('/auth', auth);
 app.route('/guardian', guardian);
 app.route('/consent', consent);
 app.route('/country-policy', countryPolicy);
+app.route('/courses', courses);
+app.route('/progress', progress);
+app.route('/payments', payments);
+app.route('/admin', admin);
 
 // 404
 app.notFound((c) => c.json({ error: 'not_found' }, 404));

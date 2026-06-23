@@ -1,0 +1,113 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Admin Users — HaMi Code Việt">
+  <div id="admin-users-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { apiCall, clearToken } from '../../lib/api';
+
+    const root = document.getElementById('admin-users-root')!;
+    let currentPage = 1;
+
+    async function renderUsers(page = 1) {
+      currentPage = page;
+      const res = await apiCall(`/admin/users?page=${page}&limit=20`);
+      if (res.status === 403) { root.innerHTML = '<p>⛔ Không có quyền Admin.</p>'; return; }
+      if (!res.ok) { root.innerHTML = '<p>Lỗi tải.</p>'; return; }
+      const { users, total, totalPages } = await res.json();
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;ADMIN&gt;</span></div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/admin">📊 Thống kê</a></li>
+              <li><a href="/admin/users" class="active">👥 Người dùng</a></li>
+              <li><a href="/admin/courses">📚 Khóa học</a></li>
+              <li><a href="/admin/payments">💰 Thanh toán</a></li>
+              <li><a href="/dashboard">← Về App</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <h1 class="dashboard-title">Quản lý người dùng (${total})</h1>
+
+            <div class="search-bar" style="margin-bottom:16px">
+              <input type="text" id="user-search" placeholder="Tìm email hoặc tên..." class="form-input" style="max-width:400px" />
+              <button id="search-btn" class="btn btn-primary">Tìm</button>
+            </div>
+
+            <table class="data-table">
+              <thead><tr><th>Email</th><th>Tên</th><th>Trạng thái</th><th>Email</th><th>Ngày đăng ký</th><th>Hành động</th></tr></thead>
+              <tbody>
+                ${users.map((u: any) => `
+                  <tr>
+                    <td>${u.email}</td>
+                    <td>${u.display_name || '-'}</td>
+                    <td><span class="badge-${u.status === 'active' ? 'succeeded' : 'failed'}">${u.status}</span></td>
+                    <td>${u.email_verified ? '✅' : '⚠️'}</td>
+                    <td>${new Date(u.created_at).toLocaleDateString('vi-VN')}</td>
+                    <td>
+                      ${u.status === 'active'
+                        ? `<button class="btn btn-sm btn-danger suspend-btn" data-id="${u.id}">Suspend</button>`
+                        : `<button class="btn btn-sm btn-primary activate-btn" data-id="${u.id}">Kích hoạt</button>`
+                      }
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+
+            ${totalPages > 1 ? `
+              <div class="pagination" style="margin-top:16px">
+                <button class="btn btn-outline" id="prev-btn" ${page <= 1 ? 'disabled' : ''}>← Trước</button>
+                <span style="padding:8px 16px">Trang ${page}/${totalPages}</span>
+                <button class="btn btn-outline" id="next-btn" ${page >= totalPages ? 'disabled' : ''}>Sau →</button>
+              </div>
+            ` : ''}
+          </main>
+        </div>
+      `;
+
+      document.getElementById('prev-btn')?.addEventListener('click', () => renderUsers(currentPage - 1));
+      document.getElementById('next-btn')?.addEventListener('click', () => renderUsers(currentPage + 1));
+
+      document.querySelectorAll('.suspend-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = (e.target as HTMLElement).dataset.id;
+          if (!confirm('Suspend user?')) return;
+          await apiCall(`/admin/users/${id}/status`, 'PUT', { status: 'suspended' });
+          renderUsers(currentPage);
+        });
+      });
+
+      document.querySelectorAll('.activate-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = (e.target as HTMLElement).dataset.id;
+          await apiCall(`/admin/users/${id}/status`, 'PUT', { status: 'active' });
+          renderUsers(currentPage);
+        });
+      });
+
+      document.getElementById('search-btn')?.addEventListener('click', async () => {
+        const q = (document.getElementById('user-search') as HTMLInputElement).value;
+        const r = await apiCall(`/admin/users?search=${encodeURIComponent(q)}`);
+        if (r.ok) {
+          const d = await r.json();
+          // Re-render with search results — simplified
+          renderUsers(1);
+        }
+      });
+
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault(); clearToken(); window.location.href = '/login';
+      });
+    }
+
+    renderUsers();
+  </script>
+</AppLayout>

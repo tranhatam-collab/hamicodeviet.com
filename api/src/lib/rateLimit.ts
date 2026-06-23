@@ -31,6 +31,8 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
   'auth:reset': { limit: 5, windowSec: 600 },        // 5 / 10 min
   'guardian:declare': { limit: 5, windowSec: 86400 }, // 5 / day
   'consent:grant': { limit: 20, windowSec: 3600 },   // 20 / hour
+  'payment:checkout': { limit: 10, windowSec: 600 }, // 10 / 10 min
+  'admin:write': { limit: 60, windowSec: 60 },       // 60 / min
   'general': { limit: 100, windowSec: 60 },           // 100 / min
 };
 
@@ -44,6 +46,8 @@ export function getRateLimitConfig(path: string, method: string): { config: Rate
   if (path === '/auth/reset-password' && method === 'POST') return { config: RATE_LIMITS['auth:reset'], bucket: 'auth:reset' };
   if (path.startsWith('/guardian/declare') && method === 'POST') return { config: RATE_LIMITS['guardian:declare'], bucket: 'guardian:declare' };
   if (path.startsWith('/consent') && method === 'POST') return { config: RATE_LIMITS['consent:grant'], bucket: 'consent:grant' };
+  if (path === '/payments/checkout' && method === 'POST') return { config: RATE_LIMITS['payment:checkout'], bucket: 'payment:checkout' };
+  if (path.startsWith('/admin/') && method !== 'GET') return { config: RATE_LIMITS['admin:write'], bucket: 'admin:write' };
 
   // All other auth endpoints
   if (path.startsWith('/auth/')) return { config: RATE_LIMITS['auth:login'], bucket: 'auth:login' };

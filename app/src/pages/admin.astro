@@ -1,0 +1,123 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Admin — HaMi Code Việt">
+  <div id="admin-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiCall, clearToken } from '../lib/api';
+
+    const root = document.getElementById('admin-root')!;
+
+    async function renderAdmin() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+
+      // Try to get admin stats
+      const statsRes = await apiCall('/admin/stats');
+      if (statsRes.status === 403) {
+        root.innerHTML = `
+          <div class="auth-container">
+            <div class="auth-card">
+              <h1 class="auth-title">⛔ Không có quyền</h1>
+              <p class="auth-subtitle">Bạn cần quyền Admin để truy cập trang này.</p>
+              <a href="/dashboard" class="btn btn-primary">Về Dashboard</a>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      if (!statsRes.ok) { root.innerHTML = '<p>Lỗi tải dữ liệu.</p>'; return; }
+      const { stats, revenueByPlan } = await statsRes.json();
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;ADMIN&gt;</span></div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/admin" class="active">📊 Thống kê</a></li>
+              <li><a href="/admin/users">👥 Người dùng</a></li>
+              <li><a href="/admin/courses">📚 Khóa học</a></li>
+              <li><a href="/admin/payments">💰 Thanh toán</a></li>
+              <li><a href="/dashboard">← Về App</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <h1 class="dashboard-title">Admin Dashboard</h1>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Tổng người dùng</div>
+                <div class="stat-value">${stats.total_users}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Đã xác nhận email</div>
+                <div class="stat-value">${stats.verified_users}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Đăng ký mới (7 ngày)</div>
+                <div class="stat-value">${stats.new_users_7d}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Đăng ký (30 ngày)</div>
+                <div class="stat-value">${stats.new_users_30d}</div>
+              </div>
+            </div>
+
+            <div class="stats-grid" style="margin-top:16px">
+              <div class="stat-card">
+                <div class="stat-label">Lượt đăng ký khóa</div>
+                <div class="stat-value">${stats.total_enrollments}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Khóa đã hoàn thành</div>
+                <div class="stat-value">${stats.completed_courses}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Sub đang hoạt động</div>
+                <div class="stat-value">${stats.active_subscriptions}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Doanh thu</div>
+                <div class="stat-value">${(stats.total_revenue_cents / 1000).toLocaleString()}K</div>
+              </div>
+            </div>
+
+            <div class="stats-grid" style="margin-top:16px">
+              <div class="stat-card">
+                <div class="stat-label">Khóa học đã xuất bản</div>
+                <div class="stat-value">${stats.published_courses}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Chứng chỉ</div>
+                <div class="stat-value">${stats.total_certificates}</div>
+              </div>
+            </div>
+
+            ${revenueByPlan?.length > 0 ? `
+              <h3 style="margin-top:32px">Sub theo gói</h3>
+              <div class="plan-grid">
+                ${revenueByPlan.map((r: any) => `
+                  <div class="plan-card">
+                    <h3>${r.plan_id}</h3>
+                    <div class="plan-price">${r.count} sub</div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </main>
+        </div>
+      `;
+
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault(); clearToken(); window.location.href = '/login';
+      });
+    }
+
+    renderAdmin();
+  </script>
+</AppLayout>

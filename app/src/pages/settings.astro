@@ -1,0 +1,90 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Cài đặt — HaMi Code Việt">
+  <div id="settings-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiCall, clearToken } from '../lib/api';
+
+    const root = document.getElementById('settings-root')!;
+
+    async function renderSettings() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/billing">💳 Gói đăng ký</a></li>
+              <li><a href="/settings" class="active">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <h1 class="dashboard-title">Cài đặt tài khoản</h1>
+
+            <div class="settings-section">
+              <h3>Thông tin cá nhân</h3>
+              <div class="form-group">
+                <label>Tên hiển thị</label>
+                <input type="text" id="display-name" value="${user.displayName || ''}" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" value="${user.email}" disabled class="form-input" />
+                ${user.emailVerified ? '<span style="color:var(--color-success)">✓ Đã xác nhận</span>' : '<span style="color:var(--color-error)">⚠ Chưa xác nhận</span>'}
+              </div>
+              <div class="form-group">
+                <label>Ngôn ngữ</label>
+                <select id="language" class="form-input">
+                  <option value="vi" ${user.language === 'vi' ? 'selected' : ''}>Tiếng Việt</option>
+                  <option value="en" ${user.language === 'en' ? 'selected' : ''}>English</option>
+                </select>
+              </div>
+              <button id="save-profile" class="btn btn-primary">Lưu thay đổi</button>
+            </div>
+
+            <div class="settings-section">
+              <h3>Bảo mật</h3>
+              <a href="/consent-settings" class="btn btn-outline">Quản lý đồng ý</a>
+              <a href="/guardian" class="btn btn-outline">Quản lý người giám hộ</a>
+            </div>
+
+            <div class="settings-section">
+              <h3>Danger Zone</h3>
+              <button id="logout-all-btn" class="btn btn-danger">Đăng xuất tất cả thiết bị</button>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('save-profile')?.addEventListener('click', async () => {
+        const displayName = (document.getElementById('display-name') as HTMLInputElement).value;
+        const language = (document.getElementById('language') as HTMLSelectElement).value;
+        const r = await apiCall('/auth/profile', 'PUT', { displayName, language });
+        if (r.ok) alert('Đã lưu! ✅');
+        else alert('Lỗi khi lưu');
+      });
+
+      document.getElementById('logout-all-btn')?.addEventListener('click', async () => {
+        if (!confirm('Đăng xuất tất cả thiết bị?')) return;
+        const r = await apiCall('/auth/logout-all', 'POST');
+        if (r.ok) { clearToken(); window.location.href = '/login'; }
+      });
+
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault(); clearToken(); window.location.href = '/login';
+      });
+    }
+
+    renderSettings();
+  </script>
+</AppLayout>

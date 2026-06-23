@@ -1,0 +1,106 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Gói đăng ký — HaMi Code Việt">
+  <div id="billing-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiCall, clearToken } from '../lib/api';
+
+    const root = document.getElementById('billing-root')!;
+
+    async function renderBilling() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+
+      const [plansRes, subRes, histRes] = await Promise.all([
+        fetch('https://api.hamicodeviet.com/payments/plans'),
+        apiCall('/payments/subscription'),
+        apiCall('/payments/history'),
+      ]);
+      const { plans } = await plansRes.json();
+      const subData = subRes.ok ? await subRes.json() : { plan: 'free', subscription: null };
+      const histData = histRes.ok ? await histRes.json() : { payments: [] };
+
+      const currentPlan = subData.plan || 'free';
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/billing" class="active">💳 Gói đăng ký</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <h1 class="dashboard-title">Gói đăng ký</h1>
+            <p style="color:var(--color-text-muted);margin-bottom:24px">Gói hiện tại: <strong style="color:var(--color-primary)">${currentPlan.toUpperCase()}</strong></p>
+
+            <div class="plan-grid">
+              ${plans.map((p: any) => `
+                <div class="plan-card ${p.id === currentPlan ? 'plan-current' : ''}">
+                  <h3>${p.name}</h3>
+                  <div class="plan-price">
+                    ${p.priceCents === 0 ? 'Miễn phí' : (p.priceCents / 1000).toLocaleString() + 'K VND/tháng'}
+                  </div>
+                  ${p.id === currentPlan
+                    ? '<span class="badge-current">Gói hiện tại</span>'
+                    : p.priceCents === 0
+                      ? '<button class="btn btn-outline" disabled>Đang dùng</button>'
+                      : `<button class="btn btn-primary checkout-btn" data-plan="${p.id}">Nâng cấp</button>`
+                  }
+                </div>
+              `).join('')}
+            </div>
+
+            <h3 style="margin-top:32px">Lịch sử thanh toán</h3>
+            ${histData.payments?.length > 0 ? `
+              <table class="data-table">
+                <thead><tr><th>Mô tả</th><th>Số tiền</th><th>Trạng thái</th><th>Ngày</th></tr></thead>
+                <tbody>
+                  ${histData.payments.map((p: any) => `
+                    <tr>
+                      <td>${p.description}</td>
+                      <td>${(p.amount_cents / 1000).toLocaleString()}K VND</td>
+                      <td><span class="badge-${p.status}">${p.status}</span></td>
+                      <td>${new Date(p.created_at).toLocaleDateString('vi-VN')}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            ` : '<p style="color:var(--color-text-muted)">Chưa có giao dịch.</p>'}
+          </main>
+        </div>
+      `;
+
+      document.querySelectorAll('.checkout-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const planId = (e.target as HTMLElement).dataset.plan;
+          const r = await apiCall('/payments/checkout', 'POST', { planId });
+          const d = await r.json();
+          if (d.checkoutUrl) {
+            window.location.href = d.checkoutUrl;
+          } else if (d.demoMode) {
+            alert('Nâng cấp thành công (demo mode)! 🎉');
+            window.location.reload();
+          } else {
+            alert('Lỗi: ' + (d.error || 'Không thể tạo thanh toán'));
+          }
+        });
+      });
+
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault(); clearToken(); window.location.href = '/login';
+      });
+    }
+
+    renderBilling();
+  </script>
+</AppLayout>

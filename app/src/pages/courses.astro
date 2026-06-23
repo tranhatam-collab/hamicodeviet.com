@@ -1,0 +1,84 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Khóa học — HaMi Code Việt">
+  <div id="courses-root">
+    <div class="auth-container">
+      <div class="auth-card">
+        <h1 class="auth-title">Đang tải khóa học...</h1>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiCall } from '../lib/api';
+
+    const root = document.getElementById('courses-root')!;
+
+    async function renderCourses() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+
+      const [coursesRes, enrolledRes] = await Promise.all([
+        fetch('https://api.hamicodeviet.com/courses'),
+        apiCall('/courses/enrolled/list'),
+      ]);
+      const { courses } = await coursesRes.json();
+      const enrolled = enrolledRes.ok ? (await enrolledRes.json()).enrollments : [];
+
+      const enrolledSlugs = new Set(enrolled.map((e: any) => e.slug));
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses" class="active">📚 Khóa học</a></li>
+              <li><a href="/billing">💳 Gói đăng ký</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header">
+              <h1 class="dashboard-title">Khóa học</h1>
+              <div class="user-menu"><div class="user-avatar">${user.displayName?.[0]?.toUpperCase() || '?'}</div></div>
+            </div>
+            <div class="course-grid">
+              ${courses.map((c: any) => `
+                <div class="course-card">
+                  <div class="course-card-header" style="background:${c.level === 'beginner' ? '#00A8CC' : c.level === 'elementary' ? '#20A779' : '#FFC857'}">
+                    <span class="course-level">${c.level}</span>
+                  </div>
+                  <div class="course-card-body">
+                    <h3>${c.title_vi}</h3>
+                    <p class="course-desc">${c.description_vi}</p>
+                    <div class="course-meta">
+                      <span>⏱ ${c.duration_hours}h</span>
+                      <span>${c.price_cents === 0 ? 'Miễn phí' : (c.price_cents / 1000).toLocaleString() + 'K VND'}</span>
+                    </div>
+                    ${enrolledSlugs.has(c.slug)
+                      ? `<a href="/course/${c.slug}" class="btn btn-primary">Tiếp tục học</a>`
+                      : `<a href="/course/${c.slug}" class="btn btn-outline">Xem chi tiết</a>`
+                    }
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('logout-btn')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const { clearToken } = await import('../lib/api');
+        clearToken();
+        window.location.href = '/login';
+      });
+    }
+
+    renderCourses();
+  </script>
+</AppLayout>

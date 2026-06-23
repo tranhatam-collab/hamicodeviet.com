@@ -3,6 +3,7 @@ import { getDb } from '../lib/db';
 import { hashPassword, verifyPassword } from '../lib/password';
 import { signJwt, verifyJwt, hashToken, generateToken } from '../lib/jwt';
 import { enqueueEmail, isEmailEnabled } from '../lib/email';
+import { getBearerToken } from '../lib/auth';
 
 const auth = new Hono<{ Bindings: Env }>();
 
@@ -389,10 +390,39 @@ auth.post('/resend-verification', async (c) => {
   return c.json({ success: true });
 });
 
-function getBearerToken(c: any): string | null {
-  const auth = c.req.header('authorization');
-  if (!auth || !auth.startsWith('Bearer ')) return null;
-  return auth.substring(7);
-}
+// PUT /auth/profile — update user profile
+auth.put('/profile', async (c) => {
+  const token = getBearerToken(c);
+  if (!token) return c.json({ error: 'unauthorized' }, 401);
+  const payload = await verifyJwt(token, c.env.JWT_SECRET);
+  if (!payload) return c.json({ error: 'invalid_token' }, 401);
+
+  const body = await c.req.json();
+  const displayName = body.displayName?.trim();
+  const language = body.language === 'en' ? 'en' : 'vi';
+
+  if (!displayName) return c.json({ error: 'missing_display_name' }, 400);
+
+  const sql = getDb(c.env);
+  await sql`
+    UPDATE profiles SET display_name = ${displayName}, language = ${language}, updated_at = now()
+    WHERE user_id = ${payload.sub}
+  `;
+
+  return c.json({ success: true, displayName, language });
+});
+
+// POST /auth/logout-all — revoke all sessions
+auth.post('/logout-all', async (c) => {
+  const token = getBearerToken(c);
+  if (!token) return c.json({ error: 'unauthorized' }, 401);
+  const payload = await verifyJwt(token, c.env.JWT_SECRET);
+  if (!payload) return c.json({ error: 'invalid_token' }, 401);
+
+  const sql = getDb(c.env);
+  await sql`UPDATE sessions SET revoked_at = now() WHERE user_id = ${payload.sub} AND revoked_at IS NULL`;
+
+  return c.json({ success: true });
+});
 
 export default auth;

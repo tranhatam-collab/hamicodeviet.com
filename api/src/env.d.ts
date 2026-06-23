@@ -3,6 +3,8 @@ interface Env {
   JWT_SECRET: string;
   APP_URL: string;
   RESEND_API_KEY: string;
+  STRIPE_SECRET_KEY: string;
+  STRIPE_WEBHOOK_SECRET: string;
   RATE_LIMITER: DurableObjectNamespace;
   EMAIL_QUEUE: Queue<EmailQueueMessage>;
   EMAIL_DLQ: Queue<EmailQueueMessage>;

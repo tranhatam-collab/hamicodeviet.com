@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const docSections = [
+  {
+    title: 'Bắt đầu',
+    titleEn: 'Getting Started',
+    icon: '🚀',
+    docs: [
+      { slug: 'getting-started', title: 'Hướng dẫn bắt đầu', titleEn: 'Quick Start Guide' },
+      { slug: 'create-account', title: 'Tạo tài khoản', titleEn: 'Create an Account' },
+      { slug: 'first-lesson', title: 'Bài học đầu tiên', titleEn: 'Your First Lesson' },
+    ],
+  },
+  {
+    title: 'Sản phẩm',
+    titleEn: 'Products',
+    icon: '📦',
+    docs: [
+      { slug: 'hami-learn', title: 'HaMi Learn — Học miễn phí', titleEn: 'HaMi Learn — Free Learning' },
+      { slug: 'hami-academy', title: 'HaMi Academy — Khóa trả phí', titleEn: 'HaMi Academy — Paid Courses' },
+      { slug: 'hami-codelab', title: 'HaMi CodeLab — Phòng thực hành', titleEn: 'HaMi CodeLab — Code Lab' },
+    ],
+  },
+  {
+    title: 'Tài khoản & Bảo mật',
+    titleEn: 'Account & Security',
+    icon: '🔒',
+    docs: [
+      { slug: 'account-security', title: 'Bảo mật tài khoản', titleEn: 'Account Security' },
+      { slug: 'guardian-consent', title: 'Người giám hộ & đồng ý', titleEn: 'Guardian & Consent' },
+      { slug: 'privacy', title: 'Quyền riêng tư', titleEn: 'Privacy' },
+    ],
+  },
+  {
+    title: 'Thanh toán',
+    titleEn: 'Billing',
+    icon: '💳',
+    docs: [
+      { slug: 'plans', title: 'Các gói đăng ký', titleEn: 'Subscription Plans' },
+      { slug: 'payment-methods', title: 'Phương thức thanh toán', titleEn: 'Payment Methods' },
+      { slug: 'refund-policy', title: 'Chính sách hoàn tiền', titleEn: 'Refund Policy' },
+    ],
+  },
+  {
+    title: 'API & Tích hợp',
+    titleEn: 'API & Integration',
+    icon: '⚙️',
+    docs: [
+      { slug: 'api-overview', title: 'Tổng quan API', titleEn: 'API Overview' },
+      { slug: 'api-auth', title: 'Xác thực API', titleEn: 'API Authentication' },
+      { slug: 'api-endpoints', title: 'Danh sách endpoints', titleEn: 'API Endpoints' },
+    ],
+  },
+  {
+    title: 'Cho giáo viên',
+    titleEn: 'For Teachers',
+    icon: '🏫',
+    docs: [
+      { slug: 'teacher-guide', title: 'Hướng dẫn giáo viên', titleEn: 'Teacher Guide' },
+      { slug: 'classroom', title: 'Quản lý lớp học', titleEn: 'Classroom Management' },
+    ],
+  },
+];
+---
+
+<BaseLayout title="Tài liệu — HaMi Code Việt">
+  <div class="docs-page">
+    <div class="container">
+      <div class="docs-hero">
+        <h1>Tài liệu</h1>
+        <p>Hướng dẫn sử dụng, API, và tài nguyên cho người học, phụ huynh, giáo viên</p>
+      </div>
+
+      <div class="docs-grid">
+        {docSections.map((section) => (
+          <div class="docs-section">
+            <div class="docs-section-header">
+              <span class="docs-icon">{section.icon}</span>
+              <h2>{section.title}</h2>
+            </div>
+            <ul class="docs-list">
+              {section.docs.map((doc) => (
+                <li><a href={`/tai-lieu/${doc.slug}`}>{doc.title}</a></li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+.docs-page { padding: 80px 0 60px; background: var(--bg-light, #F7FAFC); min-height: 60vh; }
+.docs-hero { text-align: center; margin-bottom: 48px; }
+.docs-hero h1 { font-size: 2.5rem; color: #102A43; margin-bottom: 12px; }
+.docs-hero p { color: #64748B; font-size: 1.1rem; }
+.docs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+.docs-section { background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px; }
+.docs-section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.docs-icon { font-size: 1.5rem; }
+.docs-section h2 { font-size: 1.1rem; color: #102A43; }
+.docs-list { list-style: none; padding: 0; }
+.docs-list li { padding: 8px 0; border-bottom: 1px solid #F1F5F9; }
+.docs-list li:last-child { border-bottom: none; }
+.docs-list a { color: #00A8CC; text-decoration: none; font-size: 0.95rem; }
+.docs-list a:hover { text-decoration: underline; }
+</style>

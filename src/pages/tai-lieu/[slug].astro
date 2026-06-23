@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  const slugs = [
+    'getting-started', 'create-account', 'first-lesson',
+    'hami-learn', 'hami-academy', 'hami-codelab',
+    'account-security', 'guardian-consent', 'privacy',
+    'plans', 'payment-methods', 'refund-policy',
+    'api-overview', 'api-auth', 'api-endpoints',
+    'teacher-guide', 'classroom',
+  ];
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const slug = Astro.params.slug;
+
+const docs: Record<string, { title: string; content: string }> = {
+  'getting-started': {
+    title: 'Hướng dẫn bắt đầu',
+    content: `## Chào mừng đến HaMi Code Việt
+
+HaMi Code Việt là nền tảng giáo dục công nghệ song ngữ Việt–Anh dành cho người học 8–24 tuổi.
+
+### 3 bước để bắt đầu
+
+1. **Tạo tài khoản** — Đăng ký tại app.hamicodeviet.com/signup
+2. **Xác nhận email** — Kiểm tra hộp thư và nhấn link xác nhận
+3. **Chọn khóa học** — Duyệt qua các khóa học miễn phí tại /courses
+
+### Lộ trình học
+
+Chọn lộ trình phù hợp độ tuổi:
+- **Creative Explorer** (8–10): Scratch, kể chuyện, hoạt hình
+- **Junior Builder** (11–13): HTML, CSS, JavaScript
+- **Young Creator** (14–17): Python, web app, database
+- **Product Developer** (16–20): Full-stack, SaaS
+- **Builder & Entrepreneur** (18–24): Startup, MVP, marketplace`,
+  },
+  'api-overview': {
+    title: 'Tổng quan API',
+    content: `## API HaMi Code Việt
+
+Base URL: \`https://api.hamicodeviet.com\`
+
+### Endpoints chính
+
+| Endpoint | Method | Auth | Mô tả |
+|----------|--------|------|-------|
+| /auth/signup | POST | No | Đăng ký |
+| /auth/login | POST | No | Đăng nhập |
+| /auth/me | GET | Yes | Thông tin user |
+| /courses | GET | No | Danh sách khóa học |
+| /courses/:slug | GET | No | Chi tiết khóa học |
+| /courses/:slug/enroll | POST | Yes | Đăng ký khóa |
+| /progress/:lessonId/start | POST | Yes | Bắt đầu bài |
+| /progress/:lessonId/complete | POST | Yes | Hoàn thành bài |
+| /payments/plans | GET | No | Gói đăng ký |
+| /payments/checkout | POST | Yes | Tạo thanh toán |
+| /admin/stats | GET | Admin | Thống kê platform |
+
+### Rate limiting
+
+| Endpoint | Limit |
+|----------|-------|
+| Login | 10 / 10 min |
+| Signup | 5 / hour |
+| General | 100 / min |`,
+  },
+  'plans': {
+    title: 'Các gói đăng ký',
+    content: `## Gói đăng ký HaMi Code Việt
+
+### Free (Miễn phí)
+- 30 bài học nhập môn
+- Cộng đồng học tập
+- Bài tập cơ bản
+
+### Learner (299K VND/tháng)
+- Tất cả khóa học theo lộ trình
+- Code review
+- Chứng chỉ hoàn thành
+- Hỗ trợ ưu tiên
+
+### Creator (599K VND/tháng)
+- Tất cả gói Learner
+- HaMi CodeLab
+- Marketplace listing
+- Portfolio
+
+### Family (999K VND/tháng)
+- Tất cả gói Creator
+- 5 tài khoản thành viên
+- Báo cáo phụ huynh
+- Quản lý gia đình`,
+  },
+};
+
+const doc = docs[slug] || { title: 'Tài liệu', content: 'Nội dung đang được cập nhật.' };
+---
+
+<BaseLayout title={`${doc.title} — HaMi Code Việt`}>
+  <div class="doc-page">
+    <div class="container">
+      <a href="/tai-lieu" style="color: #00A8CC; margin-bottom: 24px; display: inline-block">← Tài liệu</a>
+      <h1>{doc.title}</h1>
+      <div class="doc-content" set:html={doc.content.replace(/^## (.+)$/gm, '<h2>$1</h2>').replace(/^### (.+)$/gm, '<h3>$1</h3>').replace(/\n/g, '<br>')} />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+.doc-page { padding: 80px 0 60px; background: #F7FAFC; min-height: 60vh; }
+.doc-page h1 { font-size: 2rem; color: #102A43; margin-bottom: 24px; }
+.doc-content { background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 32px; line-height: 1.8; }
+.doc-content h2 { color: #102A43; margin: 24px 0 12px; }
+.doc-content h3 { color: #102A43; margin: 20px 0 8px; }
+</style>

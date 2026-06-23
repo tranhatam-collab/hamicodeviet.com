@@ -1,0 +1,106 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+
+export function getStaticPaths() {
+  return [{ params: { id: '_' } }];
+}
+---
+
+<AppLayout title="Bài học — HaMi Code Việt">
+  <div id="lesson-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải bài học...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiCall, clearToken } from '../../lib/api';
+
+    const root = document.getElementById('lesson-root')!;
+    const lessonId = window.location.pathname.split('/').pop();
+
+    async function renderLesson() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+
+      // Start lesson progress
+      await apiCall(`/progress/${lessonId}/start`, 'POST');
+
+      // Get lesson from API — we need course slug to find lessons
+      // For now, fetch all courses and find the lesson
+      const coursesRes = await fetch('https://api.hamicodeviet.com/courses');
+      const { courses } = await coursesRes.json();
+
+      let lessonData = null;
+      let courseSlug = null;
+      for (const c of courses) {
+        const r = await fetch(`https://api.hamicodeviet.com/courses/${c.slug}`);
+        const d = await r.json();
+        const found = d.lessons?.find((l: any) => l.id === lessonId);
+        if (found) { lessonData = found; courseSlug = c.slug; break; }
+      }
+
+      if (!lessonData) { root.innerHTML = '<p>Bài học không tìm thấy.</p>'; return; }
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses" class="active">📚 Khóa học</a></li>
+              <li><a href="/billing">💳 Gói đăng ký</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <a href="/course/${courseSlug}" style="color:var(--color-primary);margin-bottom:16px;display:inline-block">← Quay lại khóa học</a>
+            <h1 class="dashboard-title">${lessonData.title_vi}</h1>
+            <p style="color:var(--color-text-muted)">${lessonData.title_en}</p>
+            <p style="margin:16px 0">${lessonData.description_vi}</p>
+
+            <div class="lesson-meta-bar">
+              <span>⏱ ${lessonData.duration_min} phút</span>
+              <span>📊 ${lessonData.level}</span>
+              ${lessonData.is_free ? '<span class="badge-free">Free</span>' : ''}
+            </div>
+
+            ${lessonData.code_snippet ? `
+              <div class="code-block">
+                <div class="code-block-header">
+                  <span>${lessonData.code_language || 'code'}</span>
+                </div>
+                <pre><code>${escapeHtml(lessonData.code_snippet)}</code></pre>
+              </div>
+            ` : ''}
+
+            <div style="margin-top:32px;display:flex;gap:12px">
+              <button id="complete-btn" class="btn btn-primary">✅ Hoàn thành bài học</button>
+              <a href="/course/${courseSlug}" class="btn btn-outline">Bài tiếp theo →</a>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('complete-btn')?.addEventListener('click', async () => {
+        const r = await apiCall(`/progress/${lessonId}/complete`, 'POST', { timeSpentSec: 300 });
+        const d = await r.json();
+        if (d.courseCompleted) {
+          alert(`Chúc mừng! Bạn đã hoàn thành khóa học! 🎉\nChứng chỉ: ${d.certificateNumber}`);
+        } else {
+          alert('Bài học đã hoàn thành! ✅');
+        }
+        window.location.href = `/course/${courseSlug}`;
+      });
+
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault(); clearToken(); window.location.href = '/login';
+      });
+    }
+
+    function escapeHtml(s: string) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    renderLesson();
+  </script>
+</AppLayout>

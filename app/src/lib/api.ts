@@ -1,4 +1,4 @@
-export const API_URL = import.meta.env.PUBLIC_API_URL || 'https://hamicodeviet-api.tranhatam66.workers.dev';
+export const API_URL = 'https://api.hamicodeviet.com';
 
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -11,6 +11,23 @@ export function setToken(token: string): void {
 
 export function clearToken(): void {
   localStorage.removeItem('hmcv_token');
+}
+
+/**
+ * Low-level API call — returns Response object (does not throw).
+ * Use this when you need to check status codes.
+ */
+export async function apiCall(path: string, method = 'GET', body?: any): Promise<Response> {
+  const token = getToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return fetch(`${API_URL}${path}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
 }
 
 export async function apiFetch(path: string, options: RequestInit = {}): Promise<any> {
