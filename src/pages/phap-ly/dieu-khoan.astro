@@ -1,0 +1,187 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = 'Điều khoản sử dụng';
+const description = 'Bộ điều khoản sử dụng HaMi Code Việt — phiên bản dự thảo 1.0';
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="legal-page">
+    <div class="legal-container">
+      <h1>Bộ điều khoản sử dụng</h1>
+      <p class="legal-version">Phiên bản: 1.0-draft | Ngày hiệu lực dự kiến: [DD/MM/YYYY]</p>
+
+      <div class="legal-warning">
+        <strong>Trạng thái pháp lý:</strong> Đây là bản dự thảo vận hành V1.0, chưa có hiệu lực.
+        Trước khi công bố, cần điền đầy đủ thông tin pháp nhân và được luật sư rà soát.
+        Trạng thái mặc định: <strong>HOLD — CHILD ACCOUNTS AND PAYMENTS DISABLED</strong>.
+      </div>
+
+      <h2 id="pham-vi">1. Phạm vi áp dụng</h2>
+      <p>Bộ điều khoản này áp dụng cho:</p>
+      <ul>
+        <li><code>hamicodeviet.com</code>, <code>app.hamicodeviet.com</code>, <code>docs.hamicodeviet.com</code></li>
+        <li>Các ứng dụng di động, PWA và dịch vụ liên quan</li>
+        <li>Khóa học, lớp học, CodeLab, AI Agent, portfolio</li>
+        <li>Marketplace và sản phẩm số</li>
+        <li>Chương trình dành cho phụ huynh, giáo viên và trường học</li>
+        <li>Hoạt động thanh toán, subscription và cấp quyền truy cập</li>
+      </ul>
+
+      <h2 id="tuoi">2. Điều kiện độ tuổi</h2>
+      <h3>Người dưới 18 tuổi</h3>
+      <ul>
+        <li>Không được tự mua subscription hoặc sản phẩm trả phí</li>
+        <li>Không được nhập, lưu hoặc sử dụng thông tin thẻ</li>
+        <li>Tài khoản trả phí phải được người thanh toán trưởng thành phê duyệt</li>
+        <li>Public portfolio mặc định bị tắt</li>
+        <li>Direct messaging mặc định bị tắt</li>
+        <li>Marketing cá nhân hóa và quảng cáo hành vi bị cấm</li>
+      </ul>
+
+      <h3>Trẻ 8–12 tuổi</h3>
+      <ul>
+        <li>Phải có guardian account trước khi kích hoạt đầy đủ</li>
+        <li>AI mở, public portfolio, marketplace, public comments bị tắt mặc định</li>
+        <li>Guardian phải phê duyệt từng quyền tùy chọn</li>
+        <li>Không yêu cầu họ tên đầy đủ, địa chỉ, trường học, số điện thoại, ảnh cá nhân</li>
+      </ul>
+
+      <h3>Người 13–17 tuổi</h3>
+      <ul>
+        <li>Guardian approval bắt buộc đối với thanh toán</li>
+        <li>Public portfolio, marketplace, creator payout cần phê duyệt riêng</li>
+        <li>Được cung cấp bản giải thích quyền riêng tư phù hợp với tuổi</li>
+      </ul>
+
+      <h2 id="consent">3. Consent</h2>
+      <p>Consent phải:</p>
+      <ul>
+        <li>Tự nguyện, cụ thể, được thông báo đầy đủ</li>
+        <li>Thể hiện bằng hành động chủ động (không đánh dấu sẵn)</li>
+        <li>Tách riêng theo loại: điều khoản, dữ liệu, thanh toán, subscription</li>
+        <li>Có thể rút lại bất cứ lúc nào</li>
+      </ul>
+
+      <p>Các consent tùy chọn (public portfolio, ảnh, giọng nói, marketing, AI training, marketplace) mặc định <strong>TẮT</strong>.</p>
+
+      <h2 id="hanh-vi-cam">4. Hành vi bị cấm</h2>
+      <ul>
+        <li>Quấy rối, bắt nạt, đe dọa</li>
+        <li>Grooming hoặc lôi kéo trẻ</li>
+        <li>Yêu cầu trẻ cung cấp thông tin liên hệ riêng</li>
+        <li>Nội dung tình dục hoặc khai thác trẻ</li>
+        <li>Hình ảnh xâm hại trẻ em</li>
+        <li>Mạo danh, lừa đảo, phát tán mã độc</li>
+        <li>Tạo AI bot nhằm thao túng cảm xúc trẻ</li>
+        <li>Chuyển cuộc trò chuyện với trẻ sang kênh riêng</li>
+      </ul>
+
+      <h2 id="thanh-toan">5. Thanh toán</h2>
+      <ul>
+        <li>Chỉ người trưởng thành, guardian, nhà trường hoặc tổ chức được thanh toán</li>
+        <li>Checkout phải có các xác nhận riêng (không gộp)</li>
+        <li>Subscription định kỳ cần consent riêng, không gộp với mua hàng một lần</li>
+        <li>Im lặng không được xem là consent</li>
+        <li>Hủy subscription không khó hơn đăng ký, có xác nhận hủy</li>
+      </ul>
+
+      <h2 id="ai">6. Chính sách AI</h2>
+      <ul>
+        <li>AI là công cụ hỗ trợ, có thể sai</li>
+        <li>Nội dung trẻ không được dùng để huấn luyện model chung mặc định</li>
+        <li>AI không được tự quyết định đình chỉ, payout, refund, chứng nhận</li>
+        <li>Phải có human review và cơ chế khiếu nại</li>
+      </ul>
+
+      <h2 id="quoc-gia">7. Country Policy</h2>
+      <p>Một quốc gia chỉ được mở <code>ACTIVE</code> khi đã hoàn thành:</p>
+      <ul>
+        <li>Legal review, age threshold, guardian method</li>
+        <li>Privacy notice, consumer rights, refund, tax, payment</li>
+        <li>Data transfer mechanism, local representative</li>
+        <li>Local complaint channel</li>
+      </ul>
+      <p>Nếu chưa hoàn thành: <code>BLOCKED</code>, <code>FREE_ONLY</code>, <code>PILOT</code>, hoặc <code>NO_PAYMENT</code>.</p>
+
+      <h2 id="lien-he">8. Liên hệ</h2>
+      <ul>
+        <li>Email pháp lý: <a href="mailto:legal@hamicodeviet.com">legal@hamicodeviet.com</a></li>
+        <li>Email quyền riêng tư: <a href="mailto:privacy@hamicodeviet.com">privacy@hamicodeviet.com</a></li>
+        <li>Email an toàn trẻ em: <a href="mailto:safety@hamicodeviet.com">safety@hamicodeviet.com</a></li>
+        <li>Email thanh toán: <a href="mailto:billing@hamicodeviet.com">billing@hamicodeviet.com</a></li>
+      </ul>
+
+      <hr style="margin:40px 0" />
+      <p class="legal-footer">
+        Xem bản đầy đủ (19 phần, 66 điều) tại
+        <a href="https://github.com/tranhatam66/hamicodeviet.com/blob/main/docs/legal/TERMS_V1.0_DRAFT.md">docs/legal/TERMS_V1.0_DRAFT.md</a>.
+        Bộ điều khoản đầy đủ sẽ được công bố khi đủ điều kiện phát hành (Phần XIX).
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .legal-page {
+    background: var(--bg-light, #f7fafc);
+    padding: 60px 0;
+  }
+  .legal-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 24px;
+    background: white;
+    border-radius: 12px;
+    padding: 48px;
+  }
+  .legal-container h1 {
+    font-size: 2rem;
+    color: var(--navy, #102a43);
+    margin-bottom: 8px;
+  }
+  .legal-version {
+    color: var(--text-muted, #64748b);
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+  }
+  .legal-warning {
+    padding: 16px 20px;
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    border-radius: 6px;
+    margin-bottom: 32px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .legal-container h2 {
+    font-size: 1.3rem;
+    color: var(--navy, #102a43);
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+  .legal-container h3 {
+    font-size: 1.05rem;
+    margin-top: 20px;
+    margin-bottom: 8px;
+  }
+  .legal-container ul {
+    padding-left: 24px;
+    margin-bottom: 16px;
+  }
+  .legal-container li {
+    margin-bottom: 6px;
+    line-height: 1.6;
+  }
+  .legal-container code {
+    background: var(--bg-light, #f7fafc);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9em;
+  }
+  .legal-footer {
+    font-size: 0.85rem;
+    color: var(--text-muted, #64748b);
+  }
+</style>

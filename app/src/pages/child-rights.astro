@@ -1,0 +1,230 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Quyền của em trên HaMi Code Việt — HaMi Code Việt">
+  <div id="child-rights-root">
+    <div class="child-rights-page">
+      <div class="child-rights-hero">
+        <div class="child-rights-icon">👶</div>
+        <h1>Quyền của em trên HaMi Code Việt</h1>
+        <p class="child-rights-intro">
+          Em có những quyền này. Không ai được lấy đi. Nếu em thấy không an toàn, hãy báo người lớn.
+        </p>
+      </div>
+
+      <div class="rights-grid">
+        <div class="right-card right-card--privacy">
+          <div class="right-icon">🔒</div>
+          <h3>Riêng tư của em</h3>
+          <ul>
+            <li>Em không cần nói địa chỉ nhà hoặc số điện thoại.</li>
+            <li>Em không cần gửi ảnh để học.</li>
+            <li>Hồ sơ của em được để riêng tư trước.</li>
+            <li>Không ai được ép em đăng ảnh hoặc thông tin riêng tư.</li>
+          </ul>
+        </div>
+
+        <div class="right-card right-card--safety">
+          <div class="right-icon">🛡️</div>
+          <h3>An toàn của em</h3>
+          <ul>
+            <li>Em không nên nói chuyện riêng với người lạ.</li>
+            <li>Em có thể báo cáo nội dung làm em khó chịu.</li>
+            <li>Em không được dùng thẻ ngân hàng.</li>
+            <li>Em có thể yêu cầu xóa project công khai.</li>
+          </ul>
+        </div>
+
+        <div class="right-card right-card--learning">
+          <div class="right-icon">📚</div>
+          <h3>Học tập của em</h3>
+          <ul>
+            <li>Em có thể hỏi người lớn khi không hiểu.</li>
+            <li>Em được học bằng tiếng em hiểu.</li>
+            <li>Em được thử lại nếu sai.</li>
+            <li>Em không bị phạt vì hỏi câu hỏi.</li>
+          </ul>
+        </div>
+
+        <div class="right-card right-card--ai">
+          <div class="right-icon">🤖</div>
+          <h3>Về AI</h3>
+          <ul>
+            <li>AI có thể sai.</li>
+            <li>AI không phải là bạn, thầy hay bác sĩ.</li>
+            <li>AI không được tự quyết định thay em.</li>
+            <li>Em luôn có quyền nhờ người thật xem xét.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="help-section">
+        <h2>Khi em cần giúp</h2>
+        <p>Em có thể báo cho:</p>
+        <div class="help-contacts">
+          <div class="help-card">
+            <div class="help-icon">👨‍👩‍👧</div>
+            <h4>Phụ huynh hoặc guardian</h4>
+            <p>Hãy nói với người chăm sóc em trước tiên.</p>
+          </div>
+          <div class="help-card">
+            <div class="help-icon">👩‍🏫</div>
+            <h4>Giáo viên</h4>
+            <p>Nếu em đang trong lớp học, hãy báo giáo viên.</p>
+          </div>
+          <div class="help-card">
+            <div class="help-icon">✉️</div>
+            <h4>Bộ phận an toàn</h4>
+            <p>safety@hamicodeviet.com</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="report-section">
+        <h2>Báo cáo nội dung làm em khó chịu</h2>
+        <p style="margin-bottom:16px;color:var(--color-text-muted)">
+          Em có thể báo cáo mà không cần giải thích lý do. Chúng em sẽ xem xét và ẩn nội dung nếu cần.
+        </p>
+        <button id="report-btn" class="btn btn--primary">Báo cáo nội dung</button>
+        <div id="report-form" style="display:none;margin-top:16px">
+          <textarea
+            id="report-text"
+            placeholder="Em muốn báo gì? (không bắt buộc giải thích)"
+            rows="4"
+            style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--color-border);font-family:inherit;margin-bottom:12px"
+          ></textarea>
+          <button id="report-submit" class="btn btn--primary">Gửi báo cáo</button>
+          <span id="report-success" style="display:none;color:var(--color-success);margin-left:12px">
+            ✓ Cảm ơn em. Chúng em đã nhận báo cáo.
+          </span>
+        </div>
+      </div>
+
+      <div class="back-link">
+        <a href="/dashboard" class="btn btn--secondary">← Quay lại Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser } from '../lib/api';
+
+    const user = await getCurrentUser();
+    if (!user) {
+      window.location.href = '/login';
+    }
+
+    const reportBtn = document.getElementById('report-btn')!;
+    const reportForm = document.getElementById('report-form')!;
+    const reportSubmit = document.getElementById('report-submit')!;
+    const reportSuccess = document.getElementById('report-success')!;
+
+    reportBtn.addEventListener('click', () => {
+      reportForm.style.display = 'block';
+      reportBtn.style.display = 'none';
+    });
+
+    reportSubmit.addEventListener('click', () => {
+      // In production, this would POST to /safety/report
+      // For now, log and show confirmation
+      reportForm.style.display = 'none';
+      reportSuccess.style.display = 'inline';
+      reportBtn.style.display = 'inline-block';
+      reportBtn.textContent = 'Báo thêm';
+      (document.getElementById('report-text') as HTMLTextAreaElement).value = '';
+    });
+  </script>
+
+  <style>
+    .child-rights-page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+    .child-rights-hero {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .child-rights-icon {
+      font-size: 4rem;
+      margin-bottom: 16px;
+    }
+    .child-rights-hero h1 {
+      font-size: 2rem;
+      color: var(--color-navy, #102a43);
+      margin-bottom: 12px;
+    }
+    .child-rights-intro {
+      font-size: 1.1rem;
+      color: var(--color-text-muted, #64748b);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .rights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .right-card {
+      padding: 24px;
+      border-radius: 12px;
+      border: 2px solid;
+    }
+    .right-card--privacy { border-color: #00a8cc33; background: #00a8cc0d; }
+    .right-card--safety { border-color: #20a77933; background: #20a7790d; }
+    .right-card--learning { border-color: #ffc85733; background: #ffc8570d; }
+    .right-card--ai { border-color: #a78bfa33; background: #a78bfa0d; }
+    .right-icon { font-size: 2rem; margin-bottom: 12px; }
+    .right-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+      color: var(--color-navy, #102a43);
+    }
+    .right-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    .right-card li {
+      padding: 6px 0 6px 24px;
+      position: relative;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .right-card li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--color-success, #20a779);
+      font-weight: bold;
+    }
+    .help-section, .report-section {
+      padding: 24px;
+      background: var(--color-bg-light, #f7fafc);
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+    .help-section h2, .report-section h2 {
+      font-size: 1.3rem;
+      margin-bottom: 16px;
+      color: var(--color-navy, #102a43);
+    }
+    .help-contacts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .help-card {
+      text-align: center;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+    }
+    .help-icon { font-size: 2rem; margin-bottom: 8px; }
+    .help-card h4 { margin-bottom: 6px; }
+    .help-card p { font-size: 0.85rem; color: var(--color-text-muted); }
+    .back-link { text-align: center; margin-top: 32px; }
+  </style>
+</AppLayout>

@@ -1,0 +1,133 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = 'Thông báo quyền riêng tư';
+const description = 'Thông báo quyền riêng tư HaMi Code Việt — phiên bản dự thảo 1.0';
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="legal-page">
+    <div class="legal-container">
+      <h1>Thông báo quyền riêng tư</h1>
+      <p class="legal-version">Phiên bản: 1.0-draft</p>
+
+      <div class="legal-warning">
+        <strong>Trạng thái:</strong> Bản dự thảo, chưa có hiệu lực.
+      </div>
+
+      <h2>1. Dữ liệu chúng tôi thu thập</h2>
+
+      <h3>Dữ liệu tài khoản</h3>
+      <ul>
+        <li>Display name, email, năm sinh, quốc gia, ngôn ngữ, role</li>
+        <li>Guardian relationship, trạng thái consent</li>
+      </ul>
+
+      <h3>Dữ liệu học tập</h3>
+      <ul>
+        <li>Lộ trình, bài học, tiến độ, điểm, project, code, bài nộp, phản hồi, chứng nhận, portfolio</li>
+      </ul>
+
+      <h3>Dữ liệu kỹ thuật</h3>
+      <ul>
+        <li>IP, thiết bị, trình duyệt, session, lỗi, security log, thời điểm truy cập</li>
+      </ul>
+
+      <h3>Dữ liệu thanh toán</h3>
+      <ul>
+        <li>Tên người thanh toán, token thanh toán, 4 số cuối, trạng thái giao dịch, hóa đơn</li>
+        <li><strong>Không lưu toàn bộ số thẻ</strong></li>
+      </ul>
+
+      <h3>Dữ liệu AI</h3>
+      <ul>
+        <li>Prompt, câu trả lời, code gửi, model, token usage, safety result, feedback</li>
+        <li>Đối với trẻ, prompt được lọc để hạn chế dữ liệu nhận diện</li>
+      </ul>
+
+      <h3>Dữ liệu tùy chọn (chỉ thu khi có consent riêng)</h3>
+      <ul>
+        <li>Ảnh, video, giọng nói, public profile, testimonial, hồ sơ creator, vị trí</li>
+      </ul>
+
+      <h2>2. Dữ liệu KHÔNG thu theo mặc định</h2>
+      <ul>
+        <li>Vị trí chính xác, dữ liệu sinh trắc học, hồ sơ sức khỏe</li>
+        <li>Quan điểm chính trị, tôn giáo, đời sống tình dục</li>
+        <li>Số định danh quốc gia, địa chỉ nhà, trường học cụ thể</li>
+        <li>Danh bạ, tin nhắn riêng, nội dung microphone/camera nền</li>
+      </ul>
+
+      <h2>3. Không bán dữ liệu, không quảng cáo hành vi</h2>
+      <p>HaMi Code Việt không:</p>
+      <ul>
+        <li>Bán dữ liệu cá nhân của trẻ</li>
+        <li>Trao đổi dữ liệu trẻ lấy lợi ích thương mại</li>
+        <li>Quảng cáo hành vi cho trẻ</li>
+        <li>Xây hồ sơ quảng cáo đa nền tảng</li>
+        <li>Cho phép ad network theo dõi trẻ</li>
+        <li>Sử dụng dark pattern ép trẻ chia sẻ thêm dữ liệu</li>
+      </ul>
+
+      <h2>4. Thời gian lưu trữ</h2>
+      <ul>
+        <li>Tài khoản: trong thời gian hoạt động</li>
+        <li>Dữ liệu học tập: tối đa 24 tháng sau khi đóng</li>
+        <li>AI conversation của trẻ: tối đa 30 ngày</li>
+        <li>Security logs: 180–365 ngày</li>
+        <li>Consent records: trong thời gian cần thiết để chứng minh compliance</li>
+        <li>Dữ liệu bị yêu cầu xóa: loại bỏ khỏi hệ thống chính; backup hết hạn tối đa 90 ngày</li>
+      </ul>
+
+      <h2>5. Quyền của người dùng</h2>
+      <ul>
+        <li>Biết, truy cập, sửa, tải xuống dữ liệu</li>
+        <li>Rút consent, phản đối, hạn chế xử lý, xóa</li>
+        <li>Khiếu nại</li>
+        <li>Yêu cầu con người xem xét quyết định tự động</li>
+        <li>Yêu cầu chuyển dữ liệu khi có quyền</li>
+        <li>Yêu cầu ngừng công khai portfolio</li>
+      </ul>
+
+      <h2>6. Yêu cầu xóa</h2>
+      <p>Khi nhận yêu cầu hợp lệ, chúng tôi:</p>
+      <ol>
+        <li>Xác minh người yêu cầu</li>
+        <li>Đánh giá quyền guardian</li>
+        <li>Khóa public profile ngay khi có rủi ro</li>
+        <li>Xóa hoặc khử nhận diện dữ liệu không còn cần thiết</li>
+        <li>Thông báo các processor phù hợp</li>
+        <li>Giải thích dữ liệu phải giữ vì pháp luật</li>
+        <li>Cung cấp xác nhận hoàn thành</li>
+      </ol>
+
+      <h2>7. Sự cố dữ liệu</h2>
+      <p>Nếu xảy ra sự cố:</p>
+      <ul>
+        <li>Kích hoạt incident response</li>
+        <li>Đánh giá ảnh hưởng đến trẻ</li>
+        <li>Thông báo cơ quan có thẩm quyền trong thời hạn luật định</li>
+        <li>Thông báo guardian hoặc người dùng khi cần</li>
+        <li>Thực hiện post-incident review</li>
+      </ul>
+
+      <h2>8. Liên hệ</h2>
+      <ul>
+        <li>Email quyền riêng tư: <a href="mailto:privacy@hamicodeviet.com">privacy@hamicodeviet.com</a></li>
+        <li>Email an toàn trẻ em: <a href="mailto:safety@hamicodeviet.com">safety@hamicodeviet.com</a></li>
+      </ul>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .legal-page { background: var(--bg-light, #f7fafc); padding: 60px 0; }
+  .legal-container { max-width: 800px; margin: 0 auto; padding: 48px; background: white; border-radius: 12px; }
+  .legal-container h1 { font-size: 2rem; color: var(--navy, #102a43); margin-bottom: 8px; }
+  .legal-version { color: var(--text-muted, #64748b); font-size: 0.9rem; margin-bottom: 24px; }
+  .legal-warning { padding: 16px 20px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 6px; margin-bottom: 32px; font-size: 0.9rem; }
+  .legal-container h2 { font-size: 1.3rem; color: var(--navy, #102a43); margin-top: 32px; margin-bottom: 12px; }
+  .legal-container h3 { font-size: 1.05rem; margin-top: 20px; margin-bottom: 8px; }
+  .legal-container ul, .legal-container ol { padding-left: 24px; margin-bottom: 16px; }
+  .legal-container li { margin-bottom: 6px; line-height: 1.6; }
+</style>

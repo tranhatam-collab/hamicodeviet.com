@@ -1,0 +1,110 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = 'An toàn trẻ em';
+const description = 'Chính sách an toàn trẻ em HaMi Code Việt — bảo vệ cao mặc định';
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="legal-page">
+    <div class="legal-container">
+      <h1>An toàn trẻ em</h1>
+      <p class="legal-version">Phiên bản: 1.0-draft</p>
+
+      <div class="legal-warning">
+        <strong>Nguyên tắc cốt lõi:</strong> Trong mọi quyết định liên quan người dưới 18 tuổi,
+        HaMi Code Việt ưu tiên lợi ích tốt nhất của trẻ: an toàn, quyền riêng tư, phẩm giá,
+        phát triển lành mạnh, và quyền được học tập.
+      </div>
+
+      <h2>1. Bảo vệ cao mặc định</h2>
+      <ul>
+        <li><strong>Hồ sơ mặc định riêng tư</strong> — public portfolio bị tắt cho người dưới 18</li>
+        <li><strong>Không quảng cáo hành vi</strong> — không profiling, không ad network tracking</li>
+        <li><strong>Không bán dữ liệu</strong> — không trao đổi dữ liệu trẻ lấy lợi ích</li>
+        <li><strong>AI không tự quyết định</strong> — human review cho mọi quyết định quan trọng</li>
+        <li><strong>Không AI training mặc định</strong> — nội dung trẻ không dùng huấn luyện model chung</li>
+        <li><strong>Giảm thiểu dữ liệu</strong> — chỉ thu tối thiểu cần thiết</li>
+        <li><strong>Direct messaging tắt</strong> — trừ lớp học có kiểm soát</li>
+      </ul>
+
+      <h2>2. Độ tuổi và guardian</h2>
+      <table class="age-table">
+        <thead>
+          <tr><th>Độ tuổi</th><th>Guardian</th><th>AI</th><th>Portfolio</th><th>Marketplace</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>8–12</td><td>Bắt buộc</td><td>Giới hạn</td><td>Tắt</td><td>Tắt</td></tr>
+          <tr><td>13–17</td><td>Cho thanh toán</td><td>Mở có warning</td><td>Cần phê duyệt</td><td>Cần phê duyệt</td></tr>
+          <tr><td>18+</td><td>Không</td><td>Đầy đủ</td><td>Tự quyết</td><td>Tự quyết</td></tr>
+        </tbody>
+      </table>
+
+      <h2>3. Quyền của trẻ</h2>
+      <div class="rights-box">
+        <ul>
+          <li>Em không cần nói địa chỉ nhà hoặc số điện thoại</li>
+          <li>Em không cần gửi ảnh để học</li>
+          <li>Hồ sơ của em được để riêng tư trước</li>
+          <li>Em có thể hỏi người lớn khi không hiểu</li>
+          <li>Em có thể báo cáo nội dung làm em khó chịu</li>
+          <li>Em không nên nói chuyện riêng với người lạ</li>
+          <li>AI có thể sai</li>
+          <li>Em không được dùng thẻ ngân hàng</li>
+          <li>Em có thể yêu cầu xóa project công khai</li>
+          <li>Không ai được ép em đăng ảnh hoặc thông tin riêng tư</li>
+        </ul>
+      </div>
+
+      <h2>4. Hành vi bị cấm</h2>
+      <ul>
+        <li>Quấy rối, bắt nạt, đe dọa</li>
+        <li>Grooming hoặc lôi kéo trẻ</li>
+        <li>Yêu cầu trẻ cung cấp thông tin liên hệ riêng</li>
+        <li>Nội dung tình dục hoặc khai thác trẻ</li>
+        <li>Hình ảnh xâm hại trẻ em</li>
+        <li>Tạo AI bot nhằm thao túng cảm xúc trẻ</li>
+        <li>Chuyển cuộc trò chuyện với trẻ sang kênh riêng</li>
+      </ul>
+
+      <h2>5. Xử lý vi phạm</h2>
+      <p>HaMi Code Việt có thể: cảnh báo, hạn chế chức năng, ẩn/xóa nội dung, khóa tạm thời,
+      đình chỉ, chấm dứt tài khoản, giữ payout trong thời gian điều tra, thông báo guardian,
+      bảo toàn bằng chứng, báo cáo cơ quan có thẩm quyền.</p>
+
+      <h2>6. Báo cáo</h2>
+      <p>Nếu em thấy nội dung làm em khó chịu, hãy báo:</p>
+      <ul>
+        <li>Phụ huynh hoặc guardian</li>
+        <li>Giáo viên (nếu đang trong lớp)</li>
+        <li>Bộ phận an toàn: <a href="mailto:safety@hamicodeviet.com">safety@hamicodeviet.com</a></li>
+      </ul>
+
+      <h2>7. Tham khảo pháp lý</h2>
+      <ul>
+        <li>Việt Nam: Luật Bảo vệ dữ liệu cá nhân 91/2025/QH15, Luật Trẻ em, ND 56/2017, ND 13/2023</li>
+        <li>Hoa Kỳ: COPPA</li>
+        <li>EEA: GDPR (ngưỡng 13–16 tùy quốc gia)</li>
+        <li>Anh: ICO Age-Appropriate Design Code</li>
+        <li>Ấn Độ: DPDP Act 2023</li>
+        <li>UNICEF: Policy guidance on AI for children</li>
+      </ul>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .legal-page { background: var(--bg-light, #f7fafc); padding: 60px 0; }
+  .legal-container { max-width: 800px; margin: 0 auto; padding: 48px; background: white; border-radius: 12px; }
+  .legal-container h1 { font-size: 2rem; color: var(--navy, #102a43); margin-bottom: 8px; }
+  .legal-version { color: var(--text-muted, #64748b); font-size: 0.9rem; margin-bottom: 24px; }
+  .legal-warning { padding: 16px 20px; background: #d1ecf1; border-left: 4px solid #00a8cc; border-radius: 6px; margin-bottom: 32px; font-size: 0.9rem; line-height: 1.6; }
+  .legal-container h2 { font-size: 1.3rem; color: var(--navy, #102a43); margin-top: 32px; margin-bottom: 12px; }
+  .legal-container ul { padding-left: 24px; margin-bottom: 16px; }
+  .legal-container li { margin-bottom: 6px; line-height: 1.6; }
+  .age-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  .age-table th, .age-table td { padding: 10px 12px; border: 1px solid #e2e8f0; text-align: center; font-size: 0.9rem; }
+  .age-table th { background: var(--bg-light, #f7fafc); font-weight: 600; }
+  .rights-box { padding: 20px; background: #ffc8571a; border-radius: 8px; border-left: 4px solid #ffc857; }
+  .rights-box ul { margin-bottom: 0; }
+</style>

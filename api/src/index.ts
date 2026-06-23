@@ -5,6 +5,7 @@ import { rateLimit, rateLimitHeaders } from './lib/rateLimit';
 import auth from './routes/auth';
 import guardian from './routes/guardian';
 import consent from './routes/consent';
+import countryPolicy from './routes/countryPolicy';
 
 const app = new Hono<AppBindings>();
 
@@ -72,6 +73,7 @@ app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOStri
 app.route('/auth', auth);
 app.route('/guardian', guardian);
 app.route('/consent', consent);
+app.route('/country-policy', countryPolicy);
 
 // 404
 app.notFound((c) => c.json({ error: 'not_found' }, 404));

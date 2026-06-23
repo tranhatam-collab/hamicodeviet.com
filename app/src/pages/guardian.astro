@@ -1,0 +1,324 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Phụ huynh / Guardian — HaMi Code Việt">
+  <div id="guardian-root">
+    <div class="auth-container">
+      <div class="auth-card">
+        <h1 class="auth-title">Đang tải...</h1>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch, clearToken } from '../lib/api';
+
+    const root = document.getElementById('guardian-root')!;
+
+    async function renderGuardianPage() {
+      const user = await getCurrentUser();
+      if (!user) {
+        window.location.href = '/login';
+        return;
+      }
+
+      let data;
+      try {
+        data = await apiFetch('/guardian/declarations');
+      } catch (e) {
+        root.innerHTML = `<div class="auth-container"><div class="auth-card"><h1 class="auth-title">Lỗi</h1><p>Không thể tải dữ liệu.</p></div></div>`;
+        return;
+      }
+
+      const declarations = data.declarations || [];
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav>
+              <ul class="sidebar-nav">
+                <li><a href="/dashboard">📊 Dashboard</a></li>
+                <li><a href="/consent-settings">🔒 Quyền riêng tư</a></li>
+                <li><a href="/child-rights">👶 Quyền của trẻ</a></li>
+                <li><a href="/guardian" class="active">👨‍👩‍👧 Phụ huynh</a></li>
+                <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+              </ul>
+            </nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header">
+              <h1 class="dashboard-title">Phụ huynh / Guardian</h1>
+              <a href="/dashboard" class="btn btn--secondary">← Quay lại</a>
+            </div>
+
+            ${data.isGuardian ? `
+              <div class="card" style="margin-bottom:24px">
+                <h2 style="margin-bottom:12px;font-size:1.2rem">Thông tin guardian</h2>
+                <div style="font-size:0.9rem;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div><strong>Mối quan hệ:</strong> ${data.guardianInfo.relationship || '—'}</div>
+                  <div><strong>Phương thức xác minh:</strong> ${data.guardianInfo.verification_method}</div>
+                  <div><strong>Trạng thái:</strong>
+                    <span class="consent-status consent-status--${data.guardianInfo.verification_status === 'verified' ? 'granted' : 'none'}">
+                      ${data.guardianInfo.verification_status === 'verified' ? 'Đã xác minh' : 'Chưa xác minh'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+
+            <div class="card" style="margin-bottom:24px">
+              <h2 style="margin-bottom:16px;font-size:1.2rem">Khai báo guardian cho tài khoản trẻ</h2>
+              <p style="color:var(--color-text-muted);margin-bottom:20px;font-size:0.9rem">
+                Nhập email của tài khoản trẻ em để khai báo quyền guardian.
+                Tất cả các tuyên bố dưới đây phải được xác nhận (Điều 11 — Bộ điều khoản).
+              </p>
+
+              <div class="form-group">
+                <label class="form-label">Email tài khoản trẻ *</label>
+                <input type="email" id="child-email" class="form-input" placeholder="email_cua_tre@example.com" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Mối quan hệ *</label>
+                <select id="relationship" class="form-input">
+                  <option value="">— Chọn —</option>
+                  <option value="parent">Cha / Mẹ</option>
+                  <option value="guardian">Người giám hộ</option>
+                  <option value="legal_representative">Người đại diện hợp pháp</option>
+                  <option value="other">Khác (có văn bản ủy quyền)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Phương thức xác minh *</label>
+                <select id="verification-method" class="form-input">
+                  <option value="email">Email</option>
+                  <option value="phone">Số điện thoại</option>
+                  <option value="payment">Thanh toán của người lớn</option>
+                  <option value="document">Văn bản có chữ ký</option>
+                  <option value="video">Video xác minh</option>
+                  <option value="school">Qua nhà trường</option>
+                </select>
+              </div>
+
+              <h3 style="margin:24px 0 12px;font-size:1rem">Tuyên bố của guardian (Điều 11)</h3>
+              <div class="declarations-list">
+                <label class="declaration-item">
+                  <input type="checkbox" id="decl-authority" />
+                  <span>Tôi xác nhận mình là cha, mẹ, guardian hoặc người có quyền hợp lệ đối với trẻ.</span>
+                </label>
+                <label class="declaration-item">
+                  <input type="checkbox" id="decl-readNotice" />
+                  <span>Tôi đã đọc bản tóm tắt dành cho phụ huynh và thông báo quyền riêng tư.</span>
+                </label>
+                <label class="declaration-item">
+                  <input type="checkbox" id="decl-explainedToChild" />
+                  <span>Tôi xác nhận đã giải thích cho trẻ bằng cách phù hợp với độ tuổi.</span>
+                </label>
+                <label class="declaration-item">
+                  <input type="checkbox" id="decl-understandsWithdrawal" />
+                  <span>Tôi hiểu có thể quản lý và rút các consent tùy chọn bất cứ lúc nào.</span>
+                </label>
+                <label class="declaration-item">
+                  <input type="checkbox" id="decl-paysIfPurchase" />
+                  <span>Tôi chịu trách nhiệm thanh toán nếu mua dịch vụ cho trẻ.</span>
+                </label>
+                <label class="declaration-item">
+                  <input type="checkbox" id="decl-noCardToChild" />
+                  <span>Tôi sẽ không cung cấp thông tin thanh toán cho trẻ tự sử dụng.</span>
+                </label>
+                <label class="declaration-item">
+                  <input type="checkbox" id="decl-notifyOnChange" />
+                  <span>Tôi sẽ thông báo nếu quyền đại diện chấm dứt hoặc thay đổi.</span>
+                </label>
+              </div>
+
+              <button id="submit-declaration" class="btn btn--primary" style="margin-top:20px">
+                Gửi khai báo guardian
+              </button>
+              <div id="declare-error" style="display:none;color:var(--color-error);margin-top:12px"></div>
+              <div id="declare-success" style="display:none;color:var(--color-success);margin-top:12px"></div>
+            </div>
+
+            ${declarations.length > 0 ? `
+              <div class="card">
+                <h2 style="margin-bottom:16px;font-size:1.2rem">Khai báo đã gửi (${declarations.length})</h2>
+                ${declarations.map((d: any) => `
+                  <div class="declaration-record">
+                    <div class="declaration-record-header">
+                      <strong>${d.learner_name || d.learner_email}</strong>
+                      <span class="consent-status consent-status--${d.status === 'approved' ? 'granted' : d.status === 'pending' ? 'none' : 'withdrawn'}">
+                        ${d.status === 'approved' ? 'Đã duyệt' : d.status === 'pending' ? 'Chờ xác minh' : d.status}
+                      </span>
+                    </div>
+                    <div style="font-size:0.85rem;color:var(--color-text-muted);margin-top:4px">
+                      ${d.learner_email} — Tạo: ${new Date(d.created_at).toLocaleDateString('vi-VN')}
+                      ${d.approved_at ? ` — Duyệt: ${new Date(d.approved_at).toLocaleDateString('vi-VN')}` : ''}
+                    </div>
+                    ${d.status === 'pending' ? `
+                      <div class="verify-section" style="margin-top:12px">
+                        <input type="text" id="verify-code-${d.id}" placeholder="Mã xác nhận 6 chữ số" maxlength="6" style="width:160px;padding:8px;border-radius:6px;border:1px solid var(--color-border)" />
+                        <button class="btn btn--primary btn--sm" data-link-id="${d.id}">Xác minh</button>
+                      </div>
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </main>
+        </div>
+      `;
+
+      // Logout
+      document.getElementById('logout-btn')!.addEventListener('click', async (e) => {
+        e.preventDefault();
+        clearToken();
+        window.location.href = '/login';
+      });
+
+      // Submit declaration
+      document.getElementById('submit-declaration')!.addEventListener('click', async () => {
+        const childEmail = (document.getElementById('child-email') as HTMLInputElement).value.trim();
+        const relationship = (document.getElementById('relationship') as HTMLSelectElement).value;
+        const verificationMethod = (document.getElementById('verification-method') as HTMLSelectElement).value;
+        const errBox = document.getElementById('declare-error')!;
+        const successBox = document.getElementById('declare-success')!;
+        errBox.style.display = 'none';
+        successBox.style.display = 'none';
+
+        if (!childEmail || !relationship) {
+          errBox.textContent = 'Vui lòng nhập email trẻ và chọn mối quan hệ.';
+          errBox.style.display = 'block';
+          return;
+        }
+
+        const declarations = {
+          authority: (document.getElementById('decl-authority') as HTMLInputElement).checked,
+          readNotice: (document.getElementById('decl-readNotice') as HTMLInputElement).checked,
+          explainedToChild: (document.getElementById('decl-explainedToChild') as HTMLInputElement).checked,
+          understandsWithdrawal: (document.getElementById('decl-understandsWithdrawal') as HTMLInputElement).checked,
+          paysIfPurchase: (document.getElementById('decl-paysIfPurchase') as HTMLInputElement).checked,
+          noCardToChild: (document.getElementById('decl-noCardToChild') as HTMLInputElement).checked,
+          notifyOnChange: (document.getElementById('decl-notifyOnChange') as HTMLInputElement).checked,
+        };
+
+        const allChecked = Object.values(declarations).every(Boolean);
+        if (!allChecked) {
+          errBox.textContent = 'Tất cả 7 tuyên bố guardian phải được xác nhận.';
+          errBox.style.display = 'block';
+          return;
+        }
+
+        try {
+          const result = await apiFetch('/guardian/declare', {
+            method: 'POST',
+            body: JSON.stringify({
+              childEmail,
+              relationship,
+              verificationMethod,
+              declarations,
+            }),
+          });
+          successBox.textContent = '✓ Đã gửi khai báo. Trạng thái: ' + result.status + '. Mã xác minh sẽ được gửi qua ' + verificationMethod + '.';
+          successBox.style.display = 'block';
+          setTimeout(() => location.reload(), 2000);
+        } catch (err: any) {
+          errBox.textContent = 'Lỗi: ' + err.message;
+          errBox.style.display = 'block';
+        }
+      });
+
+      // Wire up verify buttons
+      document.querySelectorAll('button[data-link-id]').forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          const target = e.target as HTMLButtonElement;
+          const linkId = target.dataset.linkId;
+          const codeInput = document.getElementById(`verify-code-${linkId}`) as HTMLInputElement;
+          const code = codeInput.value.trim();
+
+          if (!/^\d{6}$/.test(code)) {
+            alert('Mã xác nhận phải có 6 chữ số.');
+            return;
+          }
+
+          try {
+            await apiFetch('/guardian/verify', {
+              method: 'POST',
+              body: JSON.stringify({ linkId, verificationCode: code }),
+            });
+            alert('✓ Đã xác minh thành công!');
+            location.reload();
+          } catch (err: any) {
+            alert('Lỗi: ' + err.message);
+          }
+        });
+      });
+    }
+
+    renderGuardianPage();
+  </script>
+
+  <style>
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--color-border, #e2e8f0);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    .declarations-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .declaration-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px;
+      background: var(--color-bg-light, #f7fafc);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .declaration-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .declaration-record {
+      padding: 14px;
+      border: 1px solid var(--color-border, #e2e8f0);
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .declaration-record-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .consent-status {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+    .consent-status--granted { background: #d4edda; color: #155724; }
+    .consent-status--withdrawn { background: #f8d7da; color: #721c24; }
+    .consent-status--none { background: #fff3cd; color: #856404; }
+    .btn--sm { padding: 6px 12px; font-size: 0.85rem; margin-left: 8px; }
+  </style>
+</AppLayout>
