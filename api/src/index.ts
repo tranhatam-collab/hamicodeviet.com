@@ -20,6 +20,7 @@ import courses from './routes/courses';
 import progress from './routes/progress';
 import payments from './routes/payments';
 import admin from './routes/admin';
+import products from './routes/products';
 
 export { RateLimiterDurableObject };
 
@@ -139,6 +140,7 @@ app.route('/courses', courses);
 app.route('/progress', progress);
 app.route('/payments', payments);
 app.route('/admin', admin);
+app.route('/products', products);
 
 // 404
 app.notFound((c) => c.json({ error: 'not_found' }, 404));

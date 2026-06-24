@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { getDb } from '../lib/db';
 import { getBearerToken, verifySession } from '../lib/auth';
+import { PayPalClient, PayPalEnvironment } from '@paypal/paypal-server-sdk';
 
 const payments = new Hono<AppBindings>();
 
@@ -11,6 +12,15 @@ const PLANS = {
   creator: { id: 'creator', name: 'Creator', priceCents: 599000, currency: 'VND' },
   family: { id: 'family', name: 'Family', priceCents: 999000, currency: 'VND' },
 };
+
+// Get PayPal client
+function getPayPalClient(env: Env) {
+  const environment = env.PAYPAL_MODE === 'live'
+    ? new PayPalEnvironment.Live(env.PAYPAL_CLIENT_ID, env.PAYPAL_CLIENT_SECRET)
+    : new PayPalEnvironment.Sandbox(env.PAYPAL_CLIENT_ID, env.PAYPAL_CLIENT_SECRET);
+
+  return new PayPalClient(environment);
+}
 
 // GET /payments/plans — list available plans
 payments.get('/plans', (c) => {
@@ -33,7 +43,7 @@ payments.get('/subscription', async (c) => {
   return c.json({ subscription: sub || null, plan: sub?.plan_id || 'free' });
 });
 
-// POST /payments/checkout — create a checkout session
+// POST /payments/checkout — create a PayPal order
 payments.post('/checkout', async (c) => {
   const token = getBearerToken(c);
   if (!token) return c.json({ error: 'unauthorized' }, 401);
@@ -46,9 +56,11 @@ payments.post('/checkout', async (c) => {
   if (!plan || plan.priceCents === 0) return c.json({ error: 'invalid_plan' }, 400);
 
   const sql = getDb(c.env);
-  const apiKey = c.env.STRIPE_SECRET_KEY?.trim();
-  if (!apiKey) {
-    // Demo mode — create subscription without Stripe (for testing)
+  const clientId = c.env.PAYPAL_CLIENT_ID?.trim();
+  const clientSecret = c.env.PAYPAL_CLIENT_SECRET?.trim();
+
+  if (!clientId || !clientSecret) {
+    // Demo mode — create subscription without PayPal (for testing)
     await sql`
       INSERT INTO subscriptions (user_id, plan_id, status, current_period_start, current_period_end)
       VALUES (${payload.sub}, ${planId}, 'active', now(), now() + interval '30 days')
@@ -61,105 +73,153 @@ payments.post('/checkout', async (c) => {
     return c.json({ success: true, demoMode: true, plan: planId });
   }
 
-  // Real Stripe checkout
-  const appUrl = c.env.APP_URL;
-  const sessionRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: new URLSearchParams({
-      'mode': 'subscription',
-      'customer_email': payload.email || '',
-      'line_items[0][price_data][currency]': 'vnd',
-      'line_items[0][price_data][unit_amount]': String(plan.priceCents),
-      'line_items[0][price_data][recurring[interval]': 'month',
-      'line_items[0][price_data][product_data][name]': `HaMi Code Việt — ${plan.name}`,
-      'line_items[0][quantity]': '1',
-      'success_url': `${appUrl}/billing?status=success`,
-      'cancel_url': `${appUrl}/billing?status=cancel`,
-      'metadata[user_id]': payload.sub,
-      'metadata[plan_id]': planId,
-    }),
-    signal: AbortSignal.timeout(15000),
-  });
+  // Real PayPal checkout
+  try {
+    const paypal = getPayPalClient(c.env);
+    const appUrl = c.env.APP_URL;
 
-  if (!sessionRes.ok) {
-    const err = await sessionRes.text();
-    console.error('[stripe] Checkout error:', sessionRes.status, err.substring(0, 200));
+    // Create order
+    const order = await paypal.orders.create({
+      intent: 'CAPTURE',
+      purchase_units: [
+        {
+          amount: {
+            currency_code: plan.currency,
+            value: (plan.priceCents / 100).toFixed(2),
+          },
+          description: `HaMi Code Việt — ${plan.name}`,
+          custom_id: `${payload.sub}:${planId}`,
+        },
+      ],
+      application_context: {
+        return_url: `${appUrl}/billing?status=success`,
+        cancel_url: `${appUrl}/billing?status=cancel`,
+        brand_name: 'HaMi Code Việt',
+        user_action: 'PAY_NOW',
+      },
+    });
+
+    // Store payment record
+    await sql`
+      INSERT INTO payments (user_id, amount_cents, currency, status, provider, description, metadata)
+      VALUES (${payload.sub}, ${plan.priceCents}, ${plan.currency}, 'pending', 'paypal', ${'Plan: ' + plan.name}, ${JSON.stringify({ planId, orderId: order.id })}::jsonb)
+    `;
+
+    // Extract approval URL
+    const approvalUrl = order.links?.find((link: any) => link.rel === 'approve')?.href;
+
+    return c.json({
+      checkoutUrl: approvalUrl,
+      orderId: order.id,
+    });
+  } catch (error) {
+    console.error('[paypal] Checkout error:', error);
     return c.json({ error: 'checkout_failed' }, 500);
   }
-
-  const session = await sessionRes.json() as any;
-  await sql`
-    INSERT INTO payments (user_id, amount_cents, currency, status, provider, stripe_checkout_session_id, description, metadata)
-    VALUES (${payload.sub}, ${plan.priceCents}, ${plan.currency}, 'pending', 'stripe', ${session.id}, ${'Plan: ' + plan.name}, ${JSON.stringify({ planId })}::jsonb)
-  `;
-
-  return c.json({ checkoutUrl: session.url, sessionId: session.id });
 });
 
-// POST /payments/webhook — Stripe webhook handler
-payments.post('/webhook', async (c) => {
-  const sig = c.req.header('stripe-signature') || '';
-  const rawBody = await c.req.text();
-  const apiKey = c.env.STRIPE_SECRET_KEY?.trim();
-  const webhookSecret = c.env.STRIPE_WEBHOOK_SECRET?.trim();
+// POST /payments/capture — capture PayPal payment
+payments.post('/capture', async (c) => {
+  const token = getBearerToken(c);
+  if (!token) return c.json({ error: 'unauthorized' }, 401);
+  const payload = await verifySession(token, c.env);
+  if (!payload) return c.json({ error: 'invalid_token' }, 401);
 
-  if (!apiKey || !webhookSecret) {
+  const body = await c.req.json();
+  const orderId = body.orderId;
+
+  if (!orderId) {
+    return c.json({ error: 'missing_order_id' }, 400);
+  }
+
+  try {
+    const paypal = getPayPalClient(c.env);
+    const sql = getDb(c.env);
+
+    // Capture payment
+    const capture = await paypal.orders.capture(orderId);
+
+    if (capture.status === 'COMPLETED') {
+      // Extract custom_id to get user_id and plan_id
+      const customId = capture.purchase_units?.[0]?.custom_id;
+      const [userId, planId] = customId?.split(':') || [];
+
+      if (userId && planId) {
+        // Create subscription
+        await sql`
+          INSERT INTO subscriptions (user_id, plan_id, status, current_period_start, current_period_end)
+          VALUES (${userId}, ${planId}, 'active', now(), now() + interval '30 days')
+          ON CONFLICT DO NOTHING
+        `;
+
+        // Update payment record
+        await sql`
+          UPDATE payments
+          SET status = 'succeeded', updated_at = now()
+          WHERE metadata->>'orderId' = ${orderId}
+        `;
+
+        return c.json({ success: true, planId });
+      }
+    }
+
+    return c.json({ error: 'capture_failed' }, 500);
+  } catch (error) {
+    console.error('[paypal] Capture error:', error);
+    return c.json({ error: 'capture_failed' }, 500);
+  }
+});
+
+// POST /payments/webhook — PayPal webhook handler
+payments.post('/webhook', async (c) => {
+  const rawBody = await c.req.text();
+  const clientId = c.env.PAYPAL_CLIENT_ID?.trim();
+  const clientSecret = c.env.PAYPAL_CLIENT_SECRET?.trim();
+  const webhookId = c.env.PAYPAL_WEBHOOK_ID?.trim();
+
+  if (!clientId || !clientSecret || !webhookId) {
     return c.json({ error: 'webhook_not_configured' }, 503);
   }
 
-  // Verify webhook signature (simplified — in production use Stripe SDK)
-  let event;
   try {
-    const res = await fetch('https://api.stripe.com/v1/webhook_endpoints', {
-      headers: { Authorization: `Bearer ${apiKey}` },
-    });
-    // For now, parse the event directly (Stripe sends JSON for webhooks)
-    event = JSON.parse(rawBody);
-  } catch {
-    return c.json({ error: 'invalid_payload' }, 400);
-  }
+    const event = JSON.parse(rawBody);
+    const sql = getDb(c.env);
 
-  const sql = getDb(c.env);
+    switch (event.event_type) {
+      case 'PAYMENT.CAPTURE.COMPLETED': {
+        const resource = event.resource;
+        const customId = resource.purchase_units?.[0]?.custom_id;
+        const [userId, planId] = customId?.split(':') || [];
 
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object;
-      const userId = session.metadata?.user_id;
-      const planId = session.metadata?.plan_id;
-      if (userId && planId) {
-        await sql`
-          INSERT INTO subscriptions (user_id, plan_id, status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end)
-          VALUES (${userId}, ${planId}, 'active', ${session.customer}, ${session.subscription}, now(), now() + interval '30 days')
-        `;
-        await sql`
-          UPDATE payments SET status = 'succeeded', stripe_payment_intent_id = ${session.payment_intent}, updated_at = now()
-          WHERE stripe_checkout_session_id = ${session.id}
-        `;
+        if (userId && planId) {
+          await sql`
+            INSERT INTO subscriptions (user_id, plan_id, status, current_period_start, current_period_end)
+            VALUES (${userId}, ${planId}, 'active', now(), now() + interval '30 days')
+            ON CONFLICT DO NOTHING
+          `;
+          await sql`
+            UPDATE payments
+            SET status = 'succeeded', updated_at = now()
+            WHERE metadata->>'orderId' = ${resource.id}
+          `;
+        }
+        break;
       }
-      break;
+      case 'BILLING.SUBSCRIPTION.CANCELLED': {
+        const resource = event.resource;
+        await sql`
+          UPDATE subscriptions SET status = 'canceled', updated_at = now()
+          WHERE stripe_subscription_id = ${resource.id}
+        `;
+        break;
+      }
     }
-    case 'customer.subscription.deleted': {
-      const sub = event.data.object;
-      await sql`
-        UPDATE subscriptions SET status = 'canceled', updated_at = now() WHERE stripe_subscription_id = ${sub.id}
-      `;
-      break;
-    }
-    case 'invoice.paid': {
-      const invoice = event.data.object;
-      await sql`
-        UPDATE subscriptions SET current_period_end = ${new Date(invoice.period_end * 1000).toISOString()}, updated_at = now()
-        WHERE stripe_subscription_id = ${invoice.subscription}
-      `;
-      break;
-    }
-  }
 
-  return c.json({ received: true });
+    return c.json({ received: true });
+  } catch (error) {
+    console.error('[paypal] Webhook error:', error);
+    return c.json({ error: 'webhook_error' }, 500);
+  }
 });
 
 // GET /payments/history — get user's payment history
