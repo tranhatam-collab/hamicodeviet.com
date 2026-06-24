@@ -6,11 +6,17 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "tail": "wrangler tail"
+    "tail": "wrangler tail",
+    "migrate": "node-pg-migrate up --migrations-dir ./migrations",
+    "migrate:down": "node-pg-migrate down --migrations-dir ./migrations",
+    "migrate:create": "node-pg-migrate create --migrations-dir ./migrations"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.0",
-    "hono": "^4.6.0"
+    "dotenv": "^17.4.2",
+    "hono": "^4.6.0",
+    "node-pg-migrate": "^8.0.4",
+    "pg": "^8.22.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260623.1",

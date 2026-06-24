@@ -88,3 +88,34 @@ jobs:
             exit 1
           fi
           echo "No token logging detected"
+
+  dependency-scan:
+    name: Dependency Scan
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component: [root, api, app]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: |
+          if [ "${{ matrix.component }}" = "root" ]; then
+            npm ci
+          elif [ "${{ matrix.component }}" = "api" ]; then
+            cd api && npm ci
+          elif [ "${{ matrix.component }}" = "app" ]; then
+            cd app && npm ci
+          fi
+      - name: Run npm audit
+        run: |
+          if [ "${{ matrix.component }}" = "root" ]; then
+            npm audit --audit-level=moderate
+          elif [ "${{ matrix.component }}" = "api" ]; then
+            cd api && npm audit --audit-level=moderate
+          elif [ "${{ matrix.component }}" = "app" ]; then
+            cd app && npm audit --audit-level=moderate
+          fi
+        continue-on-error: true
