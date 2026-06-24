@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { getDb } from '../lib/db';
 import { getBearerToken, verifySession } from '../lib/auth';
 import { PayPalClient, PayPalEnvironment } from '@paypal/paypal-server-sdk';
+import { grantSubscriptionEntitlements } from '../lib/entitlement';
 
 const payments = new Hono<AppBindings>();
 
@@ -70,6 +71,8 @@ payments.post('/checkout', async (c) => {
       INSERT INTO payments (user_id, amount_cents, currency, status, provider, description)
       VALUES (${payload.sub}, ${plan.priceCents}, ${plan.currency}, 'succeeded', 'demo', ${'Plan: ' + plan.name})
     `;
+    // Grant entitlements based on subscription
+    await grantSubscriptionEntitlements(c.env, payload.sub, planId);
     return c.json({ success: true, demoMode: true, plan: planId });
   }
 
@@ -151,6 +154,9 @@ payments.post('/capture', async (c) => {
           VALUES (${userId}, ${planId}, 'active', now(), now() + interval '30 days')
           ON CONFLICT DO NOTHING
         `;
+
+        // Grant entitlements based on subscription
+        await grantSubscriptionEntitlements(c.env, userId, planId);
 
         // Update payment record
         await sql`
