@@ -9,7 +9,8 @@
     "tail": "wrangler tail",
     "migrate": "node-pg-migrate up --migrations-dir ./migrations",
     "migrate:down": "node-pg-migrate down --migrations-dir ./migrations",
-    "migrate:create": "node-pg-migrate create --migrations-dir ./migrations"
+    "migrate:create": "node-pg-migrate create --migrations-dir ./migrations",
+    "backup": "node scripts/backup.js"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.0",

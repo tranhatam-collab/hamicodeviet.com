@@ -4,6 +4,14 @@ import { logger } from 'hono/logger';
 import { rateLimit, rateLimitHeaders } from './lib/rateLimit';
 import { RateLimiterDurableObject } from './lib/rateLimiterDO';
 import { sendEmailDirect } from './lib/email';
+import {
+  requestIdMiddleware,
+  createLogger,
+  metricsMiddleware,
+  errorLoggingMiddleware,
+  redactSensitiveData,
+  metrics,
+} from './lib/observability';
 import auth from './routes/auth';
 import guardian from './routes/guardian';
 import consent from './routes/consent';
@@ -17,7 +25,21 @@ export { RateLimiterDurableObject };
 
 const app = new Hono<AppBindings>();
 
+// Create logger instance
+const apiLogger = createLogger('api');
+
+// Initialize global metrics
+(globalThis as any).metrics = metrics;
+
 // Middleware
+app.use('*', requestIdMiddleware());
+app.use('*', (c, next) => {
+  // Set global request ID for logging
+  (globalThis as any).requestId = c.get('requestId');
+  return next();
+});
+app.use('*', metricsMiddleware());
+app.use('*', errorLoggingMiddleware(apiLogger));
 app.use('*', logger());
 // Normalize trailing slash: /consent/ -> /consent
 app.use('*', async (c, next) => {
@@ -74,6 +96,12 @@ app.use('*', async (c, next) => {
 
 // Health check
 app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }));
+
+// Metrics endpoint (for monitoring)
+app.get('/metrics', (c) => {
+  const metricsData = (globalThis as any).metrics?.toJSON() || {};
+  return c.json(metricsData);
+});
 
 // Email service diagnostic (admin only — no secrets exposed)
 app.get('/health/email', async (c) => {
