@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { getDb } from '../lib/db';
 import { getBearerToken, verifySession } from '../lib/auth';
+import { requireAdmin, requirePermission, logAuditEvent } from '../lib/permissions';
+import { logSecurityEvent } from '../lib/audit';
 
 const admin = new Hono<AppBindings>();
 
@@ -11,16 +13,15 @@ admin.use('*', async (c, next) => {
   const payload = await verifySession(token, c.env);
   if (!payload) return c.json({ error: 'invalid_token' }, 401);
 
-  const sql = getDb(c.env);
-  const [userRole] = await sql`
-    SELECT r.name FROM user_roles ur
-    JOIN roles r ON r.id = ur.role_id
-    WHERE ur.user_id = ${payload.sub} AND r.name IN ('admin', 'super_admin')
-  `;
-  if (!userRole) return c.json({ error: 'forbidden', message: 'Admin access required' }, 403);
+  // Set user in context for permission checks
+  c.set('user', payload);
+  c.set('requestId', c.req.header('x-request-id') || 'unknown');
 
   await next();
 });
+
+// Apply admin role requirement
+admin.use('*', requireAdmin());
 
 // GET /admin/stats — platform statistics
 admin.get('/stats', async (c) => {
@@ -127,6 +128,34 @@ admin.put('/users/:id/status', async (c) => {
   }
 
   const sql = getDb(c.env);
+  const user = c.get('user') as any;
+
+  // Log audit event
+  await logAuditEvent(c.env, {
+    actor_id: user.id,
+    actor_type: 'user',
+    action: 'user.update_status',
+    resource_type: 'user',
+    resource_id: userId,
+    changes: { status },
+    ip: c.req.header('cf-connecting-ip'),
+    user_agent: c.req.header('user-agent'),
+    request_id: c.get('requestId'),
+  });
+
+  // Log security event for suspensions
+  if (status === 'suspended') {
+    await logSecurityEvent(c.env, {
+      event_type: 'user_suspended',
+      severity: 'high',
+      user_id: userId,
+      ip: c.req.header('cf-connecting-ip'),
+      user_agent: c.req.header('user-agent'),
+      details: { actor_id: user.id },
+      request_id: c.get('requestId'),
+    });
+  }
+
   await sql`UPDATE users SET status = ${status}, updated_at = now() WHERE id = ${userId}`;
 
   // If suspended, revoke all sessions
@@ -154,11 +183,27 @@ admin.get('/courses', async (c) => {
 admin.post('/courses', async (c) => {
   const body = await c.req.json();
   const sql = getDb(c.env);
+  const user = c.get('user') as any;
+
   const [course] = await sql`
     INSERT INTO courses (slug, track_id, title_vi, title_en, description_vi, description_en, level, duration_hours, price_cents, currency, status)
     VALUES (${body.slug}, ${body.trackId || null}, ${body.titleVi}, ${body.titleEn}, ${body.descriptionVi || ''}, ${body.descriptionEn || ''}, ${body.level || 'beginner'}, ${body.durationHours || 0}, ${body.priceCents || 0}, ${body.currency || 'VND'}, ${body.status || 'draft'})
     RETURNING id, slug
   `;
+
+  // Log audit event
+  await logAuditEvent(c.env, {
+    actor_id: user.id,
+    actor_type: 'user',
+    action: 'course.create',
+    resource_type: 'course',
+    resource_id: course.id,
+    changes: body,
+    ip: c.req.header('cf-connecting-ip'),
+    user_agent: c.req.header('user-agent'),
+    request_id: c.get('requestId'),
+  });
+
   return c.json({ course }, 201);
 });
 
