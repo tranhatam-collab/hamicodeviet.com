@@ -1,36 +1,39 @@
 import { Hono } from 'hono';
 import { getDb } from '../lib/db';
 import { getBearerToken, verifySession } from '../lib/auth';
-import { requireAdmin, logAuditEvent } from '../lib/permissions';
+import { requireAdmin } from '../lib/permissions';
+import { logAuditEvent } from '../lib/audit';
 import { revokeSubscriptionEntitlements } from '../lib/entitlement';
-import { PayPalClient, PayPalEnvironment } from '@paypal/paypal-server-sdk';
+import { Client, Environment, PaymentsController } from '@paypal/paypal-server-sdk';
 
 const refunds = new Hono<AppBindings>();
 
 // Get PayPal client
 function getPayPalClient(env: Env) {
-  const environment = env.PAYPAL_MODE === 'live'
-    ? new PayPalEnvironment.Live(env.PAYPAL_CLIENT_ID, env.PAYPAL_CLIENT_SECRET)
-    : new PayPalEnvironment.Sandbox(env.PAYPAL_CLIENT_ID, env.PAYPAL_CLIENT_SECRET);
-
-  return new PayPalClient(environment);
+  return new Client({
+    environment: env.PAYPAL_MODE === 'live' ? Environment.Production : Environment.Sandbox,
+    clientCredentialsAuthCredentials: {
+      oAuthClientId: env.PAYPAL_CLIENT_ID,
+      oAuthClientSecret: env.PAYPAL_CLIENT_SECRET,
+    },
+  });
 }
 
-// Admin middleware
+// Auth middleware
 refunds.use('*', async (c, next) => {
   const token = getBearerToken(c);
   if (!token) return c.json({ error: 'unauthorized' }, 401);
   const payload = await verifySession(token, c.env);
   if (!payload) return c.json({ error: 'invalid_token' }, 401);
 
-  c.set('user', payload);
+  c.set('user', { id: payload.sub, email: payload.email });
   c.set('requestId', c.req.header('x-request-id') || 'unknown');
 
   await next();
 });
 
 // GET /refunds — list all refunds (admin only)
-refunds.get('/', requireAdmin(), async (c) => {
+refunds.get('/', requireAdmin, async (c) => {
   const sql = getDb(c.env);
   const page = Number(c.req.query('page')) || 1;
   const limit = Math.min(Number(c.req.query('limit')) || 20, 100);
@@ -106,8 +109,9 @@ refunds.post('/request', async (c) => {
 });
 
 // POST /refunds/:id/approve — approve and process refund (admin only)
-refunds.post('/:id/approve', requireAdmin(), async (c) => {
+refunds.post('/:id/approve', requireAdmin, async (c) => {
   const id = c.req.param('id');
+  if (!id) return c.json({ error: 'missing_refund_id' }, 400);
   const user = c.get('user') as any;
   const sql = getDb(c.env);
 
@@ -156,6 +160,7 @@ refunds.post('/:id/approve', requireAdmin(), async (c) => {
   // Real PayPal refund
   try {
     const paypal = getPayPalClient(c.env);
+    const paymentsController = new PaymentsController(paypal);
     const orderId = refund.metadata?.orderId;
 
     if (!orderId) {
@@ -163,12 +168,17 @@ refunds.post('/:id/approve', requireAdmin(), async (c) => {
     }
 
     // Create refund
-    const refundResult = await paypal.payments.capturesRefund(orderId, {
-      amount: {
-        currency_code: refund.currency,
-        value: (refund.amount_cents / 100).toFixed(2),
+    const refundResponse = await paymentsController.refundCapturedPayment({
+      captureId: orderId,
+      body: {
+        amount: {
+          currencyCode: refund.currency,
+          value: (refund.amount_cents / 100).toFixed(2),
+        },
       },
     });
+
+    const refundResult = refundResponse.result;
 
     if (refundResult.status === 'COMPLETED') {
       await sql`
@@ -206,8 +216,9 @@ refunds.post('/:id/approve', requireAdmin(), async (c) => {
 });
 
 // POST /refunds/:id/reject — reject refund request (admin only)
-refunds.post('/:id/reject', requireAdmin(), async (c) => {
+refunds.post('/:id/reject', requireAdmin, async (c) => {
   const id = c.req.param('id');
+  if (!id) return c.json({ error: 'missing_refund_id' }, 400);
   const body = await c.req.json();
   const user = c.get('user') as any;
   const sql = getDb(c.env);

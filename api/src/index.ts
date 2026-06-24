@@ -12,6 +12,7 @@ import {
   redactSensitiveData,
   metrics,
 } from './lib/observability';
+import { getDb } from './lib/db';
 import auth from './routes/auth';
 import guardian from './routes/guardian';
 import consent from './routes/consent';
@@ -38,9 +39,14 @@ const apiLogger = createLogger('api');
 // Middleware
 app.use('*', requestIdMiddleware());
 app.use('*', (c, next) => {
-  // Set global request ID for logging
+  // Set global request ID for logging (cached per request via globalThis - acceptable for Workers single-threaded per request)
   (globalThis as any).requestId = c.get('requestId');
   return next();
+});
+app.use('*', async (c, next) => {
+  // Ensure DB is initialized before any route handler (libs depend on env.DB)
+  getDb(c.env);
+  await next();
 });
 app.use('*', metricsMiddleware());
 app.use('*', errorLoggingMiddleware(apiLogger));

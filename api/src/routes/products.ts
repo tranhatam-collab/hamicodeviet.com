@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
 import { getDb } from '../lib/db';
 import { getBearerToken, verifySession } from '../lib/auth';
-import { requireAdmin, logAuditEvent } from '../lib/permissions';
+import { requireAdmin } from '../lib/permissions';
+import { logAuditEvent } from '../lib/audit';
 
 const products = new Hono<AppBindings>();
 
@@ -12,7 +13,7 @@ products.use('*', async (c, next) => {
   const payload = await verifySession(token, c.env);
   if (!payload) return c.json({ error: 'invalid_token' }, 401);
 
-  c.set('user', payload);
+  c.set('user', { id: payload.sub, email: payload.email });
   c.set('requestId', c.req.header('x-request-id') || 'unknown');
 
   await next();
@@ -39,7 +40,7 @@ products.get('/:id', async (c) => {
 });
 
 // POST /products — create new product
-products.post('/', requireAdmin(), async (c) => {
+products.post('/', requireAdmin, async (c) => {
   const body = await c.req.json();
   const user = c.get('user') as any;
   const sql = getDb(c.env);
@@ -66,7 +67,7 @@ products.post('/', requireAdmin(), async (c) => {
 });
 
 // PUT /products/:id — update product
-products.put('/:id', requireAdmin(), async (c) => {
+products.put('/:id', requireAdmin, async (c) => {
   const id = c.req.param('id');
   const body = await c.req.json();
   const user = c.get('user') as any;
@@ -103,7 +104,7 @@ products.put('/:id', requireAdmin(), async (c) => {
 });
 
 // DELETE /products/:id — delete product
-products.delete('/:id', requireAdmin(), async (c) => {
+products.delete('/:id', requireAdmin, async (c) => {
   const id = c.req.param('id');
   const user = c.get('user') as any;
   const sql = getDb(c.env);
@@ -139,7 +140,7 @@ products.get('/:id/prices', async (c) => {
 });
 
 // POST /products/:id/prices — create price for product
-products.post('/:id/prices', requireAdmin(), async (c) => {
+products.post('/:id/prices', requireAdmin, async (c) => {
   const id = c.req.param('id');
   const body = await c.req.json();
   const user = c.get('user') as any;
@@ -180,7 +181,7 @@ products.get('/plans', async (c) => {
 });
 
 // POST /plans — create new plan
-products.post('/plans', requireAdmin(), async (c) => {
+products.post('/plans', requireAdmin, async (c) => {
   const body = await c.req.json();
   const user = c.get('user') as any;
   const sql = getDb(c.env);
@@ -207,7 +208,7 @@ products.post('/plans', requireAdmin(), async (c) => {
 });
 
 // PUT /plans/:id — update plan
-products.put('/plans/:id', requireAdmin(), async (c) => {
+products.put('/plans/:id', requireAdmin, async (c) => {
   const id = c.req.param('id');
   const body = await c.req.json();
   const user = c.get('user') as any;
@@ -245,7 +246,7 @@ products.put('/plans/:id', requireAdmin(), async (c) => {
 });
 
 // DELETE /plans/:id — delete plan
-products.delete('/plans/:id', requireAdmin(), async (c) => {
+products.delete('/plans/:id', requireAdmin, async (c) => {
   const id = c.req.param('id');
   const user = c.get('user') as any;
   const sql = getDb(c.env);

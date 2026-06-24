@@ -157,7 +157,7 @@ export function auditLoggingMiddleware(action: string, resourceType: string) {
       resource_id: c.req.param('id') || c.req.param('slug'),
       ip: c.req.header('cf-connecting-ip'),
       user_agent: c.req.header('user-agent'),
-      request_id,
+      request_id: requestId,
     });
   };
 }

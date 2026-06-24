@@ -42,7 +42,7 @@ export class Logger {
       level,
       context: this.context,
       message,
-      requestId: globalThis.requestId || 'unknown',
+      requestId: (globalThis as any).requestId || 'unknown',
       ...data,
     };
 

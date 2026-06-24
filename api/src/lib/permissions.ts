@@ -91,9 +91,9 @@ export function requirePermission(resource: string, action: string) {
       return c.json({ error: 'unauthorized' }, 401);
     }
 
-    const hasPermission = await hasPermission(c.env, user.id, resource, action);
+    const allowed = await hasPermission(c.env, user.id, resource, action);
     
-    if (!hasPermission) {
+    if (!allowed) {
       authLogger.warn('Permission denied', {
         userId: user.id,
         resource,
@@ -117,9 +117,9 @@ export function requireRole(role: string) {
       return c.json({ error: 'unauthorized' }, 401);
     }
 
-    const hasRole = await hasRole(c.env, user.id, role);
+    const hasRequiredRole = await hasRole(c.env, user.id, role);
     
-    if (!hasRole) {
+    if (!hasRequiredRole) {
       authLogger.warn('Role required', {
         userId: user.id,
         requiredRole: role,
@@ -148,8 +148,8 @@ export function requireAnyRole(roles: string[]) {
     }
 
     for (const role of roles) {
-      const hasRole = await hasRole(c.env, user.id, role);
-      if (hasRole) {
+      const hasRequiredRole = await hasRole(c.env, user.id, role);
+      if (hasRequiredRole) {
         await next();
         return;
       }

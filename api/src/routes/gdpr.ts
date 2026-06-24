@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { getDb } from '../lib/db';
 import { getBearerToken, verifySession } from '../lib/auth';
-import { logAuditEvent } from '../lib/permissions';
+import { logAuditEvent } from '../lib/audit';
 
 const gdpr = new Hono<AppBindings>();
 
@@ -12,7 +12,7 @@ gdpr.use('*', async (c, next) => {
   const payload = await verifySession(token, c.env);
   if (!payload) return c.json({ error: 'invalid_token' }, 401);
 
-  c.set('user', payload);
+  c.set('user', { id: payload.sub, email: payload.email });
   c.set('requestId', c.req.header('x-request-id') || 'unknown');
 
   await next();

@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
 import { getDb } from '../lib/db';
 import { getBearerToken, verifySession } from '../lib/auth';
-import { requireAdmin, requirePermission, logAuditEvent } from '../lib/permissions';
+import { requireAdmin, requirePermission } from '../lib/permissions';
+import { logAuditEvent } from '../lib/audit';
 import { logSecurityEvent } from '../lib/audit';
 
 const admin = new Hono<AppBindings>();
@@ -14,14 +15,14 @@ admin.use('*', async (c, next) => {
   if (!payload) return c.json({ error: 'invalid_token' }, 401);
 
   // Set user in context for permission checks
-  c.set('user', payload);
+  c.set('user', { id: payload.sub, email: payload.email, email_verified: false, status: 'active' });
   c.set('requestId', c.req.header('x-request-id') || 'unknown');
 
   await next();
 });
 
 // Apply admin role requirement
-admin.use('*', requireAdmin());
+admin.use('*', requireAdmin);
 
 // GET /admin/stats — platform statistics
 admin.get('/stats', async (c) => {

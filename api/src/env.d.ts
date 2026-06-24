@@ -23,8 +23,8 @@ interface EmailQueueMessage {
 interface AuthUser {
   id: string;
   email: string;
-  email_verified: boolean;
-  status: string;
+  email_verified?: boolean;
+  status?: string;
 }
 
-type AppBindings = { Bindings: Env; Variables: { user: AuthUser } };
+type AppBindings = { Bindings: Env; Variables: { user: AuthUser; requestId: string } };

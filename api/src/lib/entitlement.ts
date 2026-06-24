@@ -266,9 +266,9 @@ export function requireEntitlement(entitlementType: string, resourceType: string
     }
 
     const resourceId = c.req.param('id') || c.req.param('slug');
-    const hasEntitlement = await hasEntitlement(c.env, user.id, entitlementType, resourceType, resourceId);
+    const entitled = await hasEntitlement(c.env, user.id, entitlementType, resourceType, resourceId);
     
-    if (!hasEntitlement) {
+    if (!entitled) {
       entitlementLogger.warn('Entitlement required', {
         userId: user.id,
         entitlementType,
@@ -288,7 +288,7 @@ export function requireEntitlement(entitlementType: string, resourceType: string
 /**
  * Check if user can access course
  */
-export async function canAccessCourse(env: any, userId: string, courseId: string): Promise<boolean> {
+export async function canAccessCourse(env: any, userId: string, courseId?: string): Promise<boolean> {
   // Check if user has specific course access
   const hasCourseAccess = await hasEntitlement(env, userId, 'access', 'course', courseId);
   if (hasCourseAccess) return true;

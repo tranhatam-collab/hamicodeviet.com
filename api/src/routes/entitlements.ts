@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
 import { getDb } from '../lib/db';
 import { getBearerToken, verifySession } from '../lib/auth';
-import { requireAdmin, logAuditEvent } from '../lib/permissions';
+import { requireAdmin } from '../lib/permissions';
+import { logAuditEvent } from '../lib/audit';
 import {
   grantEntitlement,
   revokeEntitlement,
@@ -20,14 +21,14 @@ entitlements.use('*', async (c, next) => {
   const payload = await verifySession(token, c.env);
   if (!payload) return c.json({ error: 'invalid_token' }, 401);
 
-  c.set('user', payload);
+  c.set('user', { id: payload.sub, email: payload.email });
   c.set('requestId', c.req.header('x-request-id') || 'unknown');
 
   await next();
 });
 
 // GET /entitlements — list all entitlements (admin only)
-entitlements.get('/', requireAdmin(), async (c) => {
+entitlements.get('/', requireAdmin, async (c) => {
   const sql = getDb(c.env);
   const entitlementList = await sql`
     SELECT * FROM entitlements ORDER BY created_at DESC
@@ -56,7 +57,7 @@ entitlements.get('/definitions', async (c) => {
 });
 
 // POST /entitlements/grant — grant entitlement to user (admin only)
-entitlements.post('/grant', requireAdmin(), async (c) => {
+entitlements.post('/grant', requireAdmin, async (c) => {
   const body = await c.req.json();
   const user = c.get('user') as any;
 
@@ -87,7 +88,7 @@ entitlements.post('/grant', requireAdmin(), async (c) => {
 });
 
 // POST /entitlements/revoke — revoke entitlement from user (admin only)
-entitlements.post('/revoke', requireAdmin(), async (c) => {
+entitlements.post('/revoke', requireAdmin, async (c) => {
   const body = await c.req.json();
   const user = c.get('user') as any;
 
@@ -116,8 +117,9 @@ entitlements.post('/revoke', requireAdmin(), async (c) => {
 });
 
 // POST /entitlements/subscription/:planId/grant — grant subscription entitlements (admin only)
-entitlements.post('/subscription/:planId/grant', requireAdmin(), async (c) => {
+entitlements.post('/subscription/:planId/grant', requireAdmin, async (c) => {
   const planId = c.req.param('planId');
+  if (!planId) return c.json({ error: 'missing_plan_id' }, 400);
   const body = await c.req.json();
   const user = c.get('user') as any;
 
@@ -139,8 +141,9 @@ entitlements.post('/subscription/:planId/grant', requireAdmin(), async (c) => {
 });
 
 // POST /entitlements/subscription/:planId/revoke — revoke subscription entitlements (admin only)
-entitlements.post('/subscription/:planId/revoke', requireAdmin(), async (c) => {
+entitlements.post('/subscription/:planId/revoke', requireAdmin, async (c) => {
   const planId = c.req.param('planId');
+  if (!planId) return c.json({ error: 'missing_plan_id' }, 400);
   const body = await c.req.json();
   const user = c.get('user') as any;
 
