@@ -4,6 +4,7 @@ import { hashPassword, verifyPassword } from '../lib/password';
 import { signJwt, verifyJwt, hashToken, generateToken } from '../lib/jwt';
 import { enqueueEmail, isEmailEnabled } from '../lib/email';
 import { getBearerToken } from '../lib/auth';
+import { logAuditEvent, logSecurityEvent } from '../lib/audit';
 
 const auth = new Hono<{ Bindings: Env }>();
 
@@ -59,6 +60,19 @@ auth.post('/signup', async (c) => {
 
   // Assign learner role
   await sql`INSERT INTO user_roles (user_id, role_id) VALUES (${user.id}, 'learner')`;
+
+  // Log audit event
+  await logAuditEvent(c.env, {
+    actor_id: user.id,
+    actor_type: 'user',
+    action: 'user.signup',
+    resource_type: 'user',
+    resource_id: user.id,
+    changes: { email, displayName, birthYear, country, language },
+    ip: c.req.header('cf-connecting-ip'),
+    user_agent: c.req.header('user-agent'),
+    request_id: c.req.header('x-request-id'),
+  });
 
   // If guardian email provided, create guardian + link
   if (guardianEmail) {
@@ -158,6 +172,16 @@ auth.post('/login', async (c) => {
 
   const valid = await verifyPassword(password, user.password_hash);
   if (!valid) {
+    // Log security event for failed login
+    await logSecurityEvent(c.env, {
+      event_type: 'login_failed',
+      severity: 'medium',
+      user_id: user.id,
+      ip: c.req.header('cf-connecting-ip'),
+      user_agent: c.req.header('user-agent'),
+      details: { email },
+      request_id: c.req.header('x-request-id'),
+    });
     return c.json({ error: 'invalid_credentials' }, 401);
   }
 
@@ -175,6 +199,18 @@ auth.post('/login', async (c) => {
     INSERT INTO sessions (user_id, token_hash, expires_at, ip, user_agent)
     VALUES (${user.id}, ${sessionTokenHash}, now() + interval '7 days', ${c.req.header('cf-connecting-ip') || null}, ${c.req.header('user-agent') || null})
   `;
+
+  // Log audit event for successful login
+  await logAuditEvent(c.env, {
+    actor_id: user.id,
+    actor_type: 'user',
+    action: 'user.login',
+    resource_type: 'user',
+    resource_id: user.id,
+    ip: c.req.header('cf-connecting-ip'),
+    user_agent: c.req.header('user-agent'),
+    request_id: c.req.header('x-request-id'),
+  });
 
   return c.json({
     user: {
