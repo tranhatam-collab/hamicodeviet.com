@@ -22,6 +22,7 @@ import payments from './routes/payments';
 import admin from './routes/admin';
 import products from './routes/products';
 import entitlements from './routes/entitlements';
+import refunds from './routes/refunds';
 
 export { RateLimiterDurableObject };
 
@@ -143,6 +144,7 @@ app.route('/payments', payments);
 app.route('/admin', admin);
 app.route('/products', products);
 app.route('/entitlements', entitlements);
+app.route('/refunds', refunds);
 
 // 404
 app.notFound((c) => c.json({ error: 'not_found' }, 404));
