@@ -23,6 +23,7 @@ Require status checks to pass before merging:
 
 **Required status checks:**
 - ✅ Typecheck API
+- ✅ API Smoke Tests
 - ✅ Build Public Website
 - ✅ Build App
 - ✅ Secret Scan
@@ -70,7 +71,7 @@ Alternatively, use GitHub API to configure:
 # Using GitHub CLI
 gh api repos/tranhatam-collab/hamicodeviet/branches/main/protection \
   -X PUT \
-  -f required_status_checks='["Typecheck API","Build Public Website","Build App","Secret Scan","Token Logging Scan"]' \
+  -f required_status_checks='["Typecheck API","API Smoke Tests","Build Public Website","Build App","Secret Scan","Token Logging Scan"]' \
   -f enforce_admins=true \
   -f required_pull_request_reviews='{"required_approving_review_count":1}' \
   -f restrictions=null
@@ -83,6 +84,7 @@ The following status checks are defined in `.github/workflows/ci.yml`:
 | Check | Job Name | Purpose |
 |-------|-----------|---------|
 | Typecheck API | typecheck-api | TypeScript type checking |
+| API Smoke Tests | test-api | API smoke tests (vitest) |
 | Build Public Website | build-public-site | Astro build for public site |
 | Build App | build-app | Astro build for app |
 | Secret Scan | security-scan | Scan for secrets in source |

@@ -44,7 +44,7 @@ app/                     # User learning app (Astro static)
 - **Auth**: Custom JWT + PBKDF2 (Web Crypto API), session-based
 - **Email**: Resend API (via Cloudflare Queues + DLQ for retry)
 - **Rate limiting**: Cloudflare Durable Objects (globally consistent)
-- **CI**: GitHub Actions (typecheck, build, secret scan, token log scan)
+- **CI**: GitHub Actions (typecheck, test, build, secret scan, token log scan)
 - **Styling**: Custom CSS với CSS variables
 
 ## Dev commands
@@ -61,6 +61,7 @@ npm run deploy    # Build + deploy lên Cloudflare Pages
 cd api
 npm run dev       # Local dev (wrangler dev)
 npm run deploy    # Deploy to Cloudflare Workers
+npm test          # Run smoke tests (vitest)
 ```
 
 ### App (app/)
@@ -115,12 +116,13 @@ Tables: users, profiles, roles, user_roles, sessions, email_verifications, passw
 
 - **CI**: GitHub Actions (`.github/workflows/ci.yml`)
   - API TypeScript check
+  - API smoke tests (vitest)
   - Build public site + app
   - Secret scan (no API keys in source)
   - Token logging scan (no token in console.log)
 - **Branch protection** (manual setup required):
   - GitHub → Settings → Branches → Add rule for `main`
-  - Require status checks: `Typecheck API`, `Build Public Website`, `Build App`, `Secret Scan`, `Token Logging Scan`
+  - Require status checks: `Typecheck API`, `API Smoke Tests`, `Build Public Website`, `Build App`, `Secret Scan`, `Token Logging Scan`
   - Require pull request before merging
   - Require approvals: 1
 
