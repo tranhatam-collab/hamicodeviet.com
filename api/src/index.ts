@@ -26,6 +26,9 @@ import entitlements from './routes/entitlements';
 import refunds from './routes/refunds';
 import gdpr from './routes/gdpr';
 import ai from './routes/ai';
+import codelab from './routes/codelab';
+import marketplace from './routes/marketplace';
+import school from './routes/school';
 
 export { RateLimiterDurableObject };
 
@@ -155,6 +158,9 @@ app.route('/entitlements', entitlements);
 app.route('/refunds', refunds);
 app.route('/gdpr', gdpr);
 app.route('/ai', ai);
+app.route('/codelab', codelab);
+app.route('/marketplace', marketplace);
+app.route('/school', school);
 
 // 404
 app.notFound((c) => c.json({ error: 'not_found' }, 404));
