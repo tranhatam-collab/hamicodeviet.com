@@ -80,7 +80,7 @@ exports.up = (pgm) => {
       default: 13,
     },
     guardian_consent_required_for_under: {
-      type: 'integer,
+      type: 'integer',
       default: 16,
     },
     ai_restrictions_for_under: {
