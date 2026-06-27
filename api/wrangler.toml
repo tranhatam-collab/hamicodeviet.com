@@ -13,7 +13,7 @@ routes = [
 
 [vars]
 APP_URL = "https://app.hamicodeviet.com"
-PAYPAL_MODE = "sandbox"
+PAYPAL_MODE = "live"
 
 # Durable Objects for globally-consistent rate limiting
 [[durable_objects.bindings]]
