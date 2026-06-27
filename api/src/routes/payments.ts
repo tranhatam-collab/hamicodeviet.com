@@ -6,12 +6,12 @@ import { grantSubscriptionEntitlements } from '../lib/entitlement';
 
 const payments = new Hono<AppBindings>();
 
-// Plans definition
+// Plans definition — USD because PayPal does not support VND for checkout
 const PLANS = {
-  free: { id: 'free', name: 'Free', priceCents: 0, currency: 'VND' },
-  learner: { id: 'learner', name: 'Learner', priceCents: 299000, currency: 'VND' },
-  creator: { id: 'creator', name: 'Creator', priceCents: 599000, currency: 'VND' },
-  family: { id: 'family', name: 'Family', priceCents: 999000, currency: 'VND' },
+  free: { id: 'free', name: 'Free', priceCents: 0, currency: 'USD' },
+  learner: { id: 'learner', name: 'Learner', priceCents: 1200, currency: 'USD' },
+  creator: { id: 'creator', name: 'Creator', priceCents: 2400, currency: 'USD' },
+  family: { id: 'family', name: 'Family', priceCents: 4000, currency: 'USD' },
 };
 
 // GET /payments/plans — list available plans
