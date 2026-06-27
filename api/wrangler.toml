@@ -39,3 +39,7 @@ binding = "EMAIL_DLQ"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["RateLimiterDurableObject"]
+
+# Cloudflare Workers AI — built-in, no API key needed
+[ai]
+binding = "AI"

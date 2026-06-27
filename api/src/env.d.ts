@@ -10,6 +10,7 @@ interface Env {
   RATE_LIMITER: DurableObjectNamespace;
   EMAIL_QUEUE: Queue<EmailQueueMessage>;
   EMAIL_DLQ: Queue<EmailQueueMessage>;
+  AI: Ai;
 }
 
 interface EmailQueueMessage {

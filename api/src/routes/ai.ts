@@ -164,44 +164,51 @@ ai.post('/conversations/:id/messages', async (c) => {
     LIMIT 50
   `;
 
-  // Try to call AI agent endpoint if configured
+  // Call Cloudflare Workers AI (built-in, no external API key needed)
   let aiResponse: string;
-  let metadata: any = { model: conversation.model };
+  let metadata: any = { model: 'llama-3.3-70b-instruct-fp8-fast' };
 
-  if (conversation.endpoint && conversation.endpoint !== 'null') {
-    try {
-      const res = await fetch(conversation.endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: body.message,
-          history: history.map((h: any) => ({ role: h.role, content: h.content })),
-          model: conversation.model,
-          agent_type: conversation.agent_type,
-          user_id: user.id,
-        }),
-      });
+  // Build system prompt based on agent type
+  const systemPrompts: Record<string, string> = {
+    tutor: 'Bạn là AI Gia sư, một trợ lý học tập cá nhân hóa cho nền tảng giáo dục HaMi Code Việt. Trả lời ngắn gọn, rõ ràng, bằng tiếng Việt hoặc tiếng Anh tùy người dùng. Giúp người học hiểu khái niệm, giải bài tập, và viết code.',
+    mentor: 'Bạn là AI Mentor, hướng dẫn nghề nghiệp và phát triển kỹ năng. Cung cấp lời khuyên thực tế về con đường sự nghiệp trong lĩnh vực công nghệ.',
+    code_reviewer: 'Bạn là Code Reviewer. Review code, gợi ý cải thiện, và giải thích best practices. Luôn đưa ra ví dụ code cụ thể.',
+    quiz_generator: 'Bạn là Quiz Generator. Tạo câu hỏi trắc nghiệm và bài tập đánh giá kiến thức. Đưa ra câu hỏi + đáp án + giải thích.',
+    content_creator: 'Bạn là Content Creator. Tạo nội dung học tập song ngữ Việt-Anh, giải thích khái niệm phức tạp một cách đơn giản.',
+    translator: 'Bạn là Translator. Dịch thuật Việt-Anh và Anh-Việt, giữ nguyên ngữ cảnh văn hóa và kỹ thuật.',
+    analyzer: 'Bạn là Learning Analyzer. Phân tích tiến độ học tập, xác định điểm yếu, và đề xuất kế hoạch cải thiện.',
+    safety_monitor: 'Bạn là Safety Monitor. Đảm bảo nội dung an toàn cho trẻ em, lọc nội dung không phù hợp.',
+    accessibility: 'Bạn là Accessibility Helper. Giúp người dùng sử dụng tính năng khả năng truy cập, giải thích đơn giản hóa.',
+    project_helper: 'Bạn là Project Helper. Hỗ trợ phát triển dự án: lập kế hoạch, viết code, debug.',
+    community_moderator: 'Bạn là Community Moderator. Hướng dẫn quy tắc cộng đồng, giải quyết xung đột.',
+  };
 
-      if (res.ok) {
-        const data = await res.json() as any;
-        aiResponse = data.response || data.message || data.content || 'Xin lỗi, tôi không thể trả lời lúc này.';
-        metadata.tokens = data.tokens || data.usage?.total_tokens;
-      } else {
-        aiResponse = 'AI agent hiện không khả dụng. Vui lòng thử lại sau.';
-        metadata.error = `Agent returned ${res.status}`;
-      }
-    } catch (error) {
-      aiLogger.error('AI agent call failed', {
-        error: error instanceof Error ? error.message : String(error),
-        endpoint: conversation.endpoint,
-      });
-      aiResponse = 'Có lỗi xảy ra khi kết nối với AI. Vui lòng thử lại sau.';
-      metadata.error = error instanceof Error ? error.message : String(error);
-    }
-  } else {
-    // No endpoint configured — return a helpful placeholder
-    aiResponse = `Tôi là ${conversation.agent_type} agent. Tính năng AI đang được phát triển. Tin nhắn của bạn: "${body.message}" đã được ghi nhận.`;
-    metadata.placeholder = true;
+  const systemPrompt = systemPrompts[conversation.agent_type] || systemPrompts.tutor;
+
+  // Build messages array for Workers AI
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    ...history.slice(-10).map((h: any) => ({
+      role: h.role === 'assistant' ? 'assistant' : 'user',
+      content: h.content,
+    })),
+  ];
+
+  try {
+    const aiResult = await c.env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
+      messages,
+      max_tokens: 512,
+    });
+
+    aiResponse = (aiResult as any).response || 'Xin lỗi, tôi không thể trả lời lúc này. Vui lòng thử lại.';
+    metadata.tokens = (aiResult as any).usage?.total_tokens || 0;
+    metadata.provider = 'cloudflare-workers-ai';
+  } catch (error) {
+    aiLogger.error('Workers AI call failed', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    aiResponse = 'Có lỗi xảy ra khi xử lý AI. Vui lòng thử lại sau.';
+    metadata.error = error instanceof Error ? error.message : String(error);
   }
 
   // Save AI response
