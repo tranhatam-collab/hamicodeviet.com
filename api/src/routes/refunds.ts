@@ -4,19 +4,13 @@ import { getBearerToken, verifySession } from '../lib/auth';
 import { requireAdmin } from '../lib/permissions';
 import { logAuditEvent } from '../lib/audit';
 import { revokeSubscriptionEntitlements } from '../lib/entitlement';
-import { Client, Environment, PaymentsController } from '@paypal/paypal-server-sdk';
+import { PayPalClient } from '../lib/paypal';
 
 const refunds = new Hono<AppBindings>();
 
 // Get PayPal client
 function getPayPalClient(env: Env) {
-  return new Client({
-    environment: env.PAYPAL_MODE === 'live' ? Environment.Production : Environment.Sandbox,
-    clientCredentialsAuthCredentials: {
-      oAuthClientId: env.PAYPAL_CLIENT_ID,
-      oAuthClientSecret: env.PAYPAL_CLIENT_SECRET,
-    },
-  });
+  return new PayPalClient(env);
 }
 
 // Auth middleware
@@ -160,25 +154,27 @@ refunds.post('/:id/approve', requireAdmin, async (c) => {
   // Real PayPal refund
   try {
     const paypal = getPayPalClient(c.env);
-    const paymentsController = new PaymentsController(paypal);
     const orderId = refund.metadata?.orderId;
 
     if (!orderId) {
       return c.json({ error: 'no_order_id' }, 400);
     }
 
+    // First get the order to find the capture ID
+    const order = await paypal.getOrder(orderId);
+    const captureId = order.purchase_units?.[0]?.payments?.captures?.[0]?.id;
+
+    if (!captureId) {
+      return c.json({ error: 'no_capture_id' }, 400);
+    }
+
     // Create refund
-    const refundResponse = await paymentsController.refundCapturedPayment({
-      captureId: orderId,
-      body: {
-        amount: {
-          currencyCode: refund.currency,
-          value: (refund.amount_cents / 100).toFixed(2),
-        },
+    const refundResult = await paypal.refundCapture(captureId, {
+      amount: {
+        currency_code: refund.currency,
+        value: (refund.amount_cents / 100).toFixed(2),
       },
     });
-
-    const refundResult = refundResponse.result;
 
     if (refundResult.status === 'COMPLETED') {
       await sql`

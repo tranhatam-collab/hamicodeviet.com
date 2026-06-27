@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { getDb } from '../lib/db';
 import { getBearerToken, verifySession } from '../lib/auth';
-import { Client, Environment, OrdersController, CheckoutPaymentIntent, OrderApplicationContextUserAction } from '@paypal/paypal-server-sdk';
+import { PayPalClient } from '../lib/paypal';
 import { grantSubscriptionEntitlements } from '../lib/entitlement';
 
 const payments = new Hono<AppBindings>();
@@ -13,17 +13,6 @@ const PLANS = {
   creator: { id: 'creator', name: 'Creator', priceCents: 599000, currency: 'VND' },
   family: { id: 'family', name: 'Family', priceCents: 999000, currency: 'VND' },
 };
-
-// Get PayPal client
-function getPayPalClient(env: Env) {
-  return new Client({
-    environment: env.PAYPAL_MODE === 'live' ? Environment.Production : Environment.Sandbox,
-    clientCredentialsAuthCredentials: {
-      oAuthClientId: env.PAYPAL_CLIENT_ID,
-      oAuthClientSecret: env.PAYPAL_CLIENT_SECRET,
-    },
-  });
-}
 
 // GET /payments/plans — list available plans
 payments.get('/plans', (c) => {
@@ -80,34 +69,29 @@ payments.post('/checkout', async (c) => {
 
   // Real PayPal checkout
   try {
-    const paypal = getPayPalClient(c.env);
-    const ordersController = new OrdersController(paypal);
+    const paypal = new PayPalClient(c.env);
     const appUrl = c.env.APP_URL;
 
-    // Create order
-    const orderResponse = await ordersController.createOrder({
-      body: {
-        intent: CheckoutPaymentIntent.Capture,
-        purchaseUnits: [
-          {
-            amount: {
-              currencyCode: plan.currency,
-              value: (plan.priceCents / 100).toFixed(2),
-            },
-            description: `HaMi Code Việt — ${plan.name}`,
-            customId: `${payload.sub}:${planId}`,
+    // Create order using REST API
+    const order = await paypal.createOrder({
+      intent: 'CAPTURE',
+      purchase_units: [
+        {
+          amount: {
+            currency_code: plan.currency,
+            value: (plan.priceCents / 100).toFixed(2),
           },
-        ],
-        applicationContext: {
-          returnUrl: `${appUrl}/billing?status=success`,
-          cancelUrl: `${appUrl}/billing?status=cancel`,
-          brandName: 'HaMi Code Việt',
-          userAction: OrderApplicationContextUserAction.PayNow,
+          description: `HaMi Code Việt — ${plan.name}`,
+          custom_id: `${payload.sub}:${planId}`,
         },
+      ],
+      application_context: {
+        return_url: `${appUrl}/billing?status=success`,
+        cancel_url: `${appUrl}/billing?status=cancel`,
+        brand_name: 'HaMi Code Việt',
+        user_action: 'PAY_NOW',
       },
     });
-
-    const order = orderResponse.result;
 
     // Store payment record
     await sql`
@@ -116,15 +100,15 @@ payments.post('/checkout', async (c) => {
     `;
 
     // Extract approval URL
-    const approvalUrl = order.links?.find((link: any) => link.rel === 'approve')?.href;
+    const approvalUrl = order.links?.find((link) => link.rel === 'approve')?.href;
 
     return c.json({
       checkoutUrl: approvalUrl,
       orderId: order.id,
     });
   } catch (error) {
-    console.error('[paypal] Checkout error:', error);
-    return c.json({ error: 'checkout_failed' }, 500);
+    console.error('[paypal] Checkout error:', error instanceof Error ? error.message : String(error));
+    return c.json({ error: 'checkout_failed', detail: error instanceof Error ? error.message : String(error) }, 500);
   }
 });
 
@@ -143,19 +127,15 @@ payments.post('/capture', async (c) => {
   }
 
   try {
-    const paypal = getPayPalClient(c.env);
-    const ordersController = new OrdersController(paypal);
+    const paypal = new PayPalClient(c.env);
     const sql = getDb(c.env);
 
     // Capture payment
-    const captureResponse = await ordersController.captureOrder({
-      id: orderId,
-    });
-    const capture = captureResponse.result;
+    const capture = await paypal.captureOrder(orderId);
 
     if (capture.status === 'COMPLETED') {
       // Extract custom_id to get user_id and plan_id
-      const customId = capture.purchaseUnits?.[0]?.customId;
+      const customId = capture.purchase_units?.[0]?.custom_id;
       const [userId, planId] = customId?.split(':') || [];
 
       if (userId && planId) {
@@ -180,10 +160,10 @@ payments.post('/capture', async (c) => {
       }
     }
 
-    return c.json({ error: 'capture_failed' }, 500);
+    return c.json({ error: 'capture_failed', status: capture.status }, 500);
   } catch (error) {
-    console.error('[paypal] Capture error:', error);
-    return c.json({ error: 'capture_failed' }, 500);
+    console.error('[paypal] Capture error:', error instanceof Error ? error.message : String(error));
+    return c.json({ error: 'capture_failed', detail: error instanceof Error ? error.message : String(error) }, 500);
   }
 });
 
@@ -234,7 +214,7 @@ payments.post('/webhook', async (c) => {
 
     return c.json({ received: true });
   } catch (error) {
-    console.error('[paypal] Webhook error:', error);
+    console.error('[paypal] Webhook error:', error instanceof Error ? error.message : String(error));
     return c.json({ error: 'webhook_error' }, 500);
   }
 });
