@@ -25,6 +25,7 @@ import products from './routes/products';
 import entitlements from './routes/entitlements';
 import refunds from './routes/refunds';
 import gdpr from './routes/gdpr';
+import ai from './routes/ai';
 
 export { RateLimiterDurableObject };
 
@@ -153,6 +154,7 @@ app.route('/products', products);
 app.route('/entitlements', entitlements);
 app.route('/refunds', refunds);
 app.route('/gdpr', gdpr);
+app.route('/ai', ai);
 
 // 404
 app.notFound((c) => c.json({ error: 'not_found' }, 404));
