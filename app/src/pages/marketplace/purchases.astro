@@ -1,0 +1,74 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Đã mua — HaMi Code Việt">
+  <div id="purchases-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../../lib/api';
+
+    const root = document.getElementById('purchases-root')!;
+
+    async function renderPurchases() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+
+      try {
+        const data = await apiFetch('/marketplace/my-purchases');
+        renderList(data.purchases || []);
+      } catch (err) {
+        root.innerHTML = `<div class="dashboard"><div class="dashboard-main"><p>Không thể tải.</p></div></div>`;
+      }
+    }
+
+    function renderList(purchases: any[]) {
+      const cards = purchases.map(p => `
+        <div class="card" style="padding:1.25rem;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <h3 style="font-size:1rem;margin:0 0 0.5rem">${p.title_vi || p.title}</h3>
+            <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0">${p.category} • ${p.status}</p>
+            <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0.25rem 0 0">Mua ngày: ${new Date(p.created_at).toLocaleDateString('vi-VN')}</p>
+          </div>
+          <a href="/marketplace/${p.listing_id}" class="btn btn--secondary btn--sm">Xem / View →</a>
+        </div>
+      `).join('');
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/marketplace/sell">📤 Bán sản phẩm</a></li>
+              <li><a href="/marketplace/purchases" class="active">📥 Đã mua</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header"><h1 class="dashboard-title">📥 Sản phẩm đã mua</h1></div>
+            <div class="dashboard-content">
+              <div style="display:flex;flex-direction:column;gap:0.75rem">
+                ${cards || '<p style="color:var(--color-text-muted)">Bạn chưa mua sản phẩm nào. <a href="/marketplace">Khám phá marketplace →</a></p>'}
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    renderPurchases();
+  </script>
+</AppLayout>

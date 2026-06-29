@@ -1,0 +1,115 @@
+---
+import AppLayout from '../../../layouts/AppLayout.astro';
+
+export function getStaticPaths() {
+  return [{ params: { id: '_' } }];
+}
+---
+
+<AppLayout title="Class — HaMi Code Việt">
+  <div id="class-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../../../lib/api';
+
+    const root = document.getElementById('class-root')!;
+    const classId = window.location.pathname.split('/').pop();
+
+    async function renderClass() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+
+      try {
+        const assignmentsData = await apiFetch(`/school/classes/${classId}/assignments`);
+        renderClassDetail(assignmentsData.assignments || []);
+      } catch (err) {
+        root.innerHTML = `<div class="dashboard"><div class="dashboard-main"><p>Không thể tải lớp học.</p><a href="/school">← Quay lại</a></div></div>`;
+      }
+    }
+
+    function renderClassDetail(assignments: any[]) {
+      const assignmentCards = assignments.map(a => `
+        <div class="card" style="padding:1.25rem">
+          <h3 style="font-size:1rem;margin:0 0 0.5rem">${a.title}</h3>
+          <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 0.5rem">${a.description || ''}</p>
+          <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0">
+            Hạn: ${a.due_date ? new Date(a.due_date).toLocaleDateString('vi-VN') : 'N/A'} • ${a.points_possible || 100} điểm
+          </p>
+        </div>
+      `).join('');
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/school" class="active">🏫 School</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header">
+              <div>
+                <a href="/school" style="font-size:0.85rem;color:var(--color-text-muted)">← Quay lại</a>
+                <h1 class="dashboard-title">Lớp học</h1>
+              </div>
+            </div>
+            <div class="dashboard-content">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+                <h3 style="margin:0">Bài tập / Assignments</h3>
+                <button id="create-assign-btn" class="btn btn--primary btn--sm">+ Tạo bài tập</button>
+              </div>
+              <div id="create-assign-form" style="display:none;margin-bottom:1.5rem;padding:1.5rem;background:var(--color-surface);border-radius:10px;border:1px solid var(--color-border)">
+                <input type="text" id="a-title" placeholder="Tiêu đề / Title" style="width:100%;padding:0.5rem;margin-bottom:0.75rem;border:1px solid var(--color-border);border-radius:6px" />
+                <textarea id="a-desc" rows="3" placeholder="Mô tả / Description" style="width:100%;padding:0.5rem;margin-bottom:0.75rem;border:1px solid var(--color-border);border-radius:6px"></textarea>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+                  <input type="date" id="a-due" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" />
+                  <input type="number" id="a-points" value="100" placeholder="Points" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" />
+                </div>
+                <button id="submit-assign-btn" class="btn btn--primary">Tạo / Create</button>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:0.75rem">
+                ${assignmentCards || '<p style="color:var(--color-text-muted)">Chưa có bài tập.</p>'}
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('create-assign-btn')?.addEventListener('click', () => {
+        const form = document.getElementById('create-assign-form')!;
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      });
+      document.getElementById('submit-assign-btn')?.addEventListener('click', createAssignment);
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    async function createAssignment() {
+      try {
+        await apiFetch(`/school/classes/${classId}/assignments`, 'POST', {
+          title: (document.getElementById('a-title') as HTMLInputElement).value,
+          description: (document.getElementById('a-desc') as HTMLTextAreaElement).value,
+          dueDate: (document.getElementById('a-due') as HTMLInputElement).value,
+          pointsPossible: parseInt((document.getElementById('a-points') as HTMLInputElement).value) || 100,
+        });
+        location.reload();
+      } catch (err: any) {
+        alert(err.message);
+      }
+    }
+
+    renderClass();
+  </script>
+</AppLayout>

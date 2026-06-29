@@ -29,6 +29,7 @@ import ai from './routes/ai';
 import codelab from './routes/codelab';
 import marketplace from './routes/marketplace';
 import school from './routes/school';
+import contact from './routes/contact';
 
 export { RateLimiterDurableObject };
 
@@ -161,6 +162,7 @@ app.route('/ai', ai);
 app.route('/codelab', codelab);
 app.route('/marketplace', marketplace);
 app.route('/school', school);
+app.route('/contact', contact);
 
 // 404
 app.notFound((c) => c.json({ error: 'not_found' }, 404));

@@ -1,0 +1,157 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+
+export function getStaticPaths() {
+  return [{ params: { id: '_' } }];
+}
+---
+
+<AppLayout title="Marketplace — HaMi Code Việt">
+  <div id="marketplace-detail-root">
+    <div class="auth-container">
+      <div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../../lib/api';
+
+    const root = document.getElementById('marketplace-detail-root')!;
+    const id = window.location.pathname.split('/').pop();
+
+    async function renderDetail() {
+      const user = await getCurrentUser();
+      if (!user) {
+        window.location.href = '/login';
+        return;
+      }
+
+      try {
+        const data = await apiFetch(`/marketplace/listings/${id}`);
+        renderListing(data.listing);
+      } catch (err) {
+        root.innerHTML = `<div class="dashboard"><div class="dashboard-main"><p>Sản phẩm không tìm thấy.</p><a href="/marketplace">← Quay lại</a></div></div>`;
+      }
+    }
+
+    function renderListing(l: any) {
+      const isFree = l.price_cents === 0;
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/marketplace" class="active">🛒 Marketplace</a></li>
+              <li><a href="/marketplace/sell">📤 Bán sản phẩm</a></li>
+              <li><a href="/marketplace/purchases">📥 Đã mua</a></li>
+              <li><a href="/portfolio">🏆 Portfolio</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header">
+              <div>
+                <a href="/marketplace" style="font-size:0.85rem;color:var(--color-text-muted)">← Quay lại</a>
+                <h1 class="dashboard-title">${l.title_vi || l.title}</h1>
+              </div>
+            </div>
+            <div class="dashboard-content">
+              <div style="display:grid;grid-template-columns:1fr 320px;gap:1.5rem">
+                <div>
+                  <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#0D1F2D,#102A43);border-radius:12px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:center">
+                    <span style="font-size:3rem">${getIcon(l.category)}</span>
+                  </div>
+                  <h3>Mô tả / Description</h3>
+                  <p style="color:var(--color-text-muted);line-height:1.6">${l.description_vi || l.description || ''}</p>
+                  ${l.tags ? `<div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap">${JSON.parse(typeof l.tags === 'string' ? l.tags : '[]').map((t: string) => `<span style="background:var(--color-border);padding:0.2rem 0.6rem;border-radius:6px;font-size:0.75rem">${t}</span>`).join('')}</div>` : ''}
+                </div>
+                <div>
+                  <div class="card" style="padding:1.5rem;position:sticky;top:1rem">
+                    <div style="font-size:1.5rem;font-weight:700;color:${isFree ? 'var(--color-success)' : 'var(--color-navy)'};margin-bottom:1rem">
+                      ${isFree ? 'Miễn phí / Free' : '$' + (l.price_cents/100).toFixed(2)}
+                    </div>
+                    <button id="purchase-btn" class="btn btn--primary" style="width:100%;margin-bottom:0.75rem">
+                      ${isFree ? 'Lấy miễn phí / Get free' : 'Mua / Buy'}
+                    </button>
+                    <button id="review-btn" class="btn btn--secondary" style="width:100%">
+                      Đánh giá / Review
+                    </button>
+                    <hr style="margin:1rem 0;border:none;border-top:1px solid var(--color-border)">
+                    <div style="font-size:0.85rem;color:var(--color-text-muted)">
+                      <p>⭐ ${(l.rating_avg || 0).toFixed(1)} (${l.rating_count || 0} đánh giá)</p>
+                      <p>📥 ${l.sales_count || 0} lượt tải</p>
+                      <p>📝 ${l.language || 'vi'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="status-msg" style="margin-top:1rem"></div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('purchase-btn')?.addEventListener('click', purchase);
+      document.getElementById('review-btn')?.addEventListener('click', () => {
+        const rating = prompt('Đánh giá (1-5):');
+        if (!rating) return;
+        const review = prompt('Nhận xét:');
+        submitReview(parseInt(rating), review || '');
+      });
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    async function purchase() {
+      const btn = document.getElementById('purchase-btn') as HTMLButtonElement;
+      const status = document.getElementById('status-msg')!;
+      btn.disabled = true;
+      btn.textContent = 'Đang xử lý...';
+      try {
+        await apiFetch(`/marketplace/listings/${id}/purchase`, 'POST', {});
+        status.innerHTML = '<span style="color:var(--color-success)">✓ Đã lấy sản phẩm thành công! / Product acquired!</span>';
+        btn.textContent = 'Đã lấy / Acquired';
+      } catch (err: any) {
+        if (err.message === 'already_purchased') {
+          status.innerHTML = '<span style="color:var(--color-text-muted)">Bạn đã sở hữu sản phẩm này.</span>';
+        } else {
+          status.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+        }
+        btn.disabled = false;
+        btn.textContent = 'Thử lại / Retry';
+      }
+    }
+
+    async function submitReview(rating: number, review: string) {
+      const status = document.getElementById('status-msg')!;
+      if (rating < 1 || rating > 5) {
+        status.innerHTML = '<span style="color:#e53e3e">Đánh giá từ 1-5</span>';
+        return;
+      }
+      try {
+        await apiFetch(`/marketplace/listings/${id}/review`, 'POST', { rating, reviewText: review });
+        status.innerHTML = '<span style="color:var(--color-success)">✓ Cảm ơn đánh giá của bạn!</span>';
+      } catch (err: any) {
+        status.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+      }
+    }
+
+    function getIcon(cat: string): string {
+      const icons: Record<string, string> = {
+        programming: '💻', game: '🎮', template: '📄', asset: '🎨',
+        resource: '📚', lesson_pack: '📚', education: '🛠️',
+      };
+      return icons[cat] || '📦';
+    }
+
+    renderDetail();
+  </script>
+</AppLayout>

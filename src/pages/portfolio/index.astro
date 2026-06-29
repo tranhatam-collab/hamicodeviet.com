@@ -92,16 +92,21 @@ const sampleProjects = [
     <div class="container">
       <div class="development-card">
         <h2 class="text-center mb-lg">
-          <span data-vi>Tính năng đang được xây dựng</span>
-          <span data-en>Feature in development</span>
+          <span data-vi>Xác minh chứng chỉ</span>
+          <span data-en>Certificate verification</span>
         </h2>
-        <p class="text-center">
-          <span data-vi>HaMi Verify đang trong giai đoạn thử nghiệm. Dự kiến ra mắt đầy đủ: Q2 2026.</span>
-          <span data-en>HaMi Verify is in pilot. Full launch expected: Q2 2026.</span>
+        <p class="text-center" style="margin-bottom:1.5rem">
+          <span data-vi>Nhập ID chứng chỉ để xác minh tính xác thực. Mỗi chứng chỉ có ID duy nhất và mã QR.</span>
+          <span data-en>Enter a certificate ID to verify authenticity. Each certificate has a unique ID and QR code.</span>
         </p>
-        <div class="text-center mt-lg">
-          <span class="badge badge--blue">Q2 2026</span>
+        <div style="max-width:480px;margin:0 auto;display:flex;gap:0.75rem">
+          <input type="text" id="cert-id" placeholder="HAMI-XXXX-XXXX" style="flex:1;border:1px solid var(--color-border);border-radius:10px;padding:0.75rem 1rem;font-size:1rem" />
+          <button class="btn btn--primary" id="cert-verify-btn" onclick="verifyCert()">
+            <span data-vi>Xác minh</span>
+            <span data-en>Verify</span>
+          </button>
         </div>
+        <div id="cert-result" style="margin-top:1rem;text-align:center"></div>
       </div>
     </div>
   </section>
@@ -142,3 +147,29 @@ const sampleProjects = [
   .development-card p { margin-bottom: 0; color: var(--color-text-muted); }
   @media (max-width: 600px) { .profile-header { flex-direction: column; text-align: center; } }
 </style>
+
+<script is:inline>
+async function verifyCert() {
+  const id = document.getElementById('cert-id')?.value.trim();
+  const result = document.getElementById('cert-result');
+  if (!id) {
+    result.innerHTML = '<span style="color:#e53e3e">Vui lòng nhập ID chứng chỉ / Please enter a certificate ID</span>';
+    return;
+  }
+  result.innerHTML = '<span style="color:var(--color-text-muted)">Đang xác minh... / Verifying...</span>';
+  try {
+    const res = await fetch('https://api.hamicodeviet.com/certificates/' + encodeURIComponent(id));
+    if (res.ok) {
+      const data = await res.json();
+      result.innerHTML = '<span style="color:var(--color-success);font-weight:600">✓ Chứng chỉ hợp lệ! / Certificate valid!</span><br><span style="font-size:0.9rem;color:var(--color-text-muted)">' + (data.certificate?.recipient_name || '') + ' — ' + (data.certificate?.course_title || '') + '</span>';
+    } else if (res.status === 404) {
+      result.innerHTML = '<span style="color:#e53e3e">✗ Không tìm thấy chứng chỉ / Certificate not found</span>';
+    } else {
+      result.innerHTML = '<span style="color:#e53e3e">Hệ thống xác minh chưa sẵn sàng / Verification system not ready</span>';
+    }
+  } catch (e) {
+    result.innerHTML = '<span style="color:var(--color-text-muted)">Tính năng xác minh sẽ sớm có mặt / Verification coming soon</span>';
+  }
+}
+window.verifyCert = verifyCert;
+</script>

@@ -218,14 +218,14 @@ ai.post('/conversations/:id/messages', async (c) => {
     RETURNING *
   `;
 
-  // Track usage if ai_usage table exists
+  // Track usage
   try {
     await sql`
-      INSERT INTO ai_usage (user_id, tokens_used, model)
-      VALUES (${user.id}, ${metadata.tokens || 0}, ${conversation.model})
+      INSERT INTO ai_usage (user_id, conversation_id, tokens_used, model, provider)
+      VALUES (${user.id}, ${id}, ${metadata.tokens || 0}, ${conversation.model || 'llama-3.3-70b'}, 'cloudflare')
     `;
-  } catch {
-    // ai_usage table might not exist — ignore
+  } catch (e) {
+    console.error('[ai] Failed to track usage:', e instanceof Error ? e.message : String(e));
   }
 
   return c.json({

@@ -1,6 +1,13 @@
 import { Hono } from 'hono';
 import { verifyJwt } from '../lib/jwt';
 import { getDb } from '../lib/db';
+import { enqueueEmail } from '../lib/email';
+
+function generate6DigitCode(): string {
+  const arr = new Uint32Array(1);
+  crypto.getRandomValues(arr);
+  return String(arr[0] % 1000000).padStart(6, '0');
+}
 
 const guardian = new Hono<AppBindings>();
 
@@ -128,18 +135,32 @@ guardian.post('/declare', async (c) => {
     }, 409);
   }
 
-  // Create guardian link (pending until verified)
+  // Create guardian link (pending until verified) with verification code
+  const verificationCode = generate6DigitCode();
+  const codeExpiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 min expiry
+
   const [link] = await sql`
-    INSERT INTO guardian_links (guardian_id, learner_id, status)
-    VALUES (${guardianRec.id}, ${child.id}, 'pending')
+    INSERT INTO guardian_links (guardian_id, learner_id, status, invitation_token)
+    VALUES (${guardianRec.id}, ${child.id}, 'pending', ${verificationCode})
     RETURNING id, status
   `;
+
+  // Send verification code to guardian's email
+  await enqueueEmail({
+    type: 'guardian_verification',
+    to: user.email,
+    token: '',
+    lang: 'vi',
+    guardianCode: verificationCode,
+    guardianName: user.email,
+    childEmail: child.email,
+  }, c.env);
 
   return c.json({
     success: true,
     linkId: link.id,
     status: link.status,
-    message: 'Guardian declaration submitted. Verification pending.',
+    message: 'Guardian declaration submitted. A 6-digit verification code has been sent to your email.',
   });
 });
 
@@ -168,10 +189,24 @@ guardian.post('/verify', async (c) => {
   if (!link) return c.json({ error: 'link_not_found' }, 404);
   if (link.status === 'approved') return c.json({ error: 'already_approved' }, 400);
 
-  // TODO: In production, verify against stored verification code sent via email
-  // For now, accept any 6-digit code as placeholder
+  // Verify against stored verification code in DB
   if (!/^\d{6}$/.test(verificationCode)) {
     return c.json({ error: 'invalid_code_format', message: 'Mã xác nhận phải có 6 chữ số.' }, 400);
+  }
+
+  const [linkWithCode] = await sql`
+    SELECT id, status, invitation_token FROM guardian_links
+    WHERE id = ${linkId} AND guardian_id = ${guardianRecord[0].id}
+  `;
+  if (!linkWithCode) return c.json({ error: 'link_not_found' }, 404);
+  if (linkWithCode.status === 'approved') return c.json({ error: 'already_approved' }, 400);
+
+  if (!linkWithCode.invitation_token) {
+    return c.json({ error: 'no_code_sent', message: 'Chưa có mã xác nhận nào được gửi. Vui lòng khai báo lại.' }, 400);
+  }
+
+  if (linkWithCode.invitation_token !== verificationCode) {
+    return c.json({ error: 'invalid_code', message: 'Mã xác nhận không đúng.' }, 400);
   }
 
   // Approve the link

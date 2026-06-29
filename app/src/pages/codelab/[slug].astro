@@ -1,0 +1,190 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+
+export function getStaticPaths() {
+  return [{ params: { slug: '_' } }];
+}
+---
+
+<AppLayout title="CodeLab Exercise — HaMi Code Việt">
+  <div id="codelab-exercise-root">
+    <div class="auth-container">
+      <div class="auth-card">
+        <h1 class="auth-title">Đang tải bài tập...</h1>
+      </div>
+    </div>
+  </div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/dracula.css" />
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/javascript/javascript.js"></script>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../../lib/api';
+
+    const root = document.getElementById('codelab-exercise-root')!;
+    const slug = window.location.pathname.split('/').pop();
+
+    let editor: any = null;
+    let currentExercise: any = null;
+
+    async function renderExercise() {
+      const user = await getCurrentUser();
+      if (!user) {
+        window.location.href = '/login';
+        return;
+      }
+
+      try {
+        const data = await apiFetch(`/codelab/exercises/${slug}`);
+        currentExercise = data.exercise;
+        renderEditor(data.exercise);
+      } catch (err) {
+        root.innerHTML = `<div class="dashboard"><div class="dashboard-main"><p>Bài tập không tìm thấy.</p><a href="/codelab">← Quay lại danh sách</a></div></div>`;
+      }
+    }
+
+    function renderEditor(ex: any) {
+      const lang = ex.language || 'python';
+      const starterCode = ex.starter_code || (lang === 'python' ? '# Viết code của bạn ở đây\n' : '// Write your code here\n');
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab" class="active">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/portfolio">🏆 Portfolio</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header">
+              <div>
+                <a href="/codelab" style="font-size:0.85rem;color:var(--color-text-muted)">← Quay lại</a>
+                <h1 class="dashboard-title">${ex.title_vi || ex.title}</h1>
+                <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+                  <span style="background:var(--color-tech-blue);color:white;padding:0.2rem 0.6rem;border-radius:6px;font-size:0.75rem;font-weight:600">${lang}</span>
+                  <span style="background:var(--color-border);padding:0.2rem 0.6rem;border-radius:6px;font-size:0.75rem">${ex.difficulty}</span>
+                  <span style="background:var(--color-border);padding:0.2rem 0.6rem;border-radius:6px;font-size:0.75rem">${ex.category || ''}</span>
+                </div>
+              </div>
+            </div>
+            <div class="dashboard-content">
+              <div style="margin-bottom:1.5rem;padding:1rem 1.25rem;background:var(--color-surface);border-radius:10px;border:1px solid var(--color-border)">
+                <h3 style="font-size:0.9rem;margin:0 0 0.5rem;color:var(--color-text-muted)">Bài toán / Problem</h3>
+                <p style="margin:0;font-size:0.9rem;line-height:1.6">${ex.description_vi || ex.description || ''}</p>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr;gap:1rem">
+                <div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+                    <h3 style="font-size:0.9rem;margin:0">Code Editor</h3>
+                    <button id="submit-btn" class="btn btn--primary" style="padding:0.5rem 1.5rem">Chạy & Nộp / Run & Submit</button>
+                  </div>
+                  <textarea id="code-editor">${starterCode}</textarea>
+                </div>
+
+                <div>
+                  <h3 style="font-size:0.9rem;margin:0 0 0.5rem">Kết quả / Results</h3>
+                  <div id="results-panel" style="background:#0D1F2D;color:#E2E8F0;padding:1rem;border-radius:10px;min-height:120px;font-family:var(--font-mono);font-size:0.85rem">
+                    <span style="color:var(--color-text-muted)">Nhấn "Chạy & Nộp" để xem kết quả.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      // Initialize CodeMirror
+      setTimeout(() => {
+        const textarea = document.getElementById('code-editor') as HTMLTextAreaElement;
+        if (textarea && (window as any).CodeMirror) {
+          editor = (window as any).CodeMirror.fromTextArea(textarea, {
+            mode: lang === 'python' ? 'python' : 'javascript',
+            theme: 'dracula',
+            lineNumbers: true,
+            indentUnit: 4,
+            tabSize: 4,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+          });
+        }
+      }, 100);
+
+      document.getElementById('submit-btn')?.addEventListener('click', submitCode);
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    async function submitCode() {
+      const btn = document.getElementById('submit-btn') as HTMLButtonElement;
+      const panel = document.getElementById('results-panel')!;
+      btn.disabled = true;
+      btn.textContent = 'Đang chạy... / Running...';
+      panel.innerHTML = '<span style="color:#FFC857">⏳ Đang chạy code và chấm điểm...</span>';
+
+      const code = editor ? editor.getValue() : (document.getElementById('code-editor') as HTMLTextAreaElement).value;
+
+      try {
+        const res = await apiFetch(`/codelab/exercises/${currentExercise.id}/submit`, 'POST', {
+          code,
+          language: currentExercise.language,
+        });
+
+        const results = res.submission?.test_results || [];
+        const passed = results.filter((r: any) => r.status === 'passed').length;
+        const failed = results.filter((r: any) => r.status === 'failed').length;
+        const errors = results.filter((r: any) => r.status === 'error').length;
+        const status = res.submission?.status || 'unknown';
+
+        let html = '';
+        if (status === 'passed') {
+          html += '<div style="color:var(--color-success);font-weight:600;margin-bottom:0.5rem">✓ Tất cả test cases passed!</div>';
+        } else if (errors > 0) {
+          html += '<div style="color:#e53e3e;font-weight:600;margin-bottom:0.5rem">✗ Có lỗi runtime</div>';
+        } else {
+          html += `<div style="color:#FFC857;font-weight:600;margin-bottom:0.5rem">⚠ ${passed} passed, ${failed} failed</div>`;
+        }
+
+        html += '<div style="margin-top:0.5rem">';
+        results.forEach((r: any, i: number) => {
+          const icon = r.status === 'passed' ? '✓' : r.status === 'failed' ? '✗' : '⚠';
+          const color = r.status === 'passed' ? 'var(--color-success)' : r.status === 'failed' ? '#e53e3e' : '#FFC857';
+          html += `<div style="padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.1)">
+            <span style="color:${color}">${icon}</span>
+            <span style="margin-left:0.5rem">${r.name || 'Test ' + (i+1)}</span>
+            ${r.output ? `<div style="font-size:0.8rem;color:rgba(255,255,255,0.6);margin-left:1.5rem;margin-top:0.25rem">Output: ${escapeHtml(r.output)}</div>` : ''}
+            ${r.expected ? `<div style="font-size:0.8rem;color:rgba(255,255,255,0.6);margin-left:1.5rem">Expected: ${escapeHtml(r.expected)}</div>` : ''}
+            ${r.error ? `<div style="font-size:0.8rem;color:#e53e3e;margin-left:1.5rem">Error: ${escapeHtml(r.error)}</div>` : ''}
+          </div>`;
+        });
+        html += '</div>';
+
+        panel.innerHTML = html;
+      } catch (err: any) {
+        panel.innerHTML = `<span style="color:#e53e3e">✗ Lỗi: ${escapeHtml(err.message)}</span>`;
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Chạy & Nộp / Run & Submit';
+    }
+
+    function escapeHtml(s: string): string {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    renderExercise();
+  </script>
+</AppLayout>

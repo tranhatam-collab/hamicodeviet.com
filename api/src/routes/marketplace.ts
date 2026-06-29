@@ -117,7 +117,7 @@ marketplace.put('/listings/:id', async (c) => {
   return c.json({ listing: updated });
 });
 
-// POST /marketplace/listings/:id/purchase — buy a listing
+// POST /marketplace/listings/:id/purchase — get a listing (free or paid)
 marketplace.post('/listings/:id/purchase', async (c) => {
   const id = c.req.param('id');
   const user = c.get('user') as any;
@@ -135,10 +135,19 @@ marketplace.post('/listings/:id/purchase', async (c) => {
   `;
   if (existing) return c.json({ error: 'already_purchased' }, 409);
 
-  // Create purchase record
+  // Free listings: grant access immediately
+  // Paid listings: payment processing not yet enabled — reject for now
+  if (listing.price_cents > 0) {
+    return c.json({
+      error: 'paid_marketplace_not_supported',
+      message: 'Thanh toán cho marketplace chưa được kích hoạt. Hiện chỉ hỗ trợ sản phẩm miễn phí.',
+    }, 503);
+  }
+
+  // Create purchase record (free)
   const [purchase] = await sql`
     INSERT INTO marketplace_purchases (listing_id, buyer_id, price_cents, currency, status)
-    VALUES (${id}, ${user.id}, ${listing.price_cents}, ${listing.currency}, 'completed')
+    VALUES (${id}, ${user.id}, 0, ${listing.currency}, 'completed')
     RETURNING *
   `;
 
@@ -150,7 +159,7 @@ marketplace.post('/listings/:id/purchase', async (c) => {
   await logAuditEvent(c.env, {
     actor_id: user.id,
     actor_type: 'user',
-    action: 'marketplace.purchase',
+    action: 'marketplace.purchase.free',
     resource_type: 'marketplace_listing',
     resource_id: id,
   });

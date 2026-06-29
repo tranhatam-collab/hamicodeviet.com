@@ -1,0 +1,122 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Bán sản phẩm — HaMi Code Việt">
+  <div id="sell-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../../lib/api';
+
+    const root = document.getElementById('sell-root')!;
+
+    async function renderSell() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+
+      try {
+        const data = await apiFetch('/marketplace/my-listings');
+        renderListings(data.listings || []);
+      } catch (err) {
+        root.innerHTML = `<div class="dashboard"><div class="dashboard-main"><p>Không thể tải.</p></div></div>`;
+      }
+    }
+
+    function renderListings(listings: any[]) {
+      const cards = listings.map(l => `
+        <div class="card" style="padding:1.25rem">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div>
+              <h3 style="font-size:1rem;margin:0 0 0.5rem">${l.title_vi || l.title}</h3>
+              <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0">${l.category} • ${l.price_cents === 0 ? 'Free' : '$' + (l.price_cents/100).toFixed(2)}</p>
+              <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0.5rem 0 0">Status: ${l.status} • Review: ${l.review_status}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/marketplace/sell" class="active">📤 Bán sản phẩm</a></li>
+              <li><a href="/marketplace/purchases">📥 Đã mua</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header">
+              <h1 class="dashboard-title">📤 Bán sản phẩm</h1>
+            </div>
+            <div class="dashboard-content">
+              <div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
+                <h3 style="margin:0 0 1rem">Đăng sản phẩm mới</h3>
+                <form id="create-listing-form" style="display:flex;flex-direction:column;gap:1rem">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                    <div><label style="font-size:0.85rem;font-weight:600">Title</label><input type="text" id="l-title" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" /></div>
+                    <div><label style="font-size:0.85rem;font-weight:600">Title (VI)</label><input type="text" id="l-title-vi" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" /></div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+                    <div><label style="font-size:0.85rem;font-weight:600">Category</label><select id="l-category" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:6px"><option>programming</option><option>template</option><option>game</option><option>asset</option><option>resource</option><option>lesson_pack</option></select></div>
+                    <div><label style="font-size:0.85rem;font-weight:600">Type</label><select id="l-type" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:6px"><option>template</option><option>source_code</option><option>game</option><option>asset</option><option>lesson_pack</option><option>resource</option></select></div>
+                    <div><label style="font-size:0.85rem;font-weight:600">Language</label><select id="l-language" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:6px"><option>vi</option><option>en</option></select></div>
+                  </div>
+                  <div><label style="font-size:0.85rem;font-weight:600">Description</label><textarea id="l-desc" rows="3" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:6px"></textarea></div>
+                  <div><label style="font-size:0.85rem;font-weight:600">Description (VI)</label><textarea id="l-desc-vi" rows="3" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:6px"></textarea></div>
+                  <div><label style="font-size:0.85rem;font-weight:600">Tags (comma separated)</label><input type="text" id="l-tags" placeholder="python, web, game" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" /></div>
+                  <button type="submit" class="btn btn--primary">Đăng sản phẩm / Create listing</button>
+                </form>
+                <div id="create-status" style="margin-top:0.75rem"></div>
+              </div>
+
+              <h3 style="margin:0 0 1rem">Sản phẩm của tôi</h3>
+              <div style="display:flex;flex-direction:column;gap:0.75rem">
+                ${cards || '<p style="color:var(--color-text-muted)">Bạn chưa có sản phẩm nào.</p>'}
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('create-listing-form')?.addEventListener('submit', createListing);
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    async function createListing(e: Event) {
+      e.preventDefault();
+      const status = document.getElementById('create-status')!;
+      const tags = (document.getElementById('l-tags') as HTMLInputElement).value.split(',').map(t => t.trim()).filter(Boolean);
+      try {
+        await apiFetch('/marketplace/listings', 'POST', {
+          title: (document.getElementById('l-title') as HTMLInputElement).value,
+          titleVi: (document.getElementById('l-title-vi') as HTMLInputElement).value,
+          description: (document.getElementById('l-desc') as HTMLTextAreaElement).value,
+          descriptionVi: (document.getElementById('l-desc-vi') as HTMLTextAreaElement).value,
+          category: (document.getElementById('l-category') as HTMLSelectElement).value,
+          type: (document.getElementById('l-type') as HTMLSelectElement).value,
+          language: (document.getElementById('l-language') as HTMLSelectElement).value,
+          tags,
+          priceCents: 0,
+        });
+        status.innerHTML = '<span style="color:var(--color-success)">✓ Đã tạo! Sản phẩm sẽ được duyệt trước khi xuất bản.</span>';
+        setTimeout(() => location.reload(), 1500);
+      } catch (err: any) {
+        status.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+      }
+    }
+
+    renderSell();
+  </script>
+</AppLayout>

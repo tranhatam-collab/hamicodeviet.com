@@ -1,0 +1,212 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="AI Chat — HaMi Code Việt">
+  <div id="ai-root">
+    <div class="auth-container">
+      <div class="auth-card">
+        <h1 class="auth-title">Đang tải AI Chat...</h1>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../lib/api';
+
+    const root = document.getElementById('ai-root')!;
+    let selectedAgent: any = null;
+    let currentConversation: any = null;
+    let messages: any[] = [];
+
+    async function renderAI() {
+      const user = await getCurrentUser();
+      if (!user) {
+        window.location.href = '/login';
+        return;
+      }
+
+      try {
+        const data = await apiFetch('/ai/agents');
+        renderAgentSelection(data.agents || []);
+      } catch (err) {
+        root.innerHTML = `<div class="dashboard"><div class="dashboard-main"><p>Không thể tải AI agents.</p></div></div>`;
+      }
+    }
+
+    function renderAgentSelection(agents: any[]) {
+      const agentCards = agents.map(a => `
+        <div class="card" style="padding:1.5rem;cursor:pointer" data-agent-id="${a.id}">
+          <div style="font-size:1.5rem;margin-bottom:0.5rem">${getAgentIcon(a.agent_type)}</div>
+          <h3 style="font-size:1rem;margin:0 0 0.5rem">${a.name_vi || a.name}</h3>
+          <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0">${a.description_vi || a.description || ''}</p>
+          <div style="margin-top:0.75rem">
+            <span style="background:var(--color-border);padding:0.2rem 0.5rem;border-radius:4px;font-size:0.7rem">${a.agent_type}</span>
+            ${a.age_restriction ? `<span style="background:var(--color-creative-yellow);color:#102A43;padding:0.2rem 0.5rem;border-radius:4px;font-size:0.7rem;margin-left:0.25rem">${a.age_restriction}+</span>` : ''}
+          </div>
+        </div>
+      `).join('');
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai" class="active">🤖 AI Chat</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/portfolio">🏆 Portfolio</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header">
+              <h1 class="dashboard-title">🤖 AI Chat</h1>
+            </div>
+            <div class="dashboard-content">
+              <p style="color:var(--color-text-muted);margin-bottom:1.5rem">Chọn AI agent để bắt đầu trò chuyện. Mỗi agent có chuyên môn riêng.</p>
+              <div class="grid grid--3">
+                ${agentCards || '<p>Chưa có AI agents. Vui lòng quay lại sau.</p>'}
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.querySelectorAll('[data-agent-id]').forEach(el => {
+        el.addEventListener('click', () => {
+          const id = (el as HTMLElement).dataset.agentId;
+          const agent = agents.find(a => a.id === id);
+          if (agent) startConversation(agent);
+        });
+      });
+
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    async function startConversation(agent: any) {
+      selectedAgent = agent;
+      try {
+        const data = await apiFetch('/ai/conversations', 'POST', {
+          agentId: agent.id,
+          title: `Chat with ${agent.name_vi || agent.name}`,
+        });
+        currentConversation = data.conversation;
+        messages = [];
+        renderChatUI();
+      } catch (err) {
+        alert('Không thể tạo cuộc trò chuyện. Vui lòng thử lại.');
+      }
+    }
+
+    function renderChatUI() {
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai" class="active">🤖 AI Chat</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/portfolio">🏆 Portfolio</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header">
+              <div>
+                <a href="/ai" style="font-size:0.85rem;color:var(--color-text-muted)">← Đổi agent</a>
+                <h1 class="dashboard-title">${getAgentIcon(selectedAgent.agent_type)} ${selectedAgent.name_vi || selectedAgent.name}</h1>
+              </div>
+            </div>
+            <div class="dashboard-content">
+              <div id="chat-messages" style="max-height:500px;overflow-y:auto;margin-bottom:1rem;display:flex;flex-direction:column;gap:0.75rem">
+                <div style="padding:1rem;background:var(--color-surface);border-radius:10px;border:1px solid var(--color-border)">
+                  <strong>AI:</strong> Xin chào! Tôi là ${selectedAgent.name_vi || selectedAgent.name}. ${selectedAgent.description_vi || selectedAgent.description || 'Tôi có thể giúp gì cho bạn?'}
+                </div>
+              </div>
+              <div style="display:flex;gap:0.75rem">
+                <input type="text" id="chat-input" placeholder="Nhập tin nhắn..." style="flex:1;border:1px solid var(--color-border);border-radius:10px;padding:0.75rem 1rem;font-size:1rem" />
+                <button id="send-btn" class="btn btn--primary">Gửi / Send</button>
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('send-btn')?.addEventListener('click', sendMessage);
+      document.getElementById('chat-input')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+      });
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('chat-input') as HTMLInputElement;
+      const btn = document.getElementById('send-btn') as HTMLButtonElement;
+      const msg = input.value.trim();
+      if (!msg || !currentConversation) return;
+
+      btn.disabled = true;
+      input.value = '';
+
+      const chatDiv = document.getElementById('chat-messages')!;
+      chatDiv.innerHTML += `<div style="padding:1rem;background:var(--color-tech-blue);color:white;border-radius:10px;align-self:flex-end;max-width:80%"><strong>You:</strong> ${escapeHtml(msg)}</div>`;
+      chatDiv.innerHTML += `<div id="loading-msg" style="padding:1rem;background:var(--color-surface);border-radius:10px;border:1px solid var(--color-border)"><strong>AI:</strong> <span style="color:var(--color-text-muted)">Đang suy nghĩ...</span></div>`;
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+
+      try {
+        const data = await apiFetch(`/ai/conversations/${currentConversation.id}/messages`, 'POST', {
+          content: msg,
+        });
+
+        document.getElementById('loading-msg')?.remove();
+        const aiResponse = data.aiMessage?.content || 'Không có phản hồi.';
+        chatDiv.innerHTML += `<div style="padding:1rem;background:var(--color-surface);border-radius:10px;border:1px solid var(--color-border);max-width:80%"><strong>AI:</strong> ${escapeHtml(aiResponse)}</div>`;
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+      } catch (err: any) {
+        document.getElementById('loading-msg')?.remove();
+        chatDiv.innerHTML += `<div style="padding:1rem;background:#fff0f0;border-radius:10px;border:1px solid #e53e3e"><strong>AI:</strong> <span style="color:#e53e3e">Lỗi: ${escapeHtml(err.message)}</span></div>`;
+      }
+
+      btn.disabled = false;
+      input.focus();
+    }
+
+    function getAgentIcon(type: string): string {
+      const icons: Record<string, string> = {
+        tutor: '👨‍🏫',
+        code_coach: '💻',
+        code_reviewer: '🔍',
+        assessment: '📝',
+        curriculum: '🗺️',
+        project: '📁',
+        safety: '🛡️',
+        parent_report: '📊',
+        teacher: '👩‍🏫',
+        marketplace: '🛒',
+      };
+      return icons[type] || '🤖';
+    }
+
+    function escapeHtml(s: string): string {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+    }
+
+    renderAI();
+  </script>
+</AppLayout>

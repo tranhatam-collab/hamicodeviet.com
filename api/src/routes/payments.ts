@@ -52,19 +52,7 @@ payments.post('/checkout', async (c) => {
   const clientSecret = c.env.PAYPAL_CLIENT_SECRET?.trim();
 
   if (!clientId || !clientSecret) {
-    // Demo mode — create subscription without PayPal (for testing)
-    await sql`
-      INSERT INTO subscriptions (user_id, plan_id, status, current_period_start, current_period_end)
-      VALUES (${payload.sub}, ${planId}, 'active', now(), now() + interval '30 days')
-      ON CONFLICT DO NOTHING
-    `;
-    await sql`
-      INSERT INTO payments (user_id, amount_cents, currency, status, provider, description)
-      VALUES (${payload.sub}, ${plan.priceCents}, ${plan.currency}, 'succeeded', 'demo', ${'Plan: ' + plan.name})
-    `;
-    // Grant entitlements based on subscription
-    await grantSubscriptionEntitlements(c.env, payload.sub, planId);
-    return c.json({ success: true, demoMode: true, plan: planId });
+    return c.json({ error: 'paypal_not_configured', message: 'PayPal credentials are not configured.' }, 503);
   }
 
   // Real PayPal checkout

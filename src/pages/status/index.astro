@@ -1,0 +1,122 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Status — HaMi Code Việt"
+  description="Trạng thái hệ thống HaMi Code Việt — API, database, email, payments."
+>
+
+<section style="background:linear-gradient(135deg,#081826 0%,#102A43 100%);color:#F7FAFC;padding:4rem 0" aria-labelledby="status-hero">
+  <div class="container text-center">
+    <h1 id="status-hero" style="color:#F7FAFC">
+      <span data-vi>Trạng thái hệ thống</span>
+      <span data-en>System status</span>
+    </h1>
+    <p style="color:rgba(247,250,252,0.8);margin:1rem 0 0">
+      <span data-vi>Theo dõi tình trạng hoạt động của các dịch vụ HaMi Code Việt.</span>
+      <span data-en>Monitor the operational status of HaMi Code Viet services.</span>
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="max-width:800px;margin:0 auto">
+    <div id="status-list" style="display:flex;flex-direction:column;gap:1rem">
+      <div style="text-align:center;padding:2rem;color:var(--color-text-muted)">
+        <span data-vi>Đang kiểm tra...</span>
+        <span data-en>Checking...</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--alt">
+  <div class="container" style="max-width:800px;margin:0 auto">
+    <h2>
+      <span data-vi>Các dịch vụ</span>
+      <span data-en>Services</span>
+    </h2>
+    <div class="grid grid--2" style="margin-top:1.5rem">
+      {[
+        { name: 'API', vi: 'API Backend', en: 'API Backend', url: 'https://api.hamicodeviet.com/health' },
+        { name: 'Email', vi: 'Email', en: 'Email', url: 'https://api.hamicodeviet.com/health/email' },
+        { name: 'Public Site', vi: 'Website công khai', en: 'Public Website', url: 'https://hamicodeviet.com' },
+        { name: 'App', vi: 'Ứng dụng học viên', en: 'Learner App', url: 'https://app.hamicodeviet.com' },
+      ].map(s => (
+        <div class="card" style="padding:1.5rem">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h3 style="font-size:1rem;margin:0">
+                <span data-vi>{s.vi}</span>
+                <span data-en>{s.en}</span>
+              </h3>
+              <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0.5rem 0 0">{s.url}</p>
+            </div>
+            <span id={`status-badge-${s.name}`} class="badge" style="background:var(--color-border);color:var(--color-text-muted)">...</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+</BaseLayout>
+
+<script is:inline>
+(async () => {
+  const services = [
+    { name: 'API', url: 'https://api.hamicodeviet.com/health' },
+    { name: 'Email', url: 'https://api.hamicodeviet.com/health/email' },
+    { name: 'Public Site', url: 'https://hamicodeviet.com' },
+    { name: 'App', url: 'https://app.hamicodeviet.com' },
+  ];
+
+  const statusList = document.getElementById('status-list');
+  let allOk = true;
+  const results = [];
+
+  for (const s of services) {
+    const badge = document.getElementById('status-badge-' + s.name);
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      const res = await fetch(s.url, { signal: controller.signal });
+      clearTimeout(timeout);
+      const ok = res.ok || (s.name === 'Public Site' && res.status < 500) || (s.name === 'App' && res.status < 500);
+      if (badge) {
+        badge.style.background = ok ? 'var(--color-success)' : '#e53e3e';
+        badge.style.color = ok ? '#fff' : '#fff';
+        badge.textContent = ok ? '✓ Operational' : '✗ Down';
+      }
+      results.push({ name: s.name, status: ok ? 'operational' : 'down', code: res.status });
+      if (!ok) allOk = false;
+    } catch (e) {
+      if (badge) {
+        badge.style.background = '#e53e3e';
+        badge.style.color = '#fff';
+        badge.textContent = '✗ Offline';
+      }
+      results.push({ name: s.name, status: 'offline', error: e.message });
+      allOk = false;
+    }
+  }
+
+  statusList.innerHTML = `
+    <div class="card" style="padding:1.5rem;display:flex;align-items:center;gap:1rem">
+      <span style="width:12px;height:12px;border-radius:50%;background:${allOk ? 'var(--color-success)' : '#e53e3e'}"></span>
+      <span style="font-size:1.1rem;font-weight:600">
+        ${allOk ? 'Tất cả dịch vụ hoạt động bình thường / All systems operational' : 'Một số dịch vụ gặp vấn đề / Some services have issues'}
+      </span>
+    </div>
+    ${results.map(r => `
+      <div class="card" style="padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:600">${r.name}</span>
+        <span style="color:${r.status === 'operational' ? 'var(--color-success)' : '#e53e3e'};font-size:0.9rem">
+          ${r.status === 'operational' ? '✓ Operational' : '✗ ' + (r.status === 'down' ? 'Down' : 'Offline')}
+        </span>
+      </div>
+    `).join('')}
+  `;
+})();
+</script>

@@ -1,0 +1,97 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Marketplace — HaMi Code Việt">
+  <div id="marketplace-root">
+    <div class="auth-container">
+      <div class="auth-card">
+        <h1 class="auth-title">Đang tải Marketplace...</h1>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../../lib/api';
+
+    const root = document.getElementById('marketplace-root')!;
+
+    async function renderMarketplace() {
+      const user = await getCurrentUser();
+      if (!user) {
+        window.location.href = '/login';
+        return;
+      }
+
+      try {
+        const data = await apiFetch('/marketplace/listings?limit=100');
+        renderListings(data.listings || []);
+      } catch (err) {
+        root.innerHTML = `<div class="dashboard"><div class="dashboard-main"><p>Không thể tải marketplace.</p></div></div>`;
+      }
+    }
+
+    function renderListings(listings: any[]) {
+      const cards = listings.map(l => `
+        <div class="card" style="padding:1.5rem;cursor:pointer" onclick="location.href='/marketplace/${l.id}'">
+          <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#0D1F2D,#102A43);border-radius:8px;margin-bottom:1rem;display:flex;align-items:center;justify-content:center">
+            <span style="font-size:2rem">${getIcon(l.category)}</span>
+          </div>
+          <span style="background:var(--color-creative-yellow);color:#102A43;padding:0.2rem 0.6rem;border-radius:6px;font-size:0.7rem;font-weight:700">${l.category || 'product'}</span>
+          <h3 style="font-size:1rem;margin:0.75rem 0 0.5rem">${l.title_vi || l.title}</h3>
+          <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 1rem">${(l.description_vi || l.description || '').substring(0, 80)}...</p>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:700;color:var(--color-success)">${l.price_cents === 0 ? 'Miễn phí' : '$' + (l.price_cents/100).toFixed(2)}</span>
+            <span style="font-size:0.8rem;color:var(--color-text-muted)">⭐ ${l.rating_avg || 'N/A'} (${l.rating_count || 0})</span>
+          </div>
+        </div>
+      `).join('');
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/marketplace" class="active">🛒 Marketplace</a></li>
+              <li><a href="/marketplace/sell">📤 Bán sản phẩm</a></li>
+              <li><a href="/marketplace/purchases">📥 Đã mua</a></li>
+              <li><a href="/portfolio">🏆 Portfolio</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header">
+              <h1 class="dashboard-title">🛒 Marketplace</h1>
+            </div>
+            <div class="dashboard-content">
+              <div class="grid grid--3">
+                ${cards || '<p>Chưa có sản phẩm. Vui lòng quay lại sau.</p>'}
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    function getIcon(cat: string): string {
+      const icons: Record<string, string> = {
+        programming: '💻', game: '🎮', template: '📄', asset: '🎨',
+        resource: '📚', lesson_pack: '📚', education: '🛠️',
+      };
+      return icons[cat] || '📦';
+    }
+
+    renderMarketplace();
+  </script>
+</AppLayout>

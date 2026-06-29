@@ -123,32 +123,7 @@ refunds.post('/:id/approve', requireAdmin, async (c) => {
   const clientSecret = c.env.PAYPAL_CLIENT_SECRET?.trim();
 
   if (!clientId || !clientSecret) {
-    // Demo mode — approve without PayPal
-    await sql`
-      UPDATE refunds
-      SET status = 'approved', processed_by = ${user.id}, processed_at = now(), updated_at = now()
-      WHERE id = ${id}
-    `;
-
-    // Revoke entitlements if subscription payment
-    const planId = refund.metadata?.planId;
-    if (planId) {
-      await revokeSubscriptionEntitlements(c.env, refund.user_id, planId);
-    }
-
-    await logAuditEvent(c.env, {
-      actor_id: user.id,
-      actor_type: 'user',
-      action: 'refund.approve',
-      resource_type: 'refund',
-      resource_id: id,
-      changes: { status: 'approved' },
-      ip: c.req.header('cf-connecting-ip'),
-      user_agent: c.req.header('user-agent'),
-      request_id: c.get('requestId'),
-    });
-
-    return c.json({ success: true, demoMode: true });
+    return c.json({ error: 'paypal_not_configured', message: 'PayPal credentials are not configured.' }, 503);
   }
 
   // Real PayPal refund

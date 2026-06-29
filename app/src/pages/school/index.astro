@@ -1,0 +1,174 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+---
+
+<AppLayout title="School — HaMi Code Việt">
+  <div id="school-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../../lib/api';
+
+    const root = document.getElementById('school-root')!;
+
+    async function renderSchool() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+
+      try {
+        const data = await apiFetch('/school/mine');
+        if (!data.schools || data.schools.length === 0) {
+          renderNoSchool();
+        } else {
+          renderSchoolDashboard(data.schools[0]);
+        }
+      } catch (err) {
+        renderNoSchool();
+      }
+    }
+
+    function renderNoSchool() {
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/school" class="active">🏫 School</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header"><h1 class="dashboard-title">🏫 School</h1></div>
+            <div class="dashboard-content">
+              <div class="card" style="padding:2rem;text-align:center">
+                <p style="margin:0 0 1.5rem">Bạn chưa có trường học nào. Tạo trường để bắt đầu quản lý lớp học và bài tập.</p>
+                <form id="create-school-form" style="max-width:400px;margin:0 auto;display:flex;flex-direction:column;gap:1rem">
+                  <input type="text" id="s-name" placeholder="Tên trường / School name" required style="padding:0.75rem;border:1px solid var(--color-border);border-radius:8px" />
+                  <select id="s-type" style="padding:0.75rem;border:1px solid var(--color-border);border-radius:8px">
+                    <option value="school">Trường học / School</option>
+                    <option value="center">Trung tâm / Center</option>
+                    <option value="academy">Học viện / Academy</option>
+                  </select>
+                  <button type="submit" class="btn btn--primary">Tạo trường / Create school</button>
+                </form>
+                <div id="school-status" style="margin-top:1rem"></div>
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('create-school-form')?.addEventListener('submit', createSchool);
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    async function createSchool(e: Event) {
+      e.preventDefault();
+      const status = document.getElementById('school-status')!;
+      try {
+        await apiFetch('/school', 'POST', {
+          name: (document.getElementById('s-name') as HTMLInputElement).value,
+          type: (document.getElementById('s-type') as HTMLSelectElement).value,
+        });
+        status.innerHTML = '<span style="color:var(--color-success)">✓ Đã tạo trường!</span>';
+        setTimeout(() => location.reload(), 1000);
+      } catch (err: any) {
+        status.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+      }
+    }
+
+    async function renderSchoolDashboard(school: any) {
+      try {
+        const classesData = await apiFetch(`/school/${school.id}/classes`);
+        const classes = classesData.classes || [];
+
+        const classCards = classes.map((c: any) => `
+          <div class="card" style="padding:1.25rem;cursor:pointer" onclick="location.href='/school/classes/${c.id}'">
+            <h3 style="font-size:1rem;margin:0 0 0.5rem">${c.name}</h3>
+            <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0">${c.subject || ''} • ${c.grade_level || ''}</p>
+            <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0.5rem 0 0">Status: ${c.status}</p>
+          </div>
+        `).join('');
+
+        root.innerHTML = `
+          <div class="dashboard">
+            <aside class="sidebar">
+              <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+              <nav><ul class="sidebar-nav">
+                <li><a href="/dashboard">📊 Dashboard</a></li>
+                <li><a href="/courses">📚 Khóa học</a></li>
+                <li><a href="/codelab">💻 CodeLab</a></li>
+                <li><a href="/ai">🤖 AI Chat</a></li>
+                <li><a href="/marketplace">🛒 Marketplace</a></li>
+                <li><a href="/school" class="active">🏫 School</a></li>
+                <li><a href="/settings">⚙️ Cài đặt</a></li>
+                <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+              </ul></nav>
+            </aside>
+            <main class="dashboard-main">
+              <div class="dashboard-header">
+                <h1 class="dashboard-title">🏫 ${school.name}</h1>
+              </div>
+              <div class="dashboard-content">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+                  <h3 style="margin:0">Lớp học / Classes</h3>
+                  <button id="create-class-btn" class="btn btn--primary btn--sm">+ Tạo lớp</button>
+                </div>
+                <div id="create-class-form" style="display:none;margin-bottom:1.5rem;padding:1.5rem;background:var(--color-surface);border-radius:10px;border:1px solid var(--color-border)">
+                  <input type="text" id="c-name" placeholder="Tên lớp / Class name" style="width:100%;padding:0.5rem;margin-bottom:0.75rem;border:1px solid var(--color-border);border-radius:6px" />
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+                    <input type="text" id="c-subject" placeholder="Môn / Subject" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" />
+                    <input type="text" id="c-grade" placeholder="Khối / Grade" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" />
+                  </div>
+                  <button id="submit-class-btn" class="btn btn--primary">Tạo / Create</button>
+                </div>
+                <div class="grid grid--3">
+                  ${classCards || '<p style="color:var(--color-text-muted)">Chưa có lớp học. Tạo lớp đầu tiên!</p>'}
+                </div>
+              </div>
+            </main>
+          </div>
+        `;
+
+        document.getElementById('create-class-btn')?.addEventListener('click', () => {
+          const form = document.getElementById('create-class-form')!;
+          form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        });
+        document.getElementById('submit-class-btn')?.addEventListener('click', createClass.bind(null, school.id));
+        document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+          e.preventDefault();
+          localStorage.removeItem('hmcv_token');
+          window.location.href = '/login';
+        });
+      } catch (err) {
+        root.innerHTML = `<div class="dashboard"><div class="dashboard-main"><p>Không thể tải lớp học.</p></div></div>`;
+      }
+    }
+
+    async function createClass(schoolId: string) {
+      try {
+        await apiFetch(`/school/${schoolId}/classes`, 'POST', {
+          name: (document.getElementById('c-name') as HTMLInputElement).value,
+          subject: (document.getElementById('c-subject') as HTMLInputElement).value,
+          gradeLevel: (document.getElementById('c-grade') as HTMLInputElement).value,
+        });
+        location.reload();
+      } catch (err: any) {
+        alert(err.message);
+      }
+    }
+
+    renderSchool();
+  </script>
+</AppLayout>

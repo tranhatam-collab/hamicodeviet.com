@@ -20,16 +20,13 @@ const sampleLessons = lessons.filter(l => l.codeSnippet).slice(0, 2);
         <span data-en>The coding lab</span>
       </h1>
       <p style="color:rgba(247,250,252,0.8);font-size:1.1rem;margin:1rem 0 2rem">
-        <span data-vi>Viết và chạy HTML, CSS, JavaScript, Python ngay trên trình duyệt — không cần cài đặt. Sandbox cô lập an toàn, preview trực tiếp và giải thích lỗi song ngữ.</span>
-        <span data-en>Write and run HTML, CSS, JavaScript, Python directly in your browser — no installation needed. Isolated safe sandbox, live preview, and bilingual error explanations.</span>
+        <span data-vi>Viết và chạy HTML, CSS, JavaScript, Python ngay trên trình duyệt — không cần cài đặt. Sandbox an toàn, chấm bài tự động và giải thích lỗi song ngữ.</span>
+        <span data-en>Write and run HTML, CSS, JavaScript, Python directly in your browser — no installation needed. Safe sandbox, auto-grading, and bilingual error explanations.</span>
       </p>
-      <div style="display:inline-flex;align-items:center;gap:0.75rem;background:rgba(32,167,121,0.15);border:1px solid rgba(32,167,121,0.3);border-radius:9999px;padding:0.5rem 1.25rem">
-        <span style="color:#20A779;font-size:1.25rem">⚙️</span>
-        <span style="color:#F7FAFC;font-weight:600">
-          <span data-vi>Đang xây dựng — Ra mắt Q3 2026</span>
-          <span data-en>Under construction — Launching Q3 2026</span>
-        </span>
-      </div>
+      <a href="https://app.hamicodeviet.com/codelab" class="btn btn--primary btn--lg">
+        <span data-vi>Vào CodeLab →</span>
+        <span data-en>Enter CodeLab →</span>
+      </a>
     </div>
   </div>
 </section>
@@ -56,17 +53,40 @@ const sampleLessons = lessons.filter(l => l.codeSnippet).slice(0, 2);
   </div>
 </section>
 
-<section class="section section--alt" aria-labelledby="code-demos">
+<section class="section section--alt" aria-labelledby="codelab-exercises">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2 id="codelab-exercises">
+        <span data-vi>Bài tập CodeLab</span>
+        <span data-en>CodeLab exercises</span>
+      </h2>
+      <p class="section-desc">
+        <span data-vi>10+ bài tập Python và JavaScript với chấm điểm tự động.</span>
+        <span data-en>10+ Python and JavaScript exercises with auto-grading.</span>
+      </p>
+    </div>
+    <div id="codelab-exercise-list" class="grid grid--3" style="min-height:200px">
+      <div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--color-text-muted)">
+        <span data-vi>Đang tải bài tập...</span>
+        <span data-en>Loading exercises...</span>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:2rem">
+      <a href="https://app.hamicodeviet.com/codelab" class="btn btn--primary">
+        <span data-vi>Xem tất cả & bắt đầu luyện →</span>
+        <span data-en>View all & start practicing →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="code-demos">
   <div class="container">
     <div class="section-header text-center">
       <h2 id="code-demos">
         <span data-vi>Ví dụ code — Học ngay hôm nay</span>
         <span data-en>Code examples — Learn today</span>
       </h2>
-      <p class="section-desc">
-        <span data-vi>Trong khi CodeLab đang xây dựng, hãy bắt đầu với các bài học miễn phí.</span>
-        <span data-en>While CodeLab is being built, start with the free lessons.</span>
-      </p>
     </div>
     {sampleLessons.map(lesson => (
       <div style="margin-bottom:2rem">
@@ -87,18 +107,49 @@ const sampleLessons = lessons.filter(l => l.codeSnippet).slice(0, 2);
 <section class="section" style="background:linear-gradient(135deg,#081826 0%,#102A43 100%)" aria-labelledby="codelab-cta">
   <div class="container text-center">
     <h2 id="codelab-cta" style="color:#F7FAFC">
-      <span data-vi>Bắt đầu học trong khi chờ CodeLab</span>
-      <span data-en>Start learning while CodeLab is being built</span>
+      <span data-vi>Sẵn sàng luyện code?</span>
+      <span data-en>Ready to practice coding?</span>
     </h2>
     <p style="color:rgba(247,250,252,0.75);margin:1rem 0 2rem">
-      <span data-vi>30 bài học miễn phí với code mẫu có thể copy và chạy ngay.</span>
-      <span data-en>30 free lessons with sample code you can copy and run right away.</span>
+      <span data-vi>Đăng nhập và bắt đầu giải bài tập ngay. Miễn phí cho mọi người dùng.</span>
+      <span data-en>Sign in and start solving exercises now. Free for all users.</span>
     </p>
-    <a href="/hoc-mien-phi" class="btn btn--primary btn--lg">
-      <span data-vi>Xem bài học miễn phí →</span>
-      <span data-en>Browse free lessons →</span>
+    <a href="https://app.hamicodeviet.com/codelab" class="btn btn--primary btn--lg">
+      <span data-vi>Vào CodeLab →</span>
+      <span data-en>Enter CodeLab →</span>
     </a>
   </div>
 </section>
+
+<script is:inline>
+(async () => {
+  try {
+    const res = await fetch('https://api.hamicodeviet.com/codelab/exercises?limit=6');
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    const list = document.getElementById('codelab-exercise-list');
+    if (!data.exercises || data.exercises.length === 0) {
+      list.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem">Bài tập sẽ sớm có mặt / Exercises coming soon</div>';
+      return;
+    }
+    list.innerHTML = data.exercises.map(ex => `
+      <div class="card" style="padding:1.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.5rem">
+          <span style="background:var(--color-tech-blue);color:white;padding:0.2rem 0.6rem;border-radius:6px;font-size:0.75rem;font-weight:600">${ex.language}</span>
+          <span style="font-size:0.75rem;color:var(--color-text-muted)">${ex.difficulty}</span>
+        </div>
+        <h3 style="font-size:1rem;margin:0.5rem 0">${ex.title_vi || ex.title}</h3>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0.5rem 0 1rem">${ex.category || ''}</p>
+        <a href="https://app.hamicodeviet.com/codelab/${ex.slug}" class="btn btn--secondary btn--sm">
+          Làm bài / Solve →
+        </a>
+      </div>
+    `).join('');
+  } catch (e) {
+    const list = document.getElementById('codelab-exercise-list');
+    if (list) list.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem"><a href="https://app.hamicodeviet.com/codelab" class="btn btn--primary">Vào CodeLab →</a></div>';
+  }
+})();
+</script>
 
 </BaseLayout>

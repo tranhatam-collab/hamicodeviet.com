@@ -1,0 +1,84 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+---
+
+<AppLayout title="CodeLab — HaMi Code Việt">
+  <div id="codelab-root">
+    <div class="auth-container">
+      <div class="auth-card">
+        <h1 class="auth-title">Đang tải CodeLab...</h1>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch, apiCall } from '../../lib/api';
+
+    const root = document.getElementById('codelab-root')!;
+
+    async function renderCodeLab() {
+      const user = await getCurrentUser();
+      if (!user) {
+        window.location.href = '/login';
+        return;
+      }
+
+      try {
+        const data = await apiFetch('/codelab/exercises?limit=100');
+        renderExerciseList(data.exercises || []);
+      } catch (err) {
+        root.innerHTML = `<div class="dashboard"><div class="dashboard-main"><p>Không thể tải bài tập. Vui lòng thử lại sau.</p></div></div>`;
+      }
+    }
+
+    function renderExerciseList(exercises: any[]) {
+      const cards = exercises.map(ex => `
+        <div class="card" style="padding:1.5rem;cursor:pointer" onclick="location.href='/codelab/${ex.slug}'">
+          <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.5rem">
+            <span style="background:var(--color-tech-blue);color:white;padding:0.2rem 0.6rem;border-radius:6px;font-size:0.75rem;font-weight:600">${ex.language}</span>
+            <span style="font-size:0.75rem;color:var(--color-text-muted)">${ex.difficulty}</span>
+          </div>
+          <h3 style="font-size:1rem;margin:0.5rem 0">${ex.title_vi || ex.title}</h3>
+          <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0.5rem 0 0">${ex.category || ''}</p>
+        </div>
+      `).join('');
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab" class="active">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/portfolio">🏆 Portfolio</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header">
+              <h1 class="dashboard-title">💻 CodeLab</h1>
+            </div>
+            <div class="dashboard-content">
+              <p style="color:var(--color-text-muted);margin-bottom:1.5rem">Chọn bài tập để bắt đầu luyện code. Mã sẽ được chạy và chấm điểm tự động.</p>
+              <div class="grid grid--3">
+                ${cards || '<p>Chưa có bài tập. Vui lòng quay lại sau.</p>'}
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    renderCodeLab();
+  </script>
+</AppLayout>

@@ -4,7 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 <BaseLayout
   title="HaMi Market — Chợ sản phẩm số"
-  description="Marketplace cho sản phẩm số của người học HaMi Code Việt — đang xây dựng."
+  description="Marketplace cho sản phẩm số của người học HaMi Code Việt — template, game, mã nguồn, asset và nhiều hơn."
 >
 
 <section style="background:linear-gradient(135deg,#081826 0%,#102A43 100%);color:#F7FAFC;padding:5rem 0" aria-labelledby="market-hero">
@@ -18,88 +18,148 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <span data-vi>Nơi người học bán sản phẩm số họ tự tạo: template, game, mã nguồn, asset, AI workflow và nhiều hơn nữa.</span>
       <span data-en>Where learners sell digital products they build: templates, games, source code, assets, AI workflows, and more.</span>
     </p>
-    <div style="display:inline-flex;align-items:center;gap:0.75rem;background:rgba(255,200,87,0.12);border:1px solid rgba(255,200,87,0.3);border-radius:9999px;padding:0.5rem 1.5rem">
-      <span style="color:#FFC857;font-weight:700">
-        <span data-vi>🚧 Đang xây dựng — Ra mắt Q4 2026</span>
-        <span data-en>🚧 Under construction — Launching Q4 2026</span>
-      </span>
+    <a href="https://app.hamicodeviet.com/marketplace" class="btn btn--primary btn--lg">
+      <span data-vi>Vào Marketplace →</span>
+      <span data-en>Enter Marketplace →</span>
+    </a>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="market-listings">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2 id="market-listings">
+        <span data-vi>Sản phẩm nổi bật</span>
+        <span data-en>Featured products</span>
+      </h2>
+      <p class="section-desc">
+        <span data-vi>Template, mã nguồn, game và tài nguyên miễn phí từ cộng đồng.</span>
+        <span data-en>Free templates, source code, games, and resources from the community.</span>
+      </p>
+    </div>
+    <div id="marketplace-list" class="grid grid--3" style="min-height:200px">
+      <div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--color-text-muted)">
+        <span data-vi>Đang tải sản phẩm...</span>
+        <span data-en>Loading products...</span>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:2rem">
+      <a href="https://app.hamicodeviet.com/marketplace" class="btn btn--primary">
+        <span data-vi>Xem tất cả sản phẩm →</span>
+        <span data-en>View all products →</span>
+      </a>
     </div>
   </div>
 </section>
 
-<section class="section" aria-labelledby="market-products">
+<section class="section section--alt" aria-labelledby="market-categories">
   <div class="container">
-    <h2 id="market-products" class="text-center">
-      <span data-vi>Loại sản phẩm được bán</span>
-      <span data-en>Types of products for sale</span>
+    <h2 id="market-categories" class="text-center">
+      <span data-vi>Loại sản phẩm</span>
+      <span data-en>Product categories</span>
     </h2>
     <div class="grid grid--4" style="margin-top:2rem">
-      {['Template', 'Mã nguồn / Source code', 'Game', 'Asset & hình ảnh / Images', 'Animation', 'Worksheet', 'Plugin', 'AI workflow', 'SaaS nhỏ / Mini SaaS', 'Bài giảng / Lesson set', 'Công cụ giáo dục / Education tool', 'Dashboard'].map(t => (
+      {[
+        { vi: 'Template', en: 'Template', icon: '📄' },
+        { vi: 'Mã nguồn', en: 'Source code', icon: '💻' },
+        { vi: 'Game', en: 'Game', icon: '🎮' },
+        { vi: 'Asset & hình ảnh', en: 'Assets & images', icon: '🎨' },
+        { vi: 'Animation', en: 'Animation', icon: '✨' },
+        { vi: 'Bài giảng', en: 'Lesson pack', icon: '📚' },
+        { vi: 'Công cụ giáo dục', en: 'Education tool', icon: '🛠️' },
+        { vi: 'AI workflow', en: 'AI workflow', icon: '🤖' },
+      ].map(t => (
         <div class="card" style="text-align:center;padding:1.25rem">
-          <span style="font-size:0.9rem;font-weight:600">{t}</span>
+          <div style="font-size:1.5rem;margin-bottom:0.5rem">{t.icon}</div>
+          <span style="font-size:0.9rem;font-weight:600">
+            <span data-vi>{t.vi}</span>
+            <span data-en>{t.en}</span>
+          </span>
         </div>
       ))}
     </div>
   </div>
 </section>
 
-<section class="section section--alt" aria-labelledby="market-requirements">
-  <div class="container">
-    <div style="max-width:700px;margin:0 auto">
-      <h2 id="market-requirements" class="text-center">
-        <span data-vi>Điều kiện để đăng sản phẩm</span>
-        <span data-en>Requirements to list a product</span>
-      </h2>
-      <div style="margin-top:2rem;display:flex;flex-direction:column;gap:1rem">
-        {[
-          { vi: 'Xác minh danh tính người bán', en: 'Seller identity verified' },
-          { vi: 'Chứng minh quyền sở hữu nội dung', en: 'Content ownership proven' },
-          { vi: 'Khai báo thành phần do AI tạo ra', en: 'AI-generated content disclosed' },
-          { vi: 'Quét mã độc và test vượt qua', en: 'Malware scan and tests passed' },
-          { vi: 'Giấy phép sử dụng rõ ràng', en: 'Clear usage license' },
-          { vi: 'Hướng dẫn sử dụng đầy đủ', en: 'Complete usage instructions' },
-        ].map((r, i) => (
-          <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;background:var(--color-surface);border-radius:10px;border:1px solid var(--color-border)">
-            <span style="width:28px;height:28px;border-radius:50%;background:var(--color-tech-blue);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0">{i+1}</span>
-            <span>
-              <span data-vi>{r.vi}</span>
-              <span data-en>{r.en}</span>
-            </span>
-          </div>
-        ))}
-      </div>
+<section class="section" aria-labelledby="market-sell">
+  <div class="container" style="max-width:700px;margin:0 auto">
+    <h2 id="market-sell" class="text-center">
+      <span data-vi>Bán sản phẩm của bạn</span>
+      <span data-en>Sell your products</span>
+    </h2>
+    <div style="margin-top:2rem;display:flex;flex-direction:column;gap:1rem">
+      {[
+        { vi: 'Đăng ký tài khoản Creator', en: 'Sign up for a Creator account' },
+        { vi: 'Xác minh danh tính', en: 'Verify your identity' },
+        { vi: 'Đăng sản phẩm với giấy phép rõ ràng', en: 'List your product with a clear license' },
+        { vi: 'Sản phẩm được duyệt và xuất bản', en: 'Product is reviewed and published' },
+        { vi: 'Người dùng tải xuống miễn phí', en: 'Users download for free' },
+      ].map((r, i) => (
+        <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;background:var(--color-surface);border-radius:10px;border:1px solid var(--color-border)">
+          <span style="width:28px;height:28px;border-radius:50%;background:var(--color-tech-blue);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0">{i+1}</span>
+          <span>
+            <span data-vi>{r.vi}</span>
+            <span data-en>{r.en}</span>
+          </span>
+        </div>
+      ))}
+    </div>
+    <div style="text-align:center;margin-top:2rem">
+      <a href="https://app.hamicodeviet.com/marketplace/sell" class="btn btn--accent">
+        <span data-vi>Đăng sản phẩm →</span>
+        <span data-en>List a product →</span>
+      </a>
     </div>
   </div>
 </section>
 
-<section class="section" aria-labelledby="market-under18">
+<section class="section section--dark" aria-labelledby="market-under18">
   <div class="container" style="max-width:700px;margin:0 auto">
-    <h2 id="market-under18">
+    <h2 id="market-under18" style="color:#F7FAFC">
       <span data-vi>⚠️ Quy định với người dưới 18 tuổi</span>
       <span data-en>⚠️ Rules for under-18 sellers</span>
     </h2>
-    <p>
+    <p style="color:rgba(247,250,252,0.75)">
       <span data-vi>Toàn bộ giao dịch, hợp đồng, quyền nhận tiền và xử lý tranh chấp của người dưới 18 tuổi phải thông qua tài khoản phụ huynh hoặc người đại diện hợp pháp.</span>
       <span data-en>All transactions, contracts, payment rights, and dispute resolution for under-18 users must go through a parent or legal guardian account.</span>
     </p>
   </div>
 </section>
 
-<section class="section section--dark" aria-labelledby="market-notify">
-  <div class="container text-center">
-    <h2 id="market-notify" style="color:#F7FAFC">
-      <span data-vi>Đăng ký để được thông báo khi Marketplace mở</span>
-      <span data-en>Register to be notified when Marketplace opens</span>
-    </h2>
-    <p style="color:rgba(247,250,252,0.75);margin:1rem 0 2rem">
-      <span data-vi>Liên hệ với chúng tôi để đăng ký danh sách chờ.</span>
-      <span data-en>Contact us to join the waitlist.</span>
-    </p>
-    <a href="/lien-he" class="btn btn--accent btn--lg">
-      <span data-vi>Đăng ký danh sách chờ →</span>
-      <span data-en>Join waitlist →</span>
-    </a>
-  </div>
-</section>
+<script is:inline>
+(async () => {
+  try {
+    const res = await fetch('https://api.hamicodeviet.com/marketplace/listings?limit=6');
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    const list = document.getElementById('marketplace-list');
+    if (!data.listings || data.listings.length === 0) {
+      list.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem">Sản phẩm sẽ sớm có mặt / Products coming soon</div>';
+      return;
+    }
+    list.innerHTML = data.listings.map(l => `
+      <div class="card" style="padding:1.5rem">
+        <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#0D1F2D,#102A43);border-radius:8px;margin-bottom:1rem;display:flex;align-items:center;justify-content:center">
+          <span style="font-size:2rem">${getIcon(l.category)}</span>
+        </div>
+        <span style="background:var(--color-creative-yellow);color:#102A43;padding:0.2rem 0.6rem;border-radius:6px;font-size:0.7rem;font-weight:700">${l.category || 'product'}</span>
+        <h3 style="font-size:1rem;margin:0.75rem 0 0.5rem">${l.title_vi || l.title}</h3>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 1rem">${(l.description_vi || l.description || '').substring(0, 80)}...</p>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:700;color:var(--color-success)">${l.price_cents === 0 ? 'Miễn phí / Free' : '$' + (l.price_cents/100).toFixed(2)}</span>
+          <a href="https://app.hamicodeviet.com/marketplace/${l.id}" class="btn btn--secondary btn--sm">Xem / View →</a>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    const list = document.getElementById('marketplace-list');
+    if (list) list.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem"><a href="https://app.hamicodeviet.com/marketplace" class="btn btn--primary">Vào Marketplace →</a></div>';
+  }
+  function getIcon(cat) {
+    const icons = { programming: '💻', game: '🎮', template: '📄', asset: '🎨', resource: '📚', lesson_pack: '📚' };
+    return icons[cat] || '📦';
+  }
+})();
+</script>
 
 </BaseLayout>

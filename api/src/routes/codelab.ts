@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { getDb } from '../lib/db';
 import { getBearerToken, verifySession } from '../lib/auth';
+import { runTests } from '../lib/runner';
 
 const codelab = new Hono<AppBindings>();
 
@@ -84,21 +85,10 @@ codelab.post('/exercises/:id/submit', async (c) => {
     RETURNING *
   `;
 
-  // Run test cases (simplified — in production use a sandbox runner)
+  // Run test cases using the real code runner
   const testCases = exercise.test_cases || [];
-  let passed = 0;
-  let failed = 0;
-  const results = [];
-
-  for (const tc of testCases) {
-    // Placeholder: real implementation would use a code runner
-    results.push({
-      name: tc.name || 'test',
-      status: 'pending',
-      input: tc.input,
-      expected: tc.expected,
-    });
-  }
+  const language = body.language || exercise.language;
+  const { results, passed, failed } = await runTests(language, body.code, testCases);
 
   // Update submission
   const status = failed === 0 ? 'passed' : 'failed';

@@ -67,21 +67,21 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         <span data-en>Send a message</span>
       </h2>
       <p class="text-center text-muted" style="margin-bottom:2rem">
-        <span data-vi>Tính năng gửi form sẽ được kích hoạt sau khi hệ thống backend hoàn thiện.</span>
-        <span data-en>Form submission will be enabled after the backend system is ready.</span>
+        <span data-vi>Chúng tôi sẽ phản hồi trong vòng 24-48 giờ.</span>
+        <span data-en>We will respond within 24-48 hours.</span>
       </p>
-      <form class="contact-form" action="" method="POST" aria-label="Contact form">
+      <form class="contact-form" id="contact-form" aria-label="Contact form">
         <div class="form-row">
           <div class="form-group">
             <label for="name">
               <span data-vi>Họ và tên</span>
               <span data-en>Full name</span>
             </label>
-            <input type="text" id="name" name="name" autocomplete="name" placeholder="Nguyễn Văn A" disabled />
+            <input type="text" id="name" name="name" autocomplete="name" placeholder="Nguyễn Văn A" required />
           </div>
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" autocomplete="email" placeholder="email@example.com" disabled />
+            <input type="email" id="email" name="email" autocomplete="email" placeholder="email@example.com" required />
           </div>
         </div>
         <div class="form-group">
@@ -89,7 +89,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
             <span data-vi>Chủ đề</span>
             <span data-en>Subject</span>
           </label>
-          <select id="subject" name="subject" disabled>
+          <select id="subject" name="subject" required>
             <option value="" data-vi>Chọn chủ đề...</option>
             <option value="" data-en>Select subject...</option>
             <option value="learn" data-vi>Câu hỏi về khóa học</option>
@@ -107,9 +107,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
             <span data-vi>Nội dung</span>
             <span data-en>Message</span>
           </label>
-          <textarea id="message" name="message" rows="5" placeholder="..." disabled></textarea>
+          <textarea id="message" name="message" rows="5" placeholder="..." required></textarea>
         </div>
-        <button type="submit" class="btn btn--primary" disabled>
+        <div id="contact-status" style="margin-bottom:1rem"></div>
+        <button type="submit" class="btn btn--primary" id="contact-submit">
           <span data-vi>Gửi tin nhắn</span>
           <span data-en>Send message</span>
         </button>
@@ -117,6 +118,40 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     </div>
   </div>
 </section>
+
+<script is:inline>
+document.getElementById('contact-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const status = document.getElementById('contact-status');
+  const btn = document.getElementById('contact-submit');
+  const form = e.target;
+  const data = {
+    name: form.name.value,
+    email: form.email.value,
+    subject: form.subject.value,
+    message: form.message.value,
+  };
+  btn.disabled = true;
+  status.innerHTML = '<span style="color:var(--color-text-muted)">Đang gửi... / Sending...</span>';
+  try {
+    const res = await fetch('https://api.hamicodeviet.com/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
+    if (res.ok) {
+      status.innerHTML = '<span style="color:var(--color-success);font-weight:600">✓ Tin nhắn đã được gửi thành công! / Message sent successfully!</span>';
+      form.reset();
+    } else {
+      status.innerHTML = '<span style="color:#e53e3e">' + (result.message || 'Có lỗi xảy ra. / An error occurred.') + '</span>';
+    }
+  } catch (err) {
+    status.innerHTML = '<span style="color:#e53e3e">Lỗi kết nối. / Connection error.</span>';
+  }
+  btn.disabled = false;
+});
+</script>
 
 </BaseLayout>
 
@@ -171,7 +206,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     font-size: 1rem;
     color: var(--color-text);
     background: var(--color-surface-alt);
-    opacity: 0.6;
-    cursor: not-allowed;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: 2px solid var(--color-tech-blue);
+    outline-offset: -1px;
   }
 </style>

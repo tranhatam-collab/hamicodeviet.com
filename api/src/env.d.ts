@@ -14,11 +14,14 @@ interface Env {
 }
 
 interface EmailQueueMessage {
-  type: 'verification' | 'password_reset';
+  type: 'verification' | 'password_reset' | 'guardian_verification';
   to: string;
   token: string;
   lang: 'vi' | 'en';
   attempts?: number;
+  guardianCode?: string;
+  guardianName?: string;
+  childEmail?: string;
 }
 
 interface AuthUser {
