@@ -1,0 +1,130 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Portfolio — HaMi Code Việt">
+  <div id="portfolio-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../lib/api';
+
+    const root = document.getElementById('portfolio-root')!;
+
+    async function renderPortfolio() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+
+      try {
+        const data = await apiFetch('/portfolio');
+        renderList(data.portfolios || []);
+      } catch (err) {
+        root.innerHTML = `<div class="dashboard"><div class="dashboard-main"><p>Không thể tải portfolio.</p></div></div>`;
+      }
+    }
+
+    function renderList(items: any[]) {
+      const cards = items.map(p => `
+        <div class="card" style="padding:1.25rem">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div>
+              <h3 style="font-size:1rem;margin:0 0 0.5rem">${p.title}</h3>
+              <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 0.5rem">${p.description || ''}</p>
+              <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+                <span style="background:var(--color-border);padding:0.2rem 0.5rem;border-radius:4px;font-size:0.7rem">${p.privacy_level}</span>
+                <span style="background:var(--color-border);padding:0.2rem 0.5rem;border-radius:4px;font-size:0.7rem">${p.status}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/portfolio" class="active">🏆 Portfolio</a></li>
+              <li><a href="/certificates">📜 Chứng chỉ</a></li>
+              <li><a href="/refunds">💰 Hoàn tiền</a></li>
+              <li><a href="/privacy">🔒 Quyền riêng tư</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header">
+              <h1 class="dashboard-title">🏆 Portfolio</h1>
+            </div>
+            <div class="dashboard-content">
+              <div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
+                <h3 style="margin:0 0 1rem">Thêm dự án mới</h3>
+                <form id="portfolio-form" style="display:flex;flex-direction:column;gap:1rem">
+                  <input type="text" id="p-title" placeholder="Tên dự án / Project title" required style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" />
+                  <textarea id="p-desc" rows="2" placeholder="Mô tả / Description" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px"></textarea>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                    <input type="text" id="p-url" placeholder="Project URL" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" />
+                    <input type="text" id="p-repo" placeholder="Repo URL" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" />
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                    <select id="p-privacy" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px">
+                      <option value="private">Private</option>
+                      <option value="guardian_only">Guardian only</option>
+                      <option value="link_only">Link only</option>
+                      <option value="public">Public</option>
+                    </select>
+                    <select id="p-status" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px">
+                      <option value="draft">Draft</option>
+                      <option value="published">Published</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="btn btn--primary">Thêm / Add project</button>
+                </form>
+                <div id="p-status-msg" style="margin-top:0.75rem"></div>
+              </div>
+
+              <h3 style="margin:0 0 1rem">Dự án của tôi</h3>
+              <div style="display:flex;flex-direction:column;gap:0.75rem">
+                ${cards || '<p style="color:var(--color-text-muted)">Chưa có dự án. Thêm dự án đầu tiên!</p>'}
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('portfolio-form')?.addEventListener('submit', createPortfolio);
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    async function createPortfolio(e: Event) {
+      e.preventDefault();
+      const status = document.getElementById('p-status-msg')!;
+      try {
+        await apiFetch('/portfolio', 'POST', {
+          title: (document.getElementById('p-title') as HTMLInputElement).value,
+          description: (document.getElementById('p-desc') as HTMLTextAreaElement).value,
+          projectUrl: (document.getElementById('p-url') as HTMLInputElement).value,
+          repoUrl: (document.getElementById('p-repo') as HTMLInputElement).value,
+          privacyLevel: (document.getElementById('p-privacy') as HTMLSelectElement).value,
+          status: (document.getElementById('p-status') as HTMLSelectElement).value,
+        });
+        status.innerHTML = '<span style="color:var(--color-success)">✓ Đã thêm!</span>';
+        setTimeout(() => location.reload(), 1000);
+      } catch (err: any) {
+        status.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+      }
+    }
+
+    renderPortfolio();
+  </script>
+</AppLayout>

@@ -11,6 +11,7 @@ interface Env {
   EMAIL_QUEUE: Queue<EmailQueueMessage>;
   EMAIL_DLQ: Queue<EmailQueueMessage>;
   AI: Ai;
+  AI_DAILY_LIMIT?: string;
 }
 
 interface EmailQueueMessage {

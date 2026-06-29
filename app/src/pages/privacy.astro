@@ -1,0 +1,119 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Quyền riêng tư — HaMi Code Việt">
+  <div id="privacy-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../lib/api';
+
+    const root = document.getElementById('privacy-root')!;
+
+    async function renderPrivacy() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+
+      // Check GDPR status
+      let deletionStatus = null;
+      try {
+        const data = await apiFetch('/gdpr/status');
+        deletionStatus = data;
+      } catch (err) {}
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/portfolio">🏆 Portfolio</a></li>
+              <li><a href="/certificates">📜 Chứng chỉ</a></li>
+              <li><a href="/refunds">💰 Hoàn tiền</a></li>
+              <li><a href="/privacy" class="active">🔒 Quyền riêng tư</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header"><h1 class="dashboard-title">🔒 Quyền riêng tư & GDPR</h1></div>
+            <div class="dashboard-content">
+              <div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
+                <h3 style="margin:0 0 0.5rem">📥 Xuất dữ liệu cá nhân</h3>
+                <p style="font-size:0.9rem;color:var(--color-text-muted);margin:0 0 1rem">Tải xuống toàn bộ dữ liệu cá nhân của bạn (GDPR Article 15 — Right of Access).</p>
+                <button id="export-btn" class="btn btn--primary">Xuất dữ liệu / Export data</button>
+                <div id="export-status" style="margin-top:0.75rem"></div>
+              </div>
+
+              <div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
+                <h3 style="margin:0 0 0.5rem">📋 Trạng thái yêu cầu xóa</h3>
+                <p style="font-size:0.9rem;color:var(--color-text-muted);margin:0 0 1rem">
+                  ${deletionStatus?.deletionRequest
+                    ? 'Bạn có yêu cầu xóa dữ liệu đang xử lý. Trạng thái: <strong>' + deletionStatus.deletionRequest.status + '</strong>'
+                    : 'Không có yêu cầu xóa dữ liệu nào.'}
+                </p>
+              </div>
+
+              <div class="card" style="padding:1.5rem;border:1px solid #e53e3e">
+                <h3 style="margin:0 0 0.5rem;color:#e53e3e">⚠️ Yêu cầu xóa tài khoản</h3>
+                <p style="font-size:0.9rem;color:var(--color-text-muted);margin:0 0 1rem">
+                  GDPR Article 17 — Right to be Forgotten. Hành động này sẽ xóa vĩnh viễn toàn bộ dữ liệu của bạn sau 30 ngày.
+                </p>
+                <button id="delete-btn" class="btn" style="background:#e53e3e;color:white">Yêu cầu xóa / Request deletion</button>
+                <div id="delete-status" style="margin-top:0.75rem"></div>
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('export-btn')?.addEventListener('click', exportData);
+      document.getElementById('delete-btn')?.addEventListener('click', requestDeletion);
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    async function exportData() {
+      const status = document.getElementById('export-status')!;
+      const btn = document.getElementById('export-btn') as HTMLButtonElement;
+      btn.disabled = true;
+      status.innerHTML = '<span style="color:var(--color-text-muted)">Đang xuất... / Exporting...</span>';
+      try {
+        const data = await apiFetch('/gdpr/export');
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'hamicodeviet-data-export.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        status.innerHTML = '<span style="color:var(--color-success)">✓ Đã xuất dữ liệu!</span>';
+      } catch (err: any) {
+        status.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+      }
+      btn.disabled = false;
+    }
+
+    async function requestDeletion() {
+      const status = document.getElementById('delete-status')!;
+      if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ dữ liệu? Hành động này không thể hoàn tác sau 30 ngày.')) return;
+      try {
+        await apiFetch('/gdpr/deletion-request', 'POST', {});
+        status.innerHTML = '<span style="color:var(--color-success)">✓ Yêu cầu xóa đã được ghi nhận. Dữ liệu sẽ bị xóa sau 30 ngày.</span>';
+      } catch (err: any) {
+        status.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+      }
+    }
+
+    renderPrivacy();
+  </script>
+</AppLayout>

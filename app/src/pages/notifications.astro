@@ -1,0 +1,102 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Thông báo — HaMi Code Việt">
+  <div id="notif-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../lib/api';
+
+    const root = document.getElementById('notif-root')!;
+
+    async function renderNotifs() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+
+      try {
+        const data = await apiFetch('/notifications?limit=50');
+        renderList(data.notifications || [], data.unread || 0);
+      } catch (err) {
+        root.innerHTML = `<div class="dashboard"><div class="dashboard-main"><p>Không thể tải thông báo.</p></div></div>`;
+      }
+    }
+
+    function renderList(items: any[], unreadCount: number) {
+      const cards = items.map(n => `
+        <div class="card" style="padding:1.25rem;${n.read ? '' : 'border-left:3px solid var(--color-primary)'}">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div>
+              <h3 style="font-size:0.95rem;margin:0 0 0.25rem;font-weight:${n.read ? 400 : 600}">${n.title}</h3>
+              ${n.body ? `<p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 0.5rem">${n.body}</p>` : ''}
+              <p style="font-size:0.75rem;color:var(--color-text-muted);margin:0">${new Date(n.created_at).toLocaleString('vi-VN')}</p>
+            </div>
+            ${!n.read ? `<button class="btn btn--secondary btn--sm" data-mark-read="${n.id}">Đánh dấu đã đọc</button>` : ''}
+          </div>
+        </div>
+      `).join('');
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/portfolio">🏆 Portfolio</a></li>
+              <li><a href="/certificates">📜 Chứng chỉ</a></li>
+              <li><a href="/refunds">💰 Hoàn tiền</a></li>
+              <li><a href="/privacy">🔒 Quyền riêng tư</a></li>
+              <li><a href="/notifications" class="active">🔔 Thông báo${unreadCount > 0 ? ` (${unreadCount})` : ''}</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <h1 class="dashboard-title">🔔 Thông báo</h1>
+                ${unreadCount > 0 ? `<button id="read-all-btn" class="btn btn--secondary btn--sm">Đánh dấu tất cả đã đọc</button>` : ''}
+              </div>
+            </div>
+            <div class="dashboard-content">
+              <div style="display:flex;flex-direction:column;gap:0.75rem">
+                ${cards || '<p style="color:var(--color-text-muted)">Chưa có thông báo nào.</p>'}
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.querySelectorAll('[data-mark-read]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = (btn as HTMLElement).dataset.markRead;
+          try {
+            await apiFetch(`/notifications/${id}/read`, 'POST');
+            location.reload();
+          } catch (err) { alert('Lỗi'); }
+        });
+      });
+
+      document.getElementById('read-all-btn')?.addEventListener('click', async () => {
+        try {
+          await apiFetch('/notifications/read-all', 'POST');
+          location.reload();
+        } catch (err) { alert('Lỗi'); }
+      });
+
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    renderNotifs();
+  </script>
+</AppLayout>

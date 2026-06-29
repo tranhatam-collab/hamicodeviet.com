@@ -30,6 +30,10 @@ import codelab from './routes/codelab';
 import marketplace from './routes/marketplace';
 import school from './routes/school';
 import contact from './routes/contact';
+import portfolio from './routes/portfolio';
+import certificates from './routes/certificates';
+import notifications from './routes/notifications';
+import features from './routes/features';
 
 export { RateLimiterDurableObject };
 
@@ -163,6 +167,10 @@ app.route('/codelab', codelab);
 app.route('/marketplace', marketplace);
 app.route('/school', school);
 app.route('/contact', contact);
+app.route('/portfolio', portfolio);
+app.route('/certificates', certificates);
+app.route('/notifications', notifications);
+app.route('/features', features);
 
 // 404
 app.notFound((c) => c.json({ error: 'not_found' }, 404));

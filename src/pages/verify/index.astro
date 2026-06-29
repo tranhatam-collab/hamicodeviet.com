@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Xác minh chứng chỉ — HaMi Code Việt">
+  <main class="container" style="padding:4rem 1.5rem;max-width:720px;margin:0 auto">
+    <h1 style="font-size:2rem;margin:0 0 1rem">📜 Xác minh chứng chỉ</h1>
+    <p style="color:var(--color-text-muted);margin:0 0 2rem">Certificate Verification</p>
+
+    <form id="verify-form" style="display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem">
+      <input type="text" id="cert-id" placeholder="HAMI-XXXX-XXXX" required
+        style="padding:0.75rem;border:1px solid var(--color-border);border-radius:6px;font-family:monospace;font-size:1rem" />
+      <button type="submit" class="btn btn--primary">Xác minh / Verify</button>
+    </form>
+
+    <div id="verify-result"></div>
+  </main>
+
+  <script type="module">
+    const form = document.getElementById('verify-form')!;
+    const result = document.getElementById('verify-result')!;
+
+    // Auto-fill from URL query string ?id=HAMI-XXXX-XXXX
+    const params = new URLSearchParams(window.location.search);
+    const certIdFromUrl = params.get('id');
+    if (certIdFromUrl) {
+      (document.getElementById('cert-id') as HTMLInputElement).value = certIdFromUrl;
+      verify(certIdFromUrl);
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const certId = (document.getElementById('cert-id') as HTMLInputElement).value.trim();
+      verify(certId);
+    });
+
+    async function verify(certId: string) {
+      result.innerHTML = '<p style="color:var(--color-text-muted)">Đang kiểm tra... / Checking...</p>';
+      try {
+        const res = await fetch(`https://api.hamicodeviet.com/certificates/verify/${certId}`);
+        if (!res.ok) {
+          result.innerHTML = `<div class="card" style="padding:1.5rem;border:1px solid #e53e3e"><h3 style="color:#e53e3e;margin:0 0 0.5rem">❌ Không tìm thấy</h3><p style="margin:0">Chứng chỉ không tồn tại trong hệ thống.</p></div>`;
+          return;
+        }
+        const data = await res.json();
+        if (data.valid) {
+          const c = data.certificate;
+          result.innerHTML = `
+            <div class="card" style="padding:2rem;border:2px solid var(--color-success)">
+              <div style="text-align:center;margin-bottom:1.5rem">
+                <div style="font-size:3rem">✓</div>
+                <h2 style="margin:0.5rem 0 0;color:var(--color-success)">Hợp lệ / Valid</h2>
+              </div>
+              <div style="display:grid;gap:0.75rem">
+                <div><strong>Chứng chỉ ID:</strong> <code>${c.certificate_id}</code></div>
+                <div><strong>Người nhận:</strong> ${c.recipient_name}</div>
+                <div><strong>Khóa học:</strong> ${c.course_title || 'N/A'}</div>
+                <div><strong>Ngày phát hành:</strong> ${new Date(c.issue_date).toLocaleDateString('vi-VN')}</div>
+                ${c.score ? `<div><strong>Điểm:</strong> ${c.score}/100</div>` : ''}
+                ${c.expiry_date ? `<div><strong>Hết hạn:</strong> ${new Date(c.expiry_date).toLocaleDateString('vi-VN')}</div>` : ''}
+              </div>
+            </div>
+          `;
+        } else {
+          result.innerHTML = `
+            <div class="card" style="padding:1.5rem;border:1px solid #e53e3e">
+              <h3 style="color:#e53e3e;margin:0 0 0.5rem">⚠️ Đã bị thu hồi</h3>
+              <p style="margin:0">Chứng chỉ này đã bị thu hồi. Vui lòng liên hệ hỗ trợ.</p>
+            </div>
+          `;
+        }
+      } catch (err) {
+        result.innerHTML = `<div class="card" style="padding:1.5rem;border:1px solid #e53e3e"><p>Lỗi kết nối. Vui lòng thử lại.</p></div>`;
+      }
+    }
+  </script>
+</BaseLayout>

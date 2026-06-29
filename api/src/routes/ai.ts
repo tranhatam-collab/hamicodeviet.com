@@ -144,6 +144,28 @@ ai.post('/conversations/:id/messages', async (c) => {
   `;
   if (!conversation) return c.json({ error: 'conversation_not_found' }, 404);
 
+  // Quota check — daily limit per user (default 50 messages/day)
+  const DAILY_LIMIT = Number(c.env.AI_DAILY_LIMIT) || 50;
+  try {
+    const [usage] = await sql`
+      SELECT count(*) as cnt FROM ai_messages
+      WHERE conversation_id IN (SELECT id FROM ai_conversations WHERE user_id = ${user.id})
+        AND role = 'user'
+        AND created_at > now() - interval '24 hours'
+    `;
+    if (Number(usage.cnt) >= DAILY_LIMIT) {
+      return c.json({
+        error: 'quota_exceeded',
+        message: `Bạn đã dùng ${usage.cnt}/${DAILY_LIMIT} tin nhắn AI trong 24h. Vui lòng thử lại sau.`,
+        limit: DAILY_LIMIT,
+        used: Number(usage.cnt),
+      }, 429);
+    }
+  } catch (e) {
+    // If quota check fails (e.g. table missing), allow but log
+    aiLogger.warn('Quota check failed', { error: e instanceof Error ? e.message : String(e) });
+  }
+
   // Save user message
   const [userMessage] = await sql`
     INSERT INTO ai_messages (conversation_id, role, content)
@@ -267,6 +289,30 @@ ai.get('/usage', async (c) => {
     return c.json({ usage: stats });
   } catch {
     return c.json({ usage: { total_requests: 0, total_tokens: 0, last_used: null } });
+  }
+});
+
+// GET /ai/quota — get user's daily quota status
+ai.get('/quota', async (c) => {
+  const user = c.get('user') as any;
+  const sql = getDb(c.env);
+  const DAILY_LIMIT = Number(c.env.AI_DAILY_LIMIT) || 50;
+
+  try {
+    const [usage] = await sql`
+      SELECT count(*) as used FROM ai_messages
+      WHERE conversation_id IN (SELECT id FROM ai_conversations WHERE user_id = ${user.id})
+        AND role = 'user'
+        AND created_at > now() - interval '24 hours'
+    `;
+    return c.json({
+      limit: DAILY_LIMIT,
+      used: Number(usage.used),
+      remaining: Math.max(0, DAILY_LIMIT - Number(usage.used)),
+      reset_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    });
+  } catch {
+    return c.json({ limit: DAILY_LIMIT, used: 0, remaining: DAILY_LIMIT, reset_at: null });
   }
 });
 

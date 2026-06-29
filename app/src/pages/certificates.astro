@@ -1,0 +1,83 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Chứng chỉ — HaMi Code Việt">
+  <div id="cert-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../lib/api';
+
+    const root = document.getElementById('cert-root')!;
+
+    async function renderCerts() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+
+      try {
+        const data = await apiFetch('/certificates');
+        renderList(data.certificates || []);
+      } catch (err) {
+        root.innerHTML = `<div class="dashboard"><div class="dashboard-main"><p>Không thể tải chứng chỉ.</p></div></div>`;
+      }
+    }
+
+    function renderList(certs: any[]) {
+      const cards = certs.map(c => `
+        <div class="card" style="padding:1.5rem">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div>
+              <h3 style="font-size:1rem;margin:0 0 0.5rem">${c.course_title || 'Certificate'}</h3>
+              <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0">ID: <code>${c.certificate_id}</code></p>
+              <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0.25rem 0 0">Phát hành: ${new Date(c.issue_date).toLocaleDateString('vi-VN')}</p>
+              ${c.score ? `<p style="font-size:0.85rem;margin:0.25rem 0 0">Điểm: ${c.score}/100</p>` : ''}
+            </div>
+            <span style="background:var(--color-success);color:white;padding:0.3rem 0.75rem;border-radius:6px;font-size:0.75rem;font-weight:600">✓ Active</span>
+          </div>
+          <div style="margin-top:1rem">
+            <a href="https://hamicodeviet.com/verify/${c.certificate_id}" target="_blank" class="btn btn--secondary btn--sm">Xác minh / Verify →</a>
+          </div>
+        </div>
+      `).join('');
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/portfolio">🏆 Portfolio</a></li>
+              <li><a href="/certificates" class="active">📜 Chứng chỉ</a></li>
+              <li><a href="/refunds">💰 Hoàn tiền</a></li>
+              <li><a href="/privacy">🔒 Quyền riêng tư</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main">
+            <div class="dashboard-header"><h1 class="dashboard-title">📜 Chứng chỉ</h1></div>
+            <div class="dashboard-content">
+              <div style="display:flex;flex-direction:column;gap:0.75rem">
+                ${cards || '<p style="color:var(--color-text-muted)">Chưa có chứng chỉ. Hoàn thành khóa học để nhận chứng chỉ!</p>'}
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    renderCerts();
+  </script>
+</AppLayout>

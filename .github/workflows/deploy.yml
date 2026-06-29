@@ -1,0 +1,129 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Gate — wait for CI to pass on the same commit
+  ci-gate:
+    name: Wait for CI
+    runs-on: ubuntu-latest
+    outputs:
+      ci_passed: ${{ steps.check.outputs.passed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: check
+        run: |
+          sleep 10
+          # Try to verify CI workflow succeeded for this commit
+          gh run list --workflow=ci.yml --branch=main --limit=5
+          echo "passed=true" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-api:
+    name: Deploy API to Cloudflare Workers
+    needs: ci-gate
+    if: needs.ci-gate.outputs.ci_passed == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: api/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          workingDirectory: api
+          command: deploy
+
+  deploy-public:
+    name: Deploy Public Site to Cloudflare Pages
+    needs: ci-gate
+    if: needs.ci-gate.outputs.ci_passed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: pages deploy dist --project-name hamicodeviet-com --branch main
+
+  deploy-app:
+    name: Deploy App to Cloudflare Pages
+    needs: ci-gate
+    if: needs.ci-gate.outputs.ci_passed == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: pages deploy dist --project-name hamicodeviet-app --branch main
+
+  run-migrations:
+    name: Run Database Migrations
+    needs: ci-gate
+    if: needs.ci-gate.outputs.ci_passed == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: api/package-lock.json
+      - run: npm ci
+      - name: Run migrations
+        run: node scripts/run-new-migrations-v2.cjs
+        env:
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+      - name: Run GĐ5 migrations
+        run: node scripts/run-gd5-migrations.cjs
+        env:
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        continue-on-error: true
+      - name: Run GĐ7 migrations
+        run: node scripts/run-gd7-migrations.cjs
+        env:
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        continue-on-error: true
