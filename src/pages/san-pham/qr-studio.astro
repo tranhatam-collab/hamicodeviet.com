@@ -1,0 +1,110 @@
+---
+import ProductLayout from '../../layouts/ProductLayout.astro';
+---
+
+<ProductLayout title="QR Studio" ageGroup="14-17" ageColor="#20A779" productType="Sản phẩm" description="Tạo mã QR có logo, màu sắc tùy chỉnh">
+  <div style="padding:1.5rem;max-width:800px;margin:0 auto">
+    <div style="display:grid;grid-template-columns:1fr 350px;gap:1.5rem">
+      <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+        <h2 style="margin:0 0 1rem;font-size:1.1rem">Nội dung / Content</h2>
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <div>
+            <label style="font-weight:600;font-size:0.85rem;display:block;margin-bottom:0.25rem">Loại / Type</label>
+            <select id="qr-type" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px">
+              <option value="text">Văn bản / Text</option>
+              <option value="url">URL</option>
+              <option value="wifi">WiFi</option>
+              <option value="vcard">Liên hệ / Contact (vCard)</option>
+            </select>
+          </div>
+          <div id="input-fields"></div>
+        </div>
+      </div>
+      <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1);text-align:center">
+        <canvas id="qr-canvas" width="256" height="256" style="border:1px solid #ddd;border-radius:8px"></canvas>
+        <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.75rem">
+          <div style="display:flex;gap:0.5rem;justify-content:center">
+            <div><label style="font-size:0.75rem;display:block">Màu mã</label><input type="color" id="fg-color" value="#102A43" style="width:50px;height:30px;border:none;cursor:pointer" /></div>
+            <div><label style="font-size:0.75rem;display:block">Nền</label><input type="color" id="bg-color" value="#ffffff" style="width:50px;height:30px;border:none;cursor:pointer" /></div>
+          </div>
+          <div>
+            <label style="font-size:0.75rem;display:block;margin-bottom:0.25rem">Kích thước / Size</label>
+            <input type="range" id="qr-size" min="128" max="512" value="256" style="width:100%" />
+          </div>
+          <div>
+            <label style="font-size:0.75rem;display:block;margin-bottom:0.25rem">Logo (tùy chọn)</label>
+            <input type="file" id="logo-input" accept="image/*" style="font-size:0.75rem" />
+          </div>
+          <button id="download-btn" style="padding:0.6rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">📥 Tải PNG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script type="module">
+    const canvas = document.getElementById('qr-canvas') as HTMLCanvasElement;
+    let logoImg: HTMLImageElement | null = null;
+
+    function getContent(): string {
+      const type = (document.getElementById('qr-type') as HTMLSelectElement).value;
+      if (type === 'text') return (document.getElementById('f-text') as HTMLTextAreaElement)?.value || '';
+      if (type === 'url') return (document.getElementById('f-url') as HTMLInputElement)?.value || '';
+      if (type === 'wifi') {
+        const ssid = (document.getElementById('f-ssid') as HTMLInputElement)?.value || '';
+        const pass = (document.getElementById('f-pass') as HTMLInputElement)?.value || '';
+        const enc = (document.getElementById('f-enc') as HTMLSelectElement)?.value || 'WPA';
+        return `WIFI:T:${enc};S:${ssid};P:${pass};;`;
+      }
+      if (type === 'vcard') {
+        const name = (document.getElementById('f-name') as HTMLInputElement)?.value || '';
+        const phone = (document.getElementById('f-phone') as HTMLInputElement)?.value || '';
+        const email = (document.getElementById('f-email') as HTMLInputElement)?.value || '';
+        return `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEMAIL:${email}\nEND:VCARD`;
+      }
+      return '';
+    }
+
+    function renderFields() {
+      const type = (document.getElementById('qr-type') as HTMLSelectElement).value;
+      const c = document.getElementById('input-fields')!;
+      if (type === 'text') c.innerHTML = `<textarea id="f-text" rows="4" placeholder="Nhập văn bản..." style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px">Hello, HaMi Code Việt!</textarea>`;
+      else if (type === 'url') c.innerHTML = `<input type="text" id="f-url" value="https://hamicodeviet.com" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px" />`;
+      else if (type === 'wifi') c.innerHTML = `<div style="display:flex;flex-direction:column;gap:0.5rem"><input type="text" id="f-ssid" placeholder="WiFi Name / SSID" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /><input type="text" id="f-pass" placeholder="Password" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /><select id="f-enc" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px"><option value="WPA">WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">No password</option></select></div>`;
+      else if (type === 'vcard') c.innerHTML = `<div style="display:flex;flex-direction:column;gap:0.5rem"><input type="text" id="f-name" placeholder="Họ tên / Name" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /><input type="text" id="f-phone" placeholder="Số điện thoại / Phone" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /><input type="text" id="f-email" placeholder="Email" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /></div>`;
+      c.querySelectorAll('input,textarea,select').forEach(el => el.addEventListener('input', generateQR));
+      generateQR();
+    }
+
+    async function generateQR() {
+      const text = getContent();
+      if (!text) return;
+      const fg = (document.getElementById('fg-color') as HTMLInputElement).value;
+      const bg = (document.getElementById('bg-color') as HTMLInputElement).value;
+      const size = parseInt((document.getElementById('qr-size') as HTMLInputElement).value);
+      canvas.width = size; canvas.height = size;
+      try {
+        await (window as any).QRCode.toCanvas(canvas, text, { width: size, color: { dark: fg, light: bg }, margin: 2 });
+        if (logoImg) {
+          const ctx = canvas.getContext('2d')!;
+          const logoSize = size * 0.2;
+          const x = (size - logoSize) / 2;
+          ctx.fillStyle = bg;
+          ctx.fillRect(x - 4, x - 4, logoSize + 8, logoSize + 8);
+          ctx.drawImage(logoImg, x, x, logoSize, logoSize);
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    document.getElementById('qr-type')!.addEventListener('change', renderFields);
+    document.getElementById('fg-color')!.addEventListener('input', generateQR);
+    document.getElementById('bg-color')!.addEventListener('input', generateQR);
+    document.getElementById('qr-size')!.addEventListener('input', generateQR);
+    document.getElementById('logo-input')!.addEventListener('change', (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) { const reader = new FileReader(); reader.onload = (ev) => { logoImg = new Image(); logoImg.onload = generateQR; logoImg.src = ev.target!.result as string; }; reader.readAsDataURL(file); }
+    });
+    document.getElementById('download-btn')!.addEventListener('click', () => { const a = document.createElement('a'); a.href = canvas.toDataURL('image/png'); a.download = 'qr-code.png'; a.click(); });
+    renderFields();
+  </script>
+</ProductLayout>

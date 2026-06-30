@@ -1,0 +1,95 @@
+---
+import ProductLayout from '../../layouts/ProductLayout.astro';
+---
+
+<ProductLayout title="Site Builder" ageGroup="11-13" ageColor="#00A8CC" productType="Sản phẩm" description="Tạo website cá nhân từ template, tải HTML">
+  <div style="padding:1.5rem;max-width:1000px;margin:0 auto">
+    <div style="display:grid;grid-template-columns:350px 1fr;gap:1.5rem">
+      <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+        <h2 style="margin:0 0 1rem;font-size:1.1rem">⚙️ Tùy chỉnh / Customize</h2>
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <div>
+            <label style="font-weight:600;font-size:0.85rem;display:block;margin-bottom:0.25rem">Template</label>
+            <select id="template" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px">
+              <option value="portfolio">Portfolio</option>
+              <option value="blog">Blog</option>
+              <option value="landing">Landing Page</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-weight:600;font-size:0.85rem;display:block;margin-bottom:0.25rem">Tên / Name</label>
+            <input type="text" id="name" value="Nguyễn Văn A" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px" />
+          </div>
+          <div>
+            <label style="font-weight:600;font-size:0.85rem;display:block;margin-bottom:0.25rem">Tagline</label>
+            <input type="text" id="tagline" value="Học sinh yêu công nghệ" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px" />
+          </div>
+          <div>
+            <label style="font-weight:600;font-size:0.85rem;display:block;margin-bottom:0.25rem">Bio / Giới thiệu</label>
+            <textarea id="bio" rows="3" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px">Xin chào! Mình là học sinh lớp 7. Mình thích lập trình và làm web.</textarea>
+          </div>
+          <div>
+            <label style="font-weight:600;font-size:0.85rem;display:block;margin-bottom:0.25rem">Kỹ năng / Skills (cách nhau bởi dấu phẩy)</label>
+            <input type="text" id="skills" value="HTML, CSS, JavaScript, Scratch" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px" />
+          </div>
+          <div>
+            <label style="font-weight:600;font-size:0.85rem;display:block;margin-bottom:0.25rem">Màu chính / Primary color</label>
+            <input type="color" id="color" value="#00A8CC" style="width:100%;height:36px;border:1px solid #ddd;border-radius:6px;cursor:pointer" />
+          </div>
+          <div>
+            <label style="font-weight:600;font-size:0.85rem;display:block;margin-bottom:0.25rem">Facebook</label>
+            <input type="text" id="fb" placeholder="facebook.com/..." style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px" />
+          </div>
+          <div>
+            <label style="font-weight:600;font-size:0.85rem;display:block;margin-bottom:0.25rem">GitHub</label>
+            <input type="text" id="gh" placeholder="github.com/..." style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px" />
+          </div>
+          <button id="download-btn" style="padding:0.6rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">📥 Tải HTML / Download</button>
+        </div>
+      </div>
+      <div style="background:white;border-radius:12px;padding:0;box-shadow:0 2px 8px rgba(0,0,0,0.1);overflow:hidden">
+        <div style="background:#f0f0f0;padding:0.5rem;display:flex;gap:0.5rem;align-items:center">
+          <div style="display:flex;gap:4px"><span style="width:12px;height:12px;border-radius:50%;background:#ff5f56"></span><span style="width:12px;height:12px;border-radius:50%;background:#ffbd2e"></span><span style="width:12px;height:12px;border-radius:50%;background:#27c93f"></span></div>
+          <span style="font-size:0.75rem;color:#666;margin-left:0.5rem">Live Preview</span>
+        </div>
+        <iframe id="preview" style="width:100%;height:500px;border:none" sandbox="allow-same-origin"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const inputs = ['template','name','tagline','bio','skills','color','fb','gh'];
+    const preview = document.getElementById('preview') as HTMLIFrameElement;
+
+    function generateHTML(): string {
+      const t = (document.getElementById('template') as HTMLSelectElement).value;
+      const name = (document.getElementById('name') as HTMLInputElement).value;
+      const tagline = (document.getElementById('tagline') as HTMLInputElement).value;
+      const bio = (document.getElementById('bio') as HTMLTextAreaElement).value;
+      const skills = (document.getElementById('skills') as HTMLInputElement).value.split(',').map(s=>s.trim()).filter(Boolean);
+      const color = (document.getElementById('color') as HTMLInputElement).value;
+      const fb = (document.getElementById('fb') as HTMLInputElement).value;
+      const gh = (document.getElementById('gh') as HTMLInputElement).value;
+      const skillsHTML = skills.map(s=>`<span style="background:${color}20;color:${color};padding:0.3rem 0.8rem;border-radius:20px;font-size:0.85rem">${s}</span>`).join('');
+      const socialHTML = [fb?`<a href="${fb}" style="color:${color}">Facebook</a>`:'',gh?`<a href="${gh}" style="color:${color}">GitHub</a>`:''].filter(Boolean).join(' • ');
+
+      if (t === 'portfolio') {
+        return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${name}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,sans-serif;color:#102A43;line-height:1.6}.hero{text-align:center;padding:4rem 1.5rem;background:linear-gradient(135deg,${color},${color}dd);color:white}.hero h1{font-size:2.5rem;margin-bottom:0.5rem}.hero p{font-size:1.2rem;opacity:0.9}.section{max-width:700px;margin:0 auto;padding:2rem 1.5rem}.section h2{color:${color};margin-bottom:1rem}.skills{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem}.social{text-align:center;padding:2rem;border-top:1px solid #eee}</style></head><body><div class="hero"><h1>${name}</h1><p>${tagline}</p></div><div class="section"><h2>Về tôi / About</h2><p>${bio}</p></div><div class="section"><h2>Kỹ năng / Skills</h2><div class="skills">${skillsHTML}</div></div><div class="social">${socialHTML||'No social links'}</div></body></html>`;
+      }
+      if (t === 'blog') {
+        return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${name}'s Blog</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Georgia,serif;color:#333;max-width:700px;margin:0 auto;padding:2rem 1.5rem;line-height:1.7}header{text-align:center;padding:2rem 0;border-bottom:3px solid ${color}}header h1{color:${color};font-size:2rem}header p{color:#666;margin-top:0.25rem}article{padding:2rem 0;border-bottom:1px solid #eee}article h2{color:${color};margin-bottom:0.5rem}article .date{font-size:0.8rem;color:#999}.skills{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem}.social{text-align:center;padding:1.5rem 0}</style></head><body><header><h1>${name}</h1><p>${tagline}</p></header><article><h2>Bài viết đầu tiên</h2><p class="date">2026-06-30</p><p>${bio}</p></article><div><h2 style="color:${color}">Kỹ năng</h2><div class="skills">${skillsHTML}</div></div><div class="social">${socialHTML||''}</div></body></html>`;
+      }
+      // landing
+      return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${name}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,sans-serif;color:#102A43}.hero{text-align:center;padding:5rem 1.5rem;background:linear-gradient(135deg,${color},#102A43);color:white}.hero h1{font-size:3rem;margin-bottom:1rem}.hero p{font-size:1.2rem;opacity:0.9;max-width:500px;margin:0 auto 2rem}.cta{display:inline-block;padding:1rem 2rem;background:${color};color:white;text-decoration:none;border-radius:8px;font-weight:700;font-size:1.1rem}.features{max-width:800px;margin:0 auto;padding:3rem 1.5rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem}.feature{text-align:center}.feature h3{color:${color};margin-bottom:0.5rem}.about{max-width:600px;margin:0 auto;padding:2rem 1.5rem;text-align:center}.about h2{color:${color};margin-bottom:1rem}.skills{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin-top:1rem}.social{text-align:center;padding:2rem;border-top:1px solid #eee}</style></head><body><div class="hero"><h1>${name}</h1><p>${tagline}</p><a href="#about" class="cta">Tìm hiểu thêm →</a></div><div class="features">${skills.slice(0,3).map(s=>`<div class="feature"><h3>${s}</h3></div>`).join('')}</div><div class="about" id="about"><h2>Về tôi</h2><p>${bio}</p><div class="skills">${skillsHTML}</div></div><div class="social">${socialHTML||''}</div></body></html>`;
+    }
+
+    function updatePreview() { preview.srcdoc = generateHTML(); }
+    inputs.forEach(id => document.getElementById(id)!.addEventListener('input', updatePreview));
+    document.getElementById('download-btn')!.addEventListener('click', () => {
+      const blob = new Blob([generateHTML()], { type: 'text/html' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = 'my-website.html'; a.click();
+    });
+    updatePreview();
+  </script>
+</ProductLayout>

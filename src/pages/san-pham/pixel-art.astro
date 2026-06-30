@@ -1,0 +1,145 @@
+---
+import ProductLayout from '../../layouts/ProductLayout.astro';
+---
+
+<ProductLayout title="Pixel Art Editor" ageGroup="16-20" ageColor="#6C5CE7" productType="Hình ảnh" description="Editor pixel art đầy đủ, xuất PNG/sprite sheet">
+  <div style="padding:1.5rem;max-width:1000px;margin:0 auto">
+    <div style="display:grid;grid-template-columns:200px 1fr;gap:1.5rem">
+      <div style="background:white;border-radius:12px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+        <h2 style="margin:0 0 0.75rem;font-size:1rem">🛠️ Tools</h2>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;margin-bottom:1rem">
+          <button class="tool-btn" data-tool="pencil" style="padding:0.4rem;background:#6C5CE7;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">✏️ Pencil</button>
+          <button class="tool-btn" data-tool="eraser" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">🧹 Eraser</button>
+          <button class="tool-btn" data-tool="fill" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">🪣 Fill</button>
+          <button class="tool-btn" data-tool="picker" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">💧 Pick</button>
+          <button class="tool-btn" data-tool="line" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">📏 Line</button>
+          <button class="tool-btn" data-tool="rect" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">⬜ Rect</button>
+        </div>
+        <div style="margin-bottom:1rem">
+          <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.25rem">Grid size</label>
+          <select id="grid-size" style="width:100%;padding:0.3rem;border:1px solid #ddd;border-radius:4px">
+            <option value="16">16×16</option>
+            <option value="32" selected>32×32</option>
+            <option value="64">64×64</option>
+          </select>
+        </div>
+        <div style="margin-bottom:1rem">
+          <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.25rem">Palette</label>
+          <div id="palette" style="display:grid;grid-template-columns:repeat(8,1fr);gap:2px"></div>
+          <input type="color" id="custom-color" value="#6C5CE7" style="width:100%;height:30px;margin-top:0.25rem;border:1px solid #ddd;cursor:pointer" />
+        </div>
+        <div style="display:flex;gap:0.3rem;margin-bottom:0.75rem">
+          <button id="undo-btn" style="flex:1;padding:0.3rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">↩ Undo</button>
+          <button id="redo-btn" style="flex:1;padding:0.3rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">↪ Redo</button>
+        </div>
+        <button id="export-btn" style="width:100%;padding:0.5rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">📥 Export PNG</button>
+      </div>
+      <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1);text-align:center">
+        <canvas id="canvas" width="512" height="512" style="image-rendering:pixelated;border:1px solid #ddd;cursor:crosshair;max-width:100%"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d')!;
+    let gridSize = 32, pixelSize = 512 / gridSize;
+    let pixels: string[] = [], history: string[] = [], future: string[] = [];
+    let tool = 'pencil', color = '#6C5CE7', isDrawing = false, startCell: any = null;
+
+    const palette = ['#000000','#ffffff','#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff','#ff8800','#8800ff','#0088ff','#ff0088','#88ff00','#00ff88','#888888','#444444','#ff4444','#44ff44','#4444ff','#ffff44','#ff44ff','#44ffff','#ff8844','#8844ff','#4488ff','#ff4488','#44ff88','#88ff44','#ff4488','#88ff44','#ff8844','#44ff88'];
+
+    function initGrid() {
+      pixels = new Array(gridSize * gridSize).fill('');
+      pixelSize = 512 / gridSize;
+      history = []; future = [];
+      drawGrid();
+    }
+
+    function drawGrid() {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 512, 512);
+      for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+          const c = pixels[y * gridSize + x];
+          if (c) { ctx.fillStyle = c; ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize); }
+        }
+      }
+      // Grid lines
+      ctx.strokeStyle = '#eee'; ctx.lineWidth = 0.5;
+      for (let i = 0; i <= gridSize; i++) { ctx.beginPath(); ctx.moveTo(i*pixelSize,0); ctx.lineTo(i*pixelSize,512); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,i*pixelSize); ctx.lineTo(512,i*pixelSize); ctx.stroke(); }
+    }
+
+    function getCell(e: MouseEvent) {
+      const rect = canvas.getBoundingClientRect();
+      const sx = 512 / rect.width, sy = 512 / rect.height;
+      const x = Math.floor((e.clientX - rect.left) * sx / pixelSize);
+      const y = Math.floor((e.clientY - rect.top) * sy / pixelSize);
+      return { x: Math.max(0, Math.min(gridSize-1, x)), y: Math.max(0, Math.min(gridSize-1, y)) };
+    }
+
+    function saveHistory() { history.push(JSON.stringify(pixels)); if (history.length > 50) history.shift(); future = []; }
+
+    function setPixel(x: number, y: number, c: string) { pixels[y * gridSize + x] = c; }
+
+    function fillBucket(x: number, y: number, target: string, replace: string) {
+      if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) return;
+      if (pixels[y * gridSize + x] !== target) return;
+      pixels[y * gridSize + x] = replace;
+      fillBucket(x+1, y, target, replace); fillBucket(x-1, y, target, replace);
+      fillBucket(x, y+1, target, replace); fillBucket(x, y-1, target, replace);
+    }
+
+    function drawLine(x0: number, y0: number, x1: number, y1: number) {
+      const dx = Math.abs(x1-x0), dy = Math.abs(y1-y0), sx = x0<x1?1:-1, sy = y0<y1?1:-1;
+      let err = dx-dy, x = x0, y = y0;
+      while (true) { setPixel(x, y, color); if (x===x1 && y===y1) break; const e2 = 2*err; if (e2 > -dy) { err -= dy; x += sx; } if (e2 < dx) { err += dx; y += sy; } }
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      saveHistory();
+      const cell = getCell(e);
+      isDrawing = true; startCell = cell;
+      if (tool === 'pencil') setPixel(cell.x, cell.y, color);
+      else if (tool === 'eraser') setPixel(cell.x, cell.y, '');
+      else if (tool === 'fill') { fillBucket(cell.x, cell.y, pixels[cell.y*gridSize+cell.x], color); }
+      else if (tool === 'picker') { color = pixels[cell.y*gridSize+cell.x] || '#ffffff'; (document.getElementById('custom-color') as HTMLInputElement).value = color; }
+      drawGrid();
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isDrawing) return;
+      const cell = getCell(e);
+      if (tool === 'pencil') { drawLine(startCell.x, startCell.y, cell.x, cell.y); startCell = cell; }
+      else if (tool === 'eraser') setPixel(cell.x, cell.y, '');
+      else if (tool === 'line' || tool === 'rect') { drawGrid(); if (tool === 'line') { const tmp = [...pixels]; drawLine(startCell.x, startCell.y, cell.x, cell.y); drawGrid(); pixels = tmp; } else { const tmp = [...pixels]; const x1=Math.min(startCell.x,cell.x),y1=Math.min(startCell.y,cell.y),x2=Math.max(startCell.x,cell.x),y2=Math.max(startCell.y,cell.y); for(let x=x1;x<=x2;x++){setPixel(x,y1,color);setPixel(x,y2,color);} for(let y=y1;y<=y2;y++){setPixel(x1,y,color);setPixel(x2,y,color);} drawGrid(); pixels=tmp; } }
+    });
+
+    canvas.addEventListener('mouseup', () => { if (tool === 'line' || tool === 'rect') { /* commit */ } isDrawing = false; });
+    canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        tool = (btn as HTMLElement).dataset.tool!;
+        document.querySelectorAll('.tool-btn').forEach(b => { (b as HTMLElement).style.background = '#ddd'; (b as HTMLElement).style.color = '#333'; });
+        (btn as HTMLElement).style.background = '#6C5CE7'; (btn as HTMLElement).style.color = 'white';
+      });
+    });
+
+    const palDiv = document.getElementById('palette')!;
+    palDiv.innerHTML = palette.map(c => `<div data-color="${c}" style="background:${c};width:100%;aspect-ratio:1;cursor:pointer;border:1px solid #ddd;border-radius:2px"></div>`).join('');
+    palDiv.querySelectorAll('[data-color]').forEach(el => el.addEventListener('click', () => { color = (el as HTMLElement).dataset.color!; (document.getElementById('custom-color') as HTMLInputElement).value = color; }));
+    document.getElementById('custom-color')!.addEventListener('input', (e) => { color = (e.target as HTMLInputElement).value; });
+    document.getElementById('grid-size')!.addEventListener('change', (e) => { gridSize = parseInt((e.target as HTMLSelectElement).value); initGrid(); });
+    document.getElementById('undo-btn')!.addEventListener('click', () => { if (history.length) { future.push(JSON.stringify(pixels)); pixels = JSON.parse(history.pop()!); drawGrid(); } });
+    document.getElementById('redo-btn')!.addEventListener('click', () => { if (future.length) { history.push(JSON.stringify(pixels)); pixels = JSON.parse(future.pop()!); drawGrid(); } });
+    document.getElementById('export-btn')!.addEventListener('click', () => {
+      const exp = document.createElement('canvas'); exp.width = gridSize; exp.height = gridSize;
+      const ectx = exp.getContext('2d')!;
+      for (let y = 0; y < gridSize; y++) for (let x = 0; x < gridSize; x++) { const c = pixels[y*gridSize+x]; if (c) { ectx.fillStyle = c; ectx.fillRect(x, y, 1, 1); } }
+      const a = document.createElement('a'); a.href = exp.toDataURL('image/png'); a.download = 'pixel-art.png'; a.click();
+    });
+
+    initGrid();
+  </script>
+</ProductLayout>

@@ -1,0 +1,236 @@
+---
+import ProductLayout from '../../layouts/ProductLayout.astro';
+---
+
+<ProductLayout title="Story Maker" ageGroup="8-10" ageColor="#FFC857" productType="Video" description="Tạo truyện tương tác với nhân vật và bối cảnh">
+  <div style="padding:1.5rem;max-width:900px;margin:0 auto">
+    <div id="setup" style="background:white;border-radius:12px;padding:2rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+      <h2 style="margin:0 0 1.5rem;font-size:1.3rem">📖 Tạo câu chuyện của bạn / Create your story</h2>
+      <div style="display:grid;gap:1.5rem">
+        <div>
+          <label style="font-weight:700;display:block;margin-bottom:0.5rem">Nhân vật / Character</label>
+          <div id="char-pick" style="display:flex;gap:0.75rem;flex-wrap:wrap"></div>
+        </div>
+        <div>
+          <label style="font-weight:700;display:block;margin-bottom:0.5rem">Bối cảnh / Setting</label>
+          <div id="setting-pick" style="display:flex;gap:0.75rem;flex-wrap:wrap"></div>
+        </div>
+        <div>
+          <label style="font-weight:700;display:block;margin-bottom:0.5rem">Tâm trạng / Mood</label>
+          <div id="mood-pick" style="display:flex;gap:0.75rem;flex-wrap:wrap"></div>
+        </div>
+        <button id="start-btn" style="padding:0.8rem 2rem;background:#FFC857;color:#102A43;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer">Bắt đầu / Start →</button>
+      </div>
+    </div>
+    <div id="story" style="display:none;background:white;border-radius:12px;padding:2rem;box-shadow:0 2px 8px rgba(0,0,0,0.1);min-height:400px"></div>
+  </div>
+
+  <script type="module">
+    const characters = [
+      { id: 'hero', icon: '🦸', name: 'Anh hùng / Hero' },
+      { id: 'animal', icon: '🐱', name: 'Động vật / Animal' },
+      { id: 'robot', icon: '🤖', name: 'Robot' },
+      { id: 'wizard', icon: '🧙', name: 'Phù thủy / Wizard' },
+      { id: 'astronaut', icon: '👨‍🚀', name: 'Phi hành gia' },
+      { id: 'princess', icon: '👸', name: 'Công chúa' },
+    ];
+    const settings = [
+      { id: 'forest', icon: '🌲', name: 'Khu rừng' },
+      { id: 'space', icon: '🚀', name: 'Vũ trụ' },
+      { id: 'castle', icon: '🏰', name: 'Lâu đài' },
+      { id: 'ocean', icon: '🌊', name: 'Đại dương' },
+      { id: 'city', icon: '🏙️', name: 'Thành phố' },
+      { id: 'jungle', icon: '🌴', name: 'Rừng rậm' },
+    ];
+    const moods = [
+      { id: 'happy', icon: '😊', name: 'Vui vẻ' },
+      { id: 'scary', icon: '😱', name: 'Hồi hộp' },
+      { id: 'funny', icon: '😂', name: 'Hài hước' },
+      { id: 'mysterious', icon: '🔍', name: 'Bí ẩn' },
+    ];
+
+    let selected = { char: null, setting: null, mood: null };
+
+    function renderPicks(containerId, items, key) {
+      const c = document.getElementById(containerId)!;
+      c.innerHTML = items.map(i => `
+        <button data-id="${i.id}" style="display:flex;flex-direction:column;align-items:center;gap:0.25rem;padding:0.75rem 1rem;border:2px solid #ddd;border-radius:10px;background:white;cursor:pointer;font-size:0.8rem;min-width:80px">
+          <span style="font-size:1.8rem">${i.icon}</span>
+          <span>${i.name}</span>
+        </button>
+      `).join('');
+      c.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          c.querySelectorAll('button').forEach(b => b.style.borderColor = '#ddd');
+          (btn as HTMLElement).style.borderColor = '#FFC857';
+          selected[key] = (btn as HTMLElement).dataset.id;
+        });
+      });
+    }
+
+    renderPicks('char-pick', characters, 'char');
+    renderPicks('setting-pick', settings, 'setting');
+    renderPicks('mood-pick', moods, 'mood');
+
+    document.getElementById('start-btn')!.addEventListener('click', () => {
+      if (!selected.char || !selected.setting || !selected.mood) {
+        alert('Vui lòng chọn tất cả / Please pick all three!');
+        return;
+      }
+      startStory();
+    });
+
+    const stories: Record<string, any> = {
+      intro: {
+        text: (s: any) => {
+          const char = characters.find(c => c.id === s.char)!;
+          const setting = settings.find(c => c.id === s.setting)!;
+          const mood = moods.find(c => c.id === s.mood)!;
+          return `Một ngày ${mood.id === 'happy' ? 'đẹp trời' : mood.id === 'scary' ? 'tăm tối' : mood.id === 'funny' ? 'vui nhộn' : 'bí ẩn'}, ${char.icon} ${char.name.split(' / ')[0]} bước vào ${setting.icon} ${setting.name}. ${mood.id === 'mysterious' ? 'Có gì đó không ổn...' : 'Một cuộc phiêu lưu bắt đầu!'}`;
+        },
+        choices: [
+          { text: '🔍 Khám phá xung quanh / Explore', next: 'explore' },
+          { text: '🗣️ Gặp ai đó / Meet someone', next: 'meet' },
+          { text: '🏃 Chạy nhanh / Run fast', next: 'run' },
+        ],
+      },
+      explore: {
+        text: () => `Bạn tìm thấy một vật thể kỳ lạ phát sáng. Nó trông như một chiếc chìa khóa cổ!`,
+        choices: [
+          { text: '🔑 Nhặt lên / Pick it up', next: 'key' },
+          { text: '🚪 Tìm cửa / Find a door', next: 'door' },
+          { text: '🔙 Quay lại / Go back', next: 'intro' },
+        ],
+      },
+      meet: {
+        text: () => `Bạn gặp một nhân vật bí ẩn. "Ta đã chờ ngươi lâu rồi," họ nói.`,
+        choices: [
+          { text: '❓ Hỏi họ là ai / Ask who they are', next: 'reveal' },
+          { text: '🎁 Nhận quà / Accept gift', next: 'gift' },
+          { text: '🏃 Bỏ chạy / Run away', next: 'run' },
+        ],
+      },
+      run: {
+        text: () => `Bạn chạy nhanh nhất có thể! Nhưng rồi bạn thấy một lối đi hẹp dẫn đến nơi an toàn.`,
+        choices: [
+          { text: '🚪 Vào lối đi / Enter passage', next: 'safe' },
+          { text: '🔍 Dừng lại xem / Stop and look', next: 'explore' },
+        ],
+      },
+      key: {
+        text: () => `Chiếc chìa khóa phát sáng trong tay bạn. Phía trước có một cánh cửa cổ. Chìa khóa vừa khít!`,
+        choices: [
+          { text: '🚪 Mở cửa / Open door', next: 'treasure' },
+          { text: '🔙 Quay lại / Go back', next: 'explore' },
+        ],
+      },
+      door: {
+        text: () => `Bạn tìm thấy một cánh cửa lớn bị khóa. Có vẻ cần một chiếc chìa khóa...`,
+        choices: [
+          { text: '🔍 Tìm chìa khóa / Search for key', next: 'explore' },
+          { text: '💪 Cố gắng phá / Try to break', next: 'break' },
+        ],
+      },
+      reveal: {
+        text: () => `"Ta là người bảo vệ nơi này," họ nói. "Ngươi đã được chọn để hoàn thành nhiệm vụ."`,
+        choices: [
+          { text: '✅ Nhận nhiệm vụ / Accept quest', next: 'quest' },
+          { text: '❌ Từ chối / Refuse', next: 'refuse' },
+        ],
+      },
+      gift: {
+        text: () => `Họ đưa cho bạn một viên pha lê phát sáng. "Sẽ có lúc cần đến," họ nói rồi biến mất.`,
+        choices: [
+          { text: '🔮 Tiếp tục phiêu lưu / Continue adventure', next: 'explore' },
+          { text: '🏁 Kết thúc / End story', next: 'end' },
+        ],
+      },
+      safe: {
+        text: () => `Bạn đến nơi an toàn. Nhưng phiêu lưu vẫn chưa kết thúc...`,
+        choices: [
+          { text: '🔍 Tiếp tục khám phá / Continue exploring', next: 'explore' },
+          { text: '🏁 Kết thúc / End story', next: 'end' },
+        ],
+      },
+      treasure: {
+        text: () => `Cánh cửa mở ra! Bên trong là một kho báu sáng chói. Bạn đã tìm thấy kho báu! 🎉`,
+        choices: [{ text: '🏁 Kết thúc / End story', next: 'end' }],
+      },
+      break: {
+        text: () => `Cánh cửa quá mạnh. Bạn cần tìm cách khác.`,
+        choices: [{ text: '🔍 Tìm chìa khóa / Search for key', next: 'explore' }],
+      },
+      quest: {
+        text: () => `"Hãy tìm kho báu bị giấu trong nơi này," họ nói. "Nhưng cẩn thận với cạm bẫy!"`,
+        choices: [
+          { text: '🔍 Bắt đầu tìm kiếm / Start searching', next: 'explore' },
+          { text: '❓ Hỏi thêm / Ask more', next: 'reveal' },
+        ],
+      },
+      refuse: {
+        text: () => `"Rất tiếc," họ nói. "Cơ hội không đến lần thứ hai." Họ biến mất.`,
+        choices: [{ text: '🏁 Kết thúc / End story', next: 'end' }],
+      },
+      end: {
+        text: () => `Câu chuyện kết thúc. Cảm ơn bạn đã chơi! 🌟`,
+        choices: [{ text: '🔄 Chơi lại / Play again', next: 'restart' }],
+      },
+    };
+
+    let history: string[] = [];
+
+    function startStory() {
+      document.getElementById('setup')!.style.display = 'none';
+      document.getElementById('story')!.style.display = 'block';
+      history = [];
+      renderNode('intro');
+    }
+
+    function renderNode(nodeId: string) {
+      if (nodeId === 'restart') { location.reload(); return; }
+      history.push(nodeId);
+      const node = stories[nodeId];
+      if (!node) return;
+      const text = typeof node.text === 'function' ? node.text(selected) : node.text;
+      const story = document.getElementById('story')!;
+      story.innerHTML = `
+        <div style="font-size:1.1rem;line-height:1.8;margin-bottom:1.5rem;min-height:100px" id="story-text"></div>
+        <div id="choices" style="display:flex;flex-direction:column;gap:0.75rem"></div>
+        <div style="margin-top:1.5rem;display:flex;gap:0.5rem">
+          <button id="export-btn" style="padding:0.5rem 1rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer">📥 Xuất truyện / Export</button>
+          <button id="restart-btn" style="padding:0.5rem 1rem;background:#ddd;border:none;border-radius:6px;cursor:pointer">🔄 Chơi lại</button>
+        </div>
+      `;
+      // Animated text reveal
+      const textEl = document.getElementById('story-text')!;
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i >= text.length) { clearInterval(interval); return; }
+        textEl.textContent += text[i];
+        i++;
+      }, 30);
+      // Render choices after text
+      setTimeout(() => {
+        const choicesEl = document.getElementById('choices')!;
+        choicesEl.innerHTML = node.choices.map((c: any, idx: number) => `
+          <button data-next="${c.next}" style="padding:0.75rem 1.5rem;background:#FFC857;color:#102A43;border:none;border-radius:8px;cursor:pointer;font-weight:600;text-align:left;font-size:0.95rem">${c.text}</button>
+        `).join('');
+        choicesEl.querySelectorAll('button').forEach(btn => {
+          btn.addEventListener('click', () => renderNode((btn as HTMLElement).dataset.next!));
+        });
+      }, text.length * 30 + 200);
+
+      document.getElementById('export-btn')!.addEventListener('click', exportStory);
+      document.getElementById('restart-btn')!.addEventListener('click', () => location.reload());
+    }
+
+    function exportStory() {
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>My Story</title><style>body{font-family:Georgia,serif;max-width:600px;margin:2rem auto;padding:1rem;line-height:1.8}h1{color:#FFC857}</style></head><body><h1>📖 Câu chuyện của tôi</h1><p>Nhân vật: ${characters.find(c=>c.id===selected.char)?.name}</p><p>Bối cảnh: ${settings.find(s=>s.id===selected.setting)?.name}</p><p>Tâm trạng: ${moods.find(m=>m.id===selected.mood)?.name}</p><hr><p>Đường đi: ${history.join(' → ')}</p></body></html>`;
+      const blob = new Blob([html], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'my-story.html';
+      a.click();
+    }
+  </script>
+</ProductLayout>

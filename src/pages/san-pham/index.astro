@@ -1,0 +1,102 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const productChain = [
+  {
+    age: '8-10',
+    title: 'Creative Explorer',
+    titleVi: 'Khám phá sáng tạo',
+    color: '#FFC857',
+    products: [
+      { slug: 'story-maker', icon: '📖', name: 'Story Maker', desc: 'Tạo truyện tương tác với nhân vật và bối cảnh', type: 'Video' },
+      { slug: 'color-symphony', icon: '🎨', name: 'Color Symphony', desc: 'Vẽ tranh bằng âm thanh — nghệ thuật âm hình', type: 'Âm thanh + Hình ảnh' },
+      { slug: 'animation-studio', icon: '✨', name: 'Animation Studio', desc: 'Studio hoạt hình từng khung hình, xuất GIF', type: 'Video' },
+    ],
+  },
+  {
+    age: '11-13',
+    title: 'Junior Builder',
+    titleVi: 'Builder nhí',
+    color: '#00A8CC',
+    products: [
+      { slug: 'meme-generator', icon: '😂', name: 'Meme Generator', desc: 'Tạo meme từ ảnh + chữ, tải xuống PNG', type: 'Hình ảnh' },
+      { slug: 'beat-maker', icon: '🥁', name: 'Beat Maker', desc: 'Trạm tạo nhạc — sequencer 16 bước, xuất WAV', type: 'Âm thanh' },
+      { slug: 'site-builder', icon: '🌐', name: 'Site Builder', desc: 'Tạo website cá nhân từ template, tải HTML', type: 'Sản phẩm' },
+    ],
+  },
+  {
+    age: '14-17',
+    title: 'Young Creator',
+    titleVi: 'Creator trẻ',
+    color: '#20A779',
+    products: [
+      { slug: 'data-viz', icon: '📊', name: 'Data Visualizer', desc: 'Nhập dữ liệu, tạo biểu đồ tương tác', type: 'Demo' },
+      { slug: 'qr-studio', icon: '🔳', name: 'QR Studio', desc: 'Tạo mã QR có logo, màu sắc tùy chỉnh', type: 'Sản phẩm' },
+      { slug: 'chatbot-builder', icon: '🤖', name: 'Chatbot Builder', desc: 'Tạo chatbot theo quy tắc, nhúng vào web', type: 'Demo' },
+    ],
+  },
+  {
+    age: '16-20',
+    title: 'Product Developer',
+    titleVi: 'Product Developer',
+    color: '#6C5CE7',
+    products: [
+      { slug: 'api-studio', icon: '🔌', name: 'API Studio', desc: 'Thiết kế & test REST API, xem response', type: 'Sản phẩm' },
+      { slug: 'pixel-art', icon: '👾', name: 'Pixel Art Editor', desc: 'Editor pixel art đầy đủ, xuất PNG/sprite sheet', type: 'Hình ảnh' },
+      { slug: 'markdown-to-pdf', icon: '📄', name: 'Markdown → PDF', desc: 'Viết Markdown, xuất PDF đẹp', type: 'Sản phẩm' },
+    ],
+  },
+  {
+    age: '18-24',
+    title: 'Builder & Entrepreneur',
+    titleVi: 'Builder & Doanh nghiệp',
+    color: '#E17055',
+    products: [
+      { slug: 'landing-gen', icon: '🚀', name: 'Landing Page Generator', desc: 'Tạo landing page từ template, xuất HTML', type: 'Sản phẩm' },
+      { slug: 'invoice-gen', icon: '🧾', name: 'Invoice Generator', desc: 'Tạo hóa đơn chuyên nghiệp, xuất PDF', type: 'Sản phẩm' },
+      { slug: 'analytics-dash', icon: '📈', name: 'Analytics Dashboard', desc: 'Dashboard phân tích real-time template', type: 'Demo' },
+    ],
+  },
+];
+---
+
+<BaseLayout title="Chuỗi sản phẩm code — HaMi Code Việt">
+  <main class="container" style="padding:3rem 1.5rem">
+    <div style="text-align:center;margin-bottom:3rem">
+      <h1 style="font-size:2.5rem;margin:0 0 0.5rem;font-weight:800">Chuỗi sản phẩm code</h1>
+      <p style="font-size:1.1rem;color:var(--color-text-muted);margin:0 0 0.5rem">15 sản phẩm code thật — tạo video, hình ảnh, âm thanh, sản phẩm</p>
+      <p style="color:var(--color-text-muted);margin:0">Code Product Chain — Real, Usable, Educational</p>
+    </div>
+
+    {productChain.map(group => (
+      <section style="margin-bottom:3rem">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem">
+          <div style="background:{group.color};color:white;padding:0.5rem 1rem;border-radius:8px;font-weight:700;font-size:0.9rem">
+            {group.age} tuổi
+          </div>
+          <div>
+            <h2 style="font-size:1.5rem;margin:0;font-weight:700">{group.titleVi}</h2>
+            <p style="color:var(--color-text-muted);margin:0;font-size:0.85rem">{group.title}</p>
+          </div>
+        </div>
+
+        <div class="grid grid--3">
+          {group.products.map(p => (
+            <a href={`/san-pham/${p.slug}`} class="card" style="padding:1.5rem;text-decoration:none;color:inherit;display:block;transition:transform 0.2s,box-shadow 0.2s;border:1px solid var(--color-border)">
+              <div style="font-size:2rem;margin-bottom:0.75rem">{p.icon}</div>
+              <h3 style="font-size:1.1rem;margin:0 0 0.5rem;font-weight:700">{p.name}</h3>
+              <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 0.75rem">{p.desc}</p>
+              <span style="background:var(--color-border);padding:0.25rem 0.6rem;border-radius:4px;font-size:0.7rem;font-weight:600">{p.type}</span>
+              <div style="margin-top:0.75rem;font-size:0.85rem;color:{group.color};font-weight:600">Dùng thử →</div>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <div style="text-align:center;margin-top:3rem;padding:2rem;background:var(--color-bg-light);border-radius:12px">
+      <h3 style="margin:0 0 0.5rem">Mỗi sản phẩm là code thật, chạy được ngay</h3>
+      <p style="color:var(--color-text-muted);margin:0">Không mockup. Không placeholder. Code → chạy → tạo sản phẩm → tải xuống.</p>
+    </div>
+  </main>
+</BaseLayout>

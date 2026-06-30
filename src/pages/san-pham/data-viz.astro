@@ -1,0 +1,503 @@
+---
+import ProductLayout from '../../layouts/ProductLayout.astro';
+---
+<ProductLayout
+  title="Data Visualizer"
+  ageGroup="14-17"
+  ageColor="#20A779"
+  productType="Demo"
+  description="Nhập dữ liệu, tạo biểu đồ tương tác"
+>
+  <style>
+    .dv-wrap{max-width:1200px;margin:0 auto;padding:1.5rem;font-family:Inter,system-ui,sans-serif}
+    .dv-grid{display:grid;grid-template-columns:340px 1fr;gap:1.25rem}
+    @media(max-width:900px){.dv-grid{grid-template-columns:1fr}}
+    .dv-panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:1.1rem;box-shadow:0 1px 3px rgba(16,42,67,.06)}
+    .dv-panel h3{margin:0 0 .6rem;font-size:.95rem;font-weight:700;color:#102A43}
+    .dv-label{display:block;font-size:.78rem;font-weight:600;color:#475569;margin:.6rem 0 .25rem}
+    .dv-input,.dv-select,.dv-textarea{width:100%;padding:.5rem .6rem;border:1px solid #cbd5e1;border-radius:8px;font-size:.85rem;font-family:inherit;background:#fff;color:#102A43;box-sizing:border-box}
+    .dv-textarea{min-height:120px;font-family:JetBrains Mono,monospace;font-size:.78rem;resize:vertical}
+    .dv-btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.55rem .9rem;border:none;border-radius:9px;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .15s;background:#20A779;color:#fff}
+    .dv-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+    .dv-btn.secondary{background:#e2e8f0;color:#102A43}
+    .dv-btn-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem}
+    .dv-charts{display:flex;gap:.4rem;flex-wrap:wrap}
+    .dv-chart-btn{padding:.4rem .7rem;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font-size:.8rem;font-weight:600;cursor:pointer;color:#475569;transition:all .15s}
+    .dv-chart-btn.active{background:#20A779;color:#fff;border-color:#20A779}
+    .dv-colors{display:flex;gap:.5rem;flex-wrap:wrap}
+    .dv-color-chip{width:30px;height:30px;border-radius:8px;border:2px solid #fff;box-shadow:0 0 0 1px #cbd5e1;cursor:pointer;position:relative}
+    .dv-color-chip.active{box-shadow:0 0 0 2px #20A779}
+    .dv-canvas-wrap{position:relative;background:#fff;border-radius:12px;border:1px solid #e2e8f0;min-height:420px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .dv-tooltip{position:absolute;pointer-events:none;background:#102A43;color:#fff;padding:.4rem .6rem;border-radius:6px;font-size:.78rem;font-weight:500;white-space:nowrap;transform:translate(-50%,-130%);opacity:0;transition:opacity .1s;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+    .dv-tooltip.show{opacity:1}
+    .dv-empty{text-align:center;color:#94a3b8;padding:2rem}
+    .dv-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:.6rem}
+    .dv-stat{background:#F7FAFC;border-radius:8px;padding:.5rem;text-align:center}
+    .dv-stat-val{font-size:1.1rem;font-weight:700;color:#20A779}
+    .dv-stat-lbl{font-size:.68rem;color:#64748b;text-transform:uppercase;letter-spacing:.03em}
+    .dv-samples{display:flex;gap:.4rem;flex-wrap:wrap}
+    .dv-sample-btn{padding:.35rem .6rem;border:1px dashed #94a3b8;border-radius:7px;background:#F7FAFC;font-size:.76rem;cursor:pointer;color:#475569}
+    .dv-sample-btn:hover{background:#20A779;color:#fff;border-color:#20A779}
+    .dv-bi{font-size:.72rem;color:#64748b;margin:.3rem 0 0}
+  </style>
+
+  <div class="dv-wrap">
+    <div class="dv-grid">
+      <!-- Controls -->
+      <div>
+        <div class="dv-panel" style="margin-bottom:1rem">
+          <h3>📊 Dữ liệu / Data</h3>
+          <span class="dv-label">Dán CSV hoặc chọn mẫu / Paste CSV or pick sample</span>
+          <textarea class="dv-textarea" id="dv-data" placeholder="Label,Value&#10;Tháng 1,120&#10;Tháng 2,200"></textarea>
+          <div class="dv-samples" style="margin-top:.5rem">
+            <button class="dv-sample-btn" data-sample="sales">📈 Doanh số</button>
+            <button class="dv-sample-btn" data-sample="weather">🌤️ Thời tiết</button>
+            <button class="dv-sample-btn" data-sample="population">👥 Dân số</button>
+          </div>
+          <div class="dv-btn-row">
+            <button class="dv-btn" id="dv-render">Vẽ biểu đồ / Render</button>
+            <button class="dv-btn secondary" id="dv-export">⬇ PNG</button>
+          </div>
+        </div>
+
+        <div class="dv-panel" style="margin-bottom:1rem">
+          <h3>🎨 Loại biểu đồ / Chart type</h3>
+          <div class="dv-charts" id="dv-chart-types">
+            <button class="dv-chart-btn active" data-type="bar">Bar</button>
+            <button class="dv-chart-btn" data-type="line">Line</button>
+            <button class="dv-chart-btn" data-type="pie">Pie</button>
+            <button class="dv-chart-btn" data-type="scatter">Scatter</button>
+            <button class="dv-chart-btn" data-type="area">Area</button>
+          </div>
+        </div>
+
+        <div class="dv-panel">
+          <h3>⚙ Tùy chỉnh / Customize</h3>
+          <span class="dv-label">Tiêu đề / Title</span>
+          <input class="dv-input" id="dv-title" value="Biểu đồ dữ liệu" />
+          <span class="dv-label">Nhãn trục X / X-axis label</span>
+          <input class="dv-input" id="dv-xlabel" value="Danh mục" />
+          <span class="dv-label">Nhãn trục Y / Y-axis label</span>
+          <input class="dv-input" id="dv-ylabel" value="Giá trị" />
+          <span class="dv-label">Hiện nhãn / Show labels</span>
+          <select class="dv-select" id="dv-showlabels">
+            <option value="1">Có / Yes</option>
+            <option value="0">Không / No</option>
+          </select>
+          <span class="dv-label">Bảng màu / Color palette</span>
+          <div class="dv-colors" id="dv-palettes"></div>
+          <p class="dv-bi">💡 Mẹo: hover lên biểu đồ để xem giá trị / Hover chart to see values</p>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div>
+        <div class="dv-panel">
+          <div class="dv-canvas-wrap" id="dv-canvas-wrap">
+            <canvas id="dv-canvas" width="780" height="440"></canvas>
+            <div class="dv-tooltip" id="dv-tooltip"></div>
+            <div class="dv-empty" id="dv-empty">Nhập dữ liệu rồi bấm Vẽ biểu đồ<br><span style="font-size:.78rem">Enter data then click Render</span></div>
+          </div>
+          <div class="dv-stats" id="dv-stats" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const samples = {
+      sales: { title: 'Doanh số theo tháng', x: 'Tháng', y: 'Doanh số (triệu ₫)', data: 'Tháng,Doanh số\nT1,120\nT2,185\nT3,210\nT4,175\nT5,260\nT6,320\nT7,295\nT8,380' },
+      weather: { title: 'Nhiệt độ trung bình', x: 'Tháng', y: '°C', data: 'Tháng,Nhiệt độ\nT1,18\nT2,20\nT3,24\nT4,28\nT5,31\nT6,33\nT7,34\nT8,33\nT9,30\nT10,27\nT11,23\nT12,19' },
+      population: { title: 'Dân số các vùng', x: 'Vùng', y: 'Triệu người', data: 'Vùng,Dân số\nBắc,23\nTrung,19\nNam,45\nTây Nguyên,8\nĐBSCL,18' },
+    };
+    const palettes = [
+      ['#20A779','#00A8CC','#FFC857','#E17055','#6C5CE7','#FD79A8','#00B894','#0984E3'],
+      ['#102A43','#274C77','#6096BA','#A3CEF1','#8EB8E5','#6492D6','#3E7CB1','#2C5F8D'],
+      ['#FF6B6B','#FFA07A','#FFD93D','#6BCB77','#4D96FF','#9B59B6','#E84393','#00CEC9'],
+      ['#2D3436','#636E72','#B2BEC3','#DFE6E9','#74B9FF','#A29BFE','#55EFC4','#81ECEC'],
+    ];
+    let currentPalette = 0;
+    let currentType = 'bar';
+    let chartData = null;
+    let hitMap = [];
+
+    const $ = (id) => document.getElementById(id);
+    const canvas = $('dv-canvas');
+    const ctx = canvas.getContext('2d');
+    const tooltip = $('dv-tooltip');
+    const empty = $('dv-empty');
+
+    // Render palette chips
+    const palWrap = $('dv-palettes');
+    palettes.forEach((p, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'dv-color-chip' + (i === 0 ? ' active' : '');
+      chip.style.background = `linear-gradient(135deg, ${p.slice(0,4).join(', ')})`;
+      chip.title = `Bảng ${i+1}`;
+      chip.addEventListener('click', () => {
+        currentPalette = i;
+        document.querySelectorAll('.dv-color-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        if (chartData) render();
+      });
+      palWrap.appendChild(chip);
+    });
+
+    // Chart type buttons
+    document.querySelectorAll('.dv-chart-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.dv-chart-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentType = btn.dataset.type;
+        if (chartData) render();
+      });
+    });
+
+    // Sample buttons
+    document.querySelectorAll('.dv-sample-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const s = samples[btn.dataset.sample];
+        $('dv-data').value = s.data;
+        $('dv-title').value = s.title;
+        $('dv-xlabel').value = s.x;
+        $('dv-ylabel').value = s.y;
+        doRender();
+      });
+    });
+
+    $('dv-render').addEventListener('click', doRender);
+    $('dv-title').addEventListener('input', () => { if (chartData) render(); });
+    $('dv-xlabel').addEventListener('input', () => { if (chartData) render(); });
+    $('dv-ylabel').addEventListener('input', () => { if (chartData) render(); });
+    $('dv-showlabels').addEventListener('change', () => { if (chartData) render(); });
+
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+      if (lines.length < 2) return null;
+      const header = lines[0].split(',').map(h => h.trim());
+      const rows = lines.slice(1).map(line => {
+        const parts = line.split(',').map(c => c.trim());
+        return { label: parts[0], value: parseFloat(parts[1]) };
+      }).filter(r => !isNaN(r.value));
+      return { header, rows };
+    }
+
+    function doRender() {
+      const text = $('dv-data').value;
+      const parsed = parseCSV(text);
+      if (!parsed || parsed.rows.length === 0) {
+        empty.style.display = 'block';
+        canvas.style.display = 'none';
+        $('dv-stats').style.display = 'none';
+        chartData = null;
+        return;
+      }
+      chartData = parsed;
+      render();
+    }
+
+    function render() {
+      if (!chartData) return;
+      empty.style.display = 'none';
+      canvas.style.display = 'block';
+      const dpr = window.devicePixelRatio || 1;
+      const w = canvas.clientWidth || 780;
+      const h = canvas.clientHeight || 440;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      hitMap = [];
+      const palette = palettes[currentPalette];
+      const title = $('dv-title').value;
+      const xlabel = $('dv-xlabel').value;
+      const ylabel = $('dv-ylabel').value;
+      const showLabels = $('dv-showlabels').value === '1';
+
+      if (currentType === 'pie') {
+        drawPie(chartData.rows, palette, title, showLabels);
+      } else {
+        drawCartesian(chartData.rows, palette, title, xlabel, ylabel, showLabels, currentType);
+      }
+      renderStats(chartData.rows);
+    }
+
+    function drawCartesian(rows, palette, title, xlabel, ylabel, showLabels, type) {
+      const w = canvas.clientWidth || 780;
+      const h = canvas.clientHeight || 440;
+      const pad = { top: 50, right: 30, bottom: 60, left: 60 };
+      const cw = w - pad.left - pad.right;
+      const ch = h - pad.top - pad.bottom;
+      const maxV = Math.max(...rows.map(r => r.value), 0);
+      const minV = Math.min(...rows.map(r => r.value), 0);
+      const range = maxV - minV || 1;
+      const niceMax = maxV * 1.1;
+      const niceMin = minV < 0 ? minV * 1.1 : 0;
+      const niceRange = niceMax - niceMin || 1;
+
+      // Title
+      ctx.fillStyle = '#102A43';
+      ctx.font = '700 16px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(title, w / 2, 28);
+
+      // Grid + Y axis
+      const steps = 5;
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.fillStyle = '#64748b';
+      ctx.font = '500 11px Inter, sans-serif';
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= steps; i++) {
+        const y = pad.top + ch - (ch * i / steps);
+        const val = niceMin + niceRange * i / steps;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(pad.left + cw, y);
+        ctx.stroke();
+        ctx.fillText(val.toFixed(val >= 100 ? 0 : 1), pad.left - 8, y + 4);
+      }
+
+      // X axis labels
+      ctx.textAlign = 'center';
+      const slotW = cw / rows.length;
+      rows.forEach((r, i) => {
+        const x = pad.left + slotW * i + slotW / 2;
+        ctx.fillStyle = '#64748b';
+        ctx.font = '500 11px Inter, sans-serif';
+        const lbl = r.label.length > 8 ? r.label.slice(0, 7) + '…' : r.label;
+        ctx.fillText(lbl, x, pad.top + ch + 18);
+      });
+
+      // Axis titles
+      ctx.fillStyle = '#475569';
+      ctx.font = '600 12px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(xlabel, pad.left + cw / 2, h - 12);
+      ctx.save();
+      ctx.translate(16, pad.top + ch / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText(ylabel, 0, 0);
+      ctx.restore();
+
+      const valY = (v) => pad.top + ch - ((v - niceMin) / niceRange) * ch;
+
+      if (type === 'bar') {
+        const barW = slotW * 0.6;
+        rows.forEach((r, i) => {
+          const x = pad.left + slotW * i + (slotW - barW) / 2;
+          const y = valY(r.value);
+          const bh = pad.top + ch - y;
+          const color = palette[i % palette.length];
+          ctx.fillStyle = color;
+          roundRect(ctx, x, y, barW, Math.max(bh, 1), 4);
+          ctx.fill();
+          hitMap.push({ type: 'rect', x, y, w: barW, h: Math.max(bh, 1), label: r.label, value: r.value, color });
+          if (showLabels) {
+            ctx.fillStyle = '#102A43';
+            ctx.font = '600 10px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(r.value, x + barW / 2, y - 5);
+          }
+        });
+      } else if (type === 'line' || type === 'area') {
+        const pts = rows.map((r, i) => ({
+          x: pad.left + slotW * i + slotW / 2,
+          y: valY(r.value),
+          label: r.label,
+          value: r.value,
+        }));
+        if (type === 'area') {
+          ctx.beginPath();
+          ctx.moveTo(pts[0].x, pad.top + ch);
+          pts.forEach(p => ctx.lineTo(p.x, p.y));
+          ctx.lineTo(pts[pts.length - 1].x, pad.top + ch);
+          ctx.closePath();
+          const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + ch);
+          grad.addColorStop(0, palette[0] + 'AA');
+          grad.addColorStop(1, palette[0] + '11');
+          ctx.fillStyle = grad;
+          ctx.fill();
+        }
+        ctx.strokeStyle = palette[0];
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        ctx.stroke();
+        pts.forEach(p => {
+          ctx.fillStyle = '#fff';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = palette[0];
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          hitMap.push({ type: 'circle', x: p.x, y: p.y, r: 12, label: p.label, value: p.value, color: palette[0] });
+          if (showLabels) {
+            ctx.fillStyle = '#102A43';
+            ctx.font = '600 10px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(p.value, p.x, p.y - 10);
+          }
+        });
+      } else if (type === 'scatter') {
+        rows.forEach((r, i) => {
+          const x = pad.left + slotW * i + slotW / 2;
+          const y = valY(r.value);
+          ctx.fillStyle = palette[i % palette.length];
+          ctx.beginPath();
+          ctx.arc(x, y, 7, 0, Math.PI * 2);
+          ctx.fill();
+          hitMap.push({ type: 'circle', x, y, r: 10, label: r.label, value: r.value, color: palette[i % palette.length] });
+          if (showLabels) {
+            ctx.fillStyle = '#102A43';
+            ctx.font = '600 10px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(r.value, x, y - 12);
+          }
+        });
+      }
+    }
+
+    function drawPie(rows, palette, title, showLabels) {
+      const w = canvas.clientWidth || 780;
+      const h = canvas.clientHeight || 440;
+      const cx = w / 2 - 80;
+      const cy = h / 2 + 10;
+      const radius = Math.min(w, h) / 2 - 80;
+      const total = rows.reduce((s, r) => s + Math.abs(r.value), 0) || 1;
+
+      ctx.fillStyle = '#102A43';
+      ctx.font = '700 16px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(title, w / 2, 28);
+
+      let angle = -Math.PI / 2;
+      rows.forEach((r, i) => {
+        const slice = (Math.abs(r.value) / total) * Math.PI * 2;
+        const color = palette[i % palette.length];
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, angle, angle + slice);
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        hitMap.push({ type: 'arc', cx, cy, r: radius, start: angle, end: angle + slice, label: r.label, value: r.value, color });
+        // label
+        const mid = angle + slice / 2;
+        const lx = cx + Math.cos(mid) * (radius * 0.65);
+        const ly = cy + Math.sin(mid) * (radius * 0.65);
+        if (showLabels && slice > 0.15) {
+          ctx.fillStyle = '#fff';
+          ctx.font = '700 11px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(((Math.abs(r.value) / total) * 100).toFixed(0) + '%', lx, ly + 4);
+        }
+        angle += slice;
+      });
+
+      // Legend
+      const lx = cx + radius + 30;
+      let ly = cy - rows.length * 11;
+      ctx.textAlign = 'left';
+      rows.forEach((r, i) => {
+        const color = palette[i % palette.length];
+        ctx.fillStyle = color;
+        ctx.fillRect(lx, ly, 12, 12);
+        ctx.fillStyle = '#102A43';
+        ctx.font = '500 11px Inter, sans-serif';
+        const lbl = r.label.length > 12 ? r.label.slice(0, 11) + '…' : r.label;
+        ctx.fillText(`${lbl}: ${r.value}`, lx + 18, ly + 10);
+        ly += 22;
+      });
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      r = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function renderStats(rows) {
+      const vals = rows.map(r => r.value);
+      const sum = vals.reduce((a, b) => a + b, 0);
+      const avg = sum / vals.length;
+      const max = Math.max(...vals);
+      const min = Math.min(...vals);
+      const stats = $('dv-stats');
+      stats.style.display = 'grid';
+      stats.innerHTML = [
+        ['Tổng / Sum', sum.toFixed(1)],
+        ['Trung bình / Avg', avg.toFixed(1)],
+        ['Cao nhất / Max', max.toFixed(1)],
+        ['Thấp nhất / Min', min.toFixed(1)],
+      ].map(([l, v]) => `<div class="dv-stat"><div class="dv-stat-val">${v}</div><div class="dv-stat-lbl">${l}</div></div>`).join('');
+    }
+
+    // Hover tooltip
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      let hit = null;
+      for (const h of hitMap) {
+        if (h.type === 'rect') {
+          if (mx >= h.x && mx <= h.x + h.w && my >= h.y && my <= h.y + h.h) { hit = h; break; }
+        } else if (h.type === 'circle') {
+          if (Math.hypot(mx - h.x, my - h.y) <= h.r) { hit = h; break; }
+        } else if (h.type === 'arc') {
+          const d = Math.hypot(mx - h.cx, my - h.cy);
+          if (d <= h.r) {
+            let a = Math.atan2(my - h.cy, mx - h.cx);
+            while (a < h.start) a += Math.PI * 2;
+            if (a >= h.start && a <= h.end) { hit = h; break; }
+          }
+        }
+      }
+      if (hit) {
+        tooltip.style.left = mx + 'px';
+        tooltip.style.top = my + 'px';
+        tooltip.innerHTML = `<b>${hit.label}</b>: ${hit.value}`;
+        tooltip.style.background = hit.color;
+        tooltip.classList.add('show');
+        canvas.style.cursor = 'pointer';
+      } else {
+        tooltip.classList.remove('show');
+        canvas.style.cursor = 'default';
+      }
+    });
+    canvas.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
+
+    // Export PNG
+    $('dv-export').addEventListener('click', () => {
+      if (!chartData) { doRender(); }
+      if (!chartData) return;
+      // ensure white bg
+      const tmp = document.createElement('canvas');
+      tmp.width = canvas.width;
+      tmp.height = canvas.height;
+      const tctx = tmp.getContext('2d');
+      tctx.fillStyle = '#fff';
+      tctx.fillRect(0, 0, tmp.width, tmp.height);
+      tctx.drawImage(canvas, 0, 0);
+      const link = document.createElement('a');
+      link.download = 'bieu-do-data-viz.png';
+      link.href = tmp.toDataURL('image/png');
+      link.click();
+    });
+
+    // Resize
+    window.addEventListener('resize', () => { if (chartData) render(); });
+
+    // Auto-load sales sample
+    $('dv-data').value = samples.sales.data;
+    doRender();
+  </script>
+</ProductLayout>

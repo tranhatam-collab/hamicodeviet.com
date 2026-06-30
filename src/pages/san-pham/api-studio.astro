@@ -1,0 +1,112 @@
+---
+import ProductLayout from '../../layouts/ProductLayout.astro';
+---
+
+<ProductLayout title="API Studio" ageGroup="16-20" ageColor="#6C5CE7" productType="Sản phẩm" description="Thiết kế & test REST API, xem response">
+  <div style="padding:1.5rem;max-width:1000px;margin:0 auto">
+    <div style="display:grid;grid-template-columns:300px 1fr;gap:1.5rem">
+      <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+        <h2 style="margin:0 0 1rem;font-size:1.1rem">🔌 Endpoints</h2>
+        <div id="endpoints-list" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem"></div>
+        <button id="add-ep-btn" style="padding:0.5rem;background:#6C5CE7;color:white;border:none;border-radius:6px;cursor:pointer;width:100%">+ Add endpoint</button>
+        <div style="margin-top:1.5rem;display:flex;gap:0.5rem">
+          <button id="export-openapi-btn" style="padding:0.4rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;flex:1">OpenAPI JSON</button>
+          <button id="export-docs-btn" style="padding:0.4rem;background:#00A8CC;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;flex:1">Docs MD</button>
+        </div>
+      </div>
+      <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+        <div style="display:flex;gap:0.5rem;margin-bottom:1rem">
+          <select id="test-method" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px">
+            <option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option>
+          </select>
+          <input type="text" id="test-path" placeholder="/api/users" value="/api/users" style="flex:1;padding:0.5rem;border:1px solid #ddd;border-radius:6px;font-family:monospace" />
+          <button id="test-send" style="padding:0.5rem 1rem;background:#6C5CE7;color:white;border:none;border-radius:6px;cursor:pointer">Send</button>
+        </div>
+        <div style="margin-bottom:1rem">
+          <label style="font-size:0.85rem;font-weight:600">Body (JSON)</label>
+          <textarea id="test-body" rows="3" placeholder='{"name":"test"}' style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px;font-family:monospace;font-size:0.85rem"></textarea>
+        </div>
+        <div style="background:#081826;color:#0f0;border-radius:8px;padding:1rem;font-family:monospace;font-size:0.85rem;min-height:150px;max-height:300px;overflow-y:auto" id="response-view">Response sẽ hiển thị ở đây...</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    interface Endpoint { id: number; method: string; path: string; response: string; }
+    let endpoints: Endpoint[] = [
+      { id: 1, method: 'GET', path: '/api/users', response: '[{"id":1,"name":"Alice"},{"id":2,"name":"Bob"}]' },
+      { id: 2, method: 'POST', path: '/api/users', response: '{"id":3,"name":"New User","created":true}' },
+      { id: 3, method: 'GET', path: '/api/products', response: '[{"id":1,"name":"Widget","price":9.99}]' },
+    ];
+    let db: Record<string, any[]> = { '/api/users': [{id:1,name:'Alice'},{id:2,name:'Bob'}], '/api/products': [{id:1,name:'Widget',price:9.99}] };
+
+    function renderEndpoints() {
+      const list = document.getElementById('endpoints-list')!;
+      list.innerHTML = endpoints.map(e => `
+        <div data-id="${e.id}" style="padding:0.6rem;background:#f9f9f9;border-radius:6px;cursor:pointer" class="ep-item">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-family:monospace;font-size:0.8rem"><strong style="color:${e.method==='GET'?'#20A779':e.method==='POST'?'#00A8CC':e.method==='PUT'?'#FFC857':'#e53e3e'}">${e.method}</strong> ${e.path}</span>
+            <button class="ep-del" style="background:none;border:none;color:#e53e3e;cursor:pointer;font-size:0.8rem">✕</button>
+          </div>
+        </div>
+      `).join('');
+      list.querySelectorAll('.ep-item').forEach(el => {
+        const id = parseInt((el as HTMLElement).dataset.id!);
+        const ep = endpoints.find(e=>e.id===id)!;
+        el.addEventListener('click', (e) => {
+          if ((e.target as HTMLElement).classList.contains('ep-del')) { endpoints = endpoints.filter(x=>x.id!==id); renderEndpoints(); return; }
+          (document.getElementById('test-method') as HTMLSelectElement).value = ep.method;
+          (document.getElementById('test-path') as HTMLInputElement).value = ep.path;
+        });
+      });
+    }
+
+    function sendRequest() {
+      const method = (document.getElementById('test-method') as HTMLSelectElement).value;
+      const path = (document.getElementById('test-path') as HTMLInputElement).value;
+      const bodyText = (document.getElementById('test-body') as HTMLTextAreaElement).value;
+      const view = document.getElementById('response-view')!;
+      let status = 200, response: any;
+
+      try {
+        if (method === 'GET') {
+          response = db[path] || [];
+        } else if (method === 'POST') {
+          const body = JSON.parse(bodyText || '{}');
+          if (!db[path]) db[path] = [];
+          const item = { ...body, id: db[path].length + 1 };
+          db[path].push(item);
+          response = item; status = 201;
+        } else if (method === 'DELETE') {
+          db[path] = []; response = { deleted: true }; status = 200;
+        } else {
+          response = { error: 'Method not implemented' }; status = 405;
+        }
+        view.innerHTML = `<span style="color:#FFC857">HTTP ${status}</span>\n<span style="color:#aaa">Content-Type: application/json</span>\n\n${JSON.stringify(response, null, 2)}`;
+      } catch (e) {
+        view.innerHTML = `<span style="color:#e53e3e">HTTP 400 — Bad Request</span>\n\n${e instanceof Error ? e.message : 'Invalid JSON'}`;
+      }
+    }
+
+    document.getElementById('add-ep-btn')!.addEventListener('click', () => {
+      const method = prompt('Method (GET/POST/PUT/DELETE):', 'GET');
+      const path = prompt('Path:', '/api/new');
+      if (method && path) { endpoints.push({ id: Date.now(), method: method.toUpperCase(), path, response: '{}' }); renderEndpoints(); }
+    });
+    document.getElementById('test-send')!.addEventListener('click', sendRequest);
+    document.getElementById('export-openapi-btn')!.addEventListener('click', () => {
+      const spec = { openapi: '3.0.0', info: { title: 'My API', version: '1.0.0' }, paths: {} as any };
+      endpoints.forEach(e => { if (!spec.paths[e.path]) spec.paths[e.path] = {}; spec.paths[e.path][e.method.toLowerCase()] = { responses: { '200': { description: 'OK' } } }; });
+      const blob = new Blob([JSON.stringify(spec, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'openapi.json'; a.click();
+    });
+    document.getElementById('export-docs-btn')!.addEventListener('click', () => {
+      let md = '# API Documentation\n\n';
+      endpoints.forEach(e => { md += `## ${e.method} ${e.path}\n\n\`\`\`json\n${e.response}\n\`\`\`\n\n`; });
+      const blob = new Blob([md], { type: 'text/markdown' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'api-docs.md'; a.click();
+    });
+
+    renderEndpoints();
+  </script>
+</ProductLayout>

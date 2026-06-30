@@ -1,0 +1,196 @@
+---
+import ProductLayout from '../../layouts/ProductLayout.astro';
+---
+
+<ProductLayout title="Analytics Dashboard" ageGroup="18-24" ageColor="#E17055" productType="Demo" description="Dashboard phân tích real-time template">
+  <div style="padding:1.5rem;max-width:1100px;margin:0 auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.5rem">
+      <h2 style="margin:0;font-size:1.3rem">📈 Analytics Dashboard</h2>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <select id="range" style="padding:0.4rem;border:1px solid #ddd;border-radius:6px">
+          <option value="7">7 ngày</option>
+          <option value="30" selected>30 ngày</option>
+          <option value="90">90 ngày</option>
+        </select>
+        <button id="export-csv-btn" style="padding:0.4rem 0.8rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem">📥 CSV</button>
+        <span id="live-indicator" style="font-size:0.75rem;color:#20A779">● Live</span>
+      </div>
+    </div>
+
+    <div id="kpi-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem"></div>
+
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1rem">
+      <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+        <h3 style="margin:0 0 1rem;font-size:1rem">Doanh thu / Revenue</h3>
+        <canvas id="revenue-chart" width="600" height="250" style="width:100%"></canvas>
+      </div>
+      <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+        <h3 style="margin:0 0 1rem;font-size:1rem">Nguồn traffic</h3>
+        <canvas id="source-chart" width="250" height="250" style="width:100%"></canvas>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+        <h3 style="margin:0 0 1rem;font-size:1rem">Top sản phẩm</h3>
+        <canvas id="products-chart" width="400" height="200" style="width:100%"></canvas>
+      </div>
+      <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+        <h3 style="margin:0 0 1rem;font-size:1rem">Giao dịch gần đây</h3>
+        <div id="transactions" style="font-size:0.85rem;max-height:200px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    function genData(days: number) {
+      const revenue: {date:string, value:number}[] = [];
+      let base = 5000000;
+      for (let i = days; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        base += (Math.random() - 0.4) * 500000;
+        revenue.push({ date: d.toISOString().split('T')[0], value: Math.max(1000000, Math.round(base)) });
+      }
+      return revenue;
+    }
+
+    function genKPIs() {
+      return [
+        { label: 'Doanh thu', value: '₫45.2M', change: '+12%', spark: [3,5,4,6,5,7,8], color: '#20A779' },
+        { label: 'Người dùng', value: '1,234', change: '+8%', spark: [2,3,3,4,5,5,6], color: '#00A8CC' },
+        { label: 'Conversion', value: '3.4%', change: '+0.5%', spark: [1,2,2,3,3,4,4], color: '#6C5CE7' },
+        { label: 'Churn', value: '2.1%', change: '-0.3%', spark: [4,3,3,3,2,2,2], color: '#E17055' },
+      ];
+    }
+
+    function drawSparkline(canvas: HTMLCanvasElement, data: number[], color: string) {
+      const ctx = canvas.getContext('2d')!;
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      const max = Math.max(...data), min = Math.min(...data);
+      const range = max - min || 1;
+      ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+      data.forEach((v, i) => { const x = (i / (data.length-1)) * w; const y = h - ((v-min)/range) * (h-10) - 5; i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y); });
+      ctx.stroke();
+      ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+      ctx.fillStyle = color + '20'; ctx.fill();
+    }
+
+    function drawLineChart(canvas: HTMLCanvasElement, data: {date:string,value:number}[]) {
+      const ctx = canvas.getContext('2d')!;
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      const max = Math.max(...data.map(d=>d.value)), min = Math.min(...data.map(d=>d.value));
+      const range = max - min || 1;
+      // Grid
+      ctx.strokeStyle = '#f0f0f0'; ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) { const y = (i/4)*h; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+      // Line
+      ctx.strokeStyle = '#20A779'; ctx.lineWidth = 2; ctx.beginPath();
+      data.forEach((d, i) => { const x = (i/(data.length-1))*w; const y = h - ((d.value-min)/range)*(h-20) - 10; i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y); });
+      ctx.stroke();
+      // Fill
+      ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+      ctx.fillStyle = '#20A77920'; ctx.fill();
+    }
+
+    function drawDonut(canvas: HTMLCanvasElement, data: {label:string,value:number,color:string}[]) {
+      const ctx = canvas.getContext('2d')!;
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      const cx = w/2, cy = h/2, r = Math.min(w,h)/2 - 10, ir = r * 0.6;
+      const total = data.reduce((s,d)=>s+d.value, 0);
+      let angle = -Math.PI/2;
+      data.forEach(d => {
+        const a = (d.value/total) * Math.PI * 2;
+        ctx.beginPath(); ctx.arc(cx, cy, r, angle, angle+a); ctx.arc(cx, cy, ir, angle+a, angle, true); ctx.closePath();
+        ctx.fillStyle = d.color; ctx.fill();
+        angle += a;
+      });
+      // Legend
+      ctx.font = '11px Inter'; ctx.textAlign = 'left';
+      data.forEach((d, i) => { ctx.fillStyle = d.color; ctx.fillRect(10, i*18+5, 12, 12); ctx.fillStyle = '#333'; ctx.fillText(`${d.label} (${Math.round(d.value/total*100)}%)`, 28, i*18+15); });
+    }
+
+    function drawBarChart(canvas: HTMLCanvasElement, data: {label:string,value:number}[]) {
+      const ctx = canvas.getContext('2d')!;
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      const max = Math.max(...data.map(d=>d.value));
+      const barW = w / data.length * 0.7;
+      const gap = w / data.length * 0.3;
+      data.forEach((d, i) => {
+        const barH = (d.value/max) * (h - 30);
+        const x = i * (barW + gap) + gap/2;
+        const y = h - barH - 20;
+        ctx.fillStyle = '#E17055'; ctx.fillRect(x, y, barW, barH);
+        ctx.fillStyle = '#333'; ctx.font = '10px Inter'; ctx.textAlign = 'center';
+        ctx.fillText(d.label, x + barW/2, h - 5);
+      });
+    }
+
+    function renderKPIs() {
+      const kpis = genKPIs();
+      document.getElementById('kpi-cards')!.innerHTML = kpis.map(k => `
+        <div style="background:white;border-radius:12px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+          <p style="margin:0;font-size:0.8rem;color:#999">${k.label}</p>
+          <p style="margin:0.25rem 0;font-size:1.5rem;font-weight:700">${k.value}</p>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:0.75rem;color:${k.change.startsWith('+')?'#20A779':'#e53e3e'}">${k.change}</span>
+            <canvas class="spark" width="80" height="30" data-color="${k.color}" data-spark="${k.spark.join(',')}"></canvas>
+          </div>
+        </div>
+      `).join('');
+      document.querySelectorAll('.spark').forEach(c => {
+        const el = c as HTMLCanvasElement;
+        drawSparkline(el, el.dataset.spark!.split(',').map(Number), el.dataset.color!);
+      });
+    }
+
+    function renderTransactions() {
+      const names = ['Nguyễn V.A', 'Trần T.B', 'Lê M.C', 'Phạm K.D', 'Hoàng N.E'];
+      const products = ['Khóa học Web', 'Khóa học Python', 'CodeLab Pro', 'AI Tutor', 'Marketplace'];
+      const txs = Array.from({length: 8 }, () => ({
+        name: names[Math.floor(Math.random()*names.length)],
+        product: products[Math.floor(Math.random()*products.length)],
+        amount: Math.floor(Math.random()*5000000) + 500000,
+        time: new Date().toLocaleTimeString('vi-VN'),
+      }));
+      document.getElementById('transactions')!.innerHTML = txs.map(t => `
+        <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid #f0f0f0">
+          <div><span style="font-weight:600">${t.name}</span><br><span style="color:#999;font-size:0.75rem">${t.product}</span></div>
+          <div style="text-align:right"><span style="font-weight:600;color:#20A779">${new Intl.NumberFormat('vi-VN').format(t.amount)}₫</span><br><span style="color:#999;font-size:0.75rem">${t.time}</span></div>
+        </div>
+      `).join('');
+    }
+
+    function renderAll() {
+      const days = parseInt((document.getElementById('range') as HTMLSelectElement).value);
+      renderKPIs();
+      drawLineChart(document.getElementById('revenue-chart') as HTMLCanvasElement, genData(days));
+      drawDonut(document.getElementById('source-chart') as HTMLCanvasElement, [
+        { label: 'Organic', value: 45, color: '#20A779' },
+        { label: 'Social', value: 25, color: '#00A8CC' },
+        { label: 'Direct', value: 20, color: '#6C5CE7' },
+        { label: 'Referral', value: 10, color: '#FFC857' },
+      ]);
+      drawBarChart(document.getElementById('products-chart') as HTMLCanvasElement, [
+        { label: 'Web', value: 320 }, { label: 'Python', value: 280 }, { label: 'AI', value: 190 }, { label: 'Game', value: 150 }, { label: 'Mobile', value: 100 },
+      ]);
+      renderTransactions();
+    }
+
+    document.getElementById('range')!.addEventListener('change', renderAll);
+    document.getElementById('export-csv-btn')!.addEventListener('click', () => {
+      const days = parseInt((document.getElementById('range') as HTMLSelectElement).value);
+      const data = genData(days);
+      const csv = 'Date,Revenue\n' + data.map(d => `${d.date},${d.value}`).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'analytics.csv'; a.click();
+    });
+
+    renderAll();
+    // Auto-refresh
+    setInterval(renderTransactions, 5000);
+  </script>
+</ProductLayout>

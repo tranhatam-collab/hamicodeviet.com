@@ -1,0 +1,417 @@
+---
+import ProductLayout from '../../layouts/ProductLayout.astro';
+---
+<ProductLayout
+  title="Landing Page Generator"
+  ageGroup="18-24"
+  ageColor="#E17055"
+  productType="Sản phẩm"
+  description="Tạo landing page từ template, xuất HTML"
+>
+  <style is:global>
+    .lg-wrap{display:grid;grid-template-columns:380px 1fr;gap:0;height:calc(100vh - 130px);min-height:600px}
+    @media(max-width:980px){.lg-wrap{grid-template-columns:1fr;height:auto}}
+    .lg-panel{background:#fff;border-right:1px solid #e2e8f0;overflow-y:auto;padding:1.25rem}
+    .lg-panel h3{font-size:0.8rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;margin:1.25rem 0 0.5rem;font-weight:700}
+    .lg-panel label{display:block;font-size:0.78rem;font-weight:600;color:#334155;margin-bottom:0.25rem}
+    .lg-panel input,.lg-panel textarea,.lg-panel select{width:100%;padding:0.5rem 0.6rem;border:1px solid #cbd5e1;border-radius:6px;font-size:0.85rem;font-family:inherit;background:#fff;color:#0f172a;margin-bottom:0.5rem;box-sizing:border-box}
+    .lg-panel textarea{resize:vertical;min-height:60px}
+    .lg-tabs{display:flex;gap:0.25rem;margin-bottom:0.75rem}
+    .lg-tabs button{flex:1;padding:0.5rem;border:1px solid #cbd5e1;background:#fff;color:#475569;border-radius:6px;cursor:pointer;font-size:0.8rem;font-weight:600}
+    .lg-tabs button.active{background:#E17055;color:#fff;border-color:#E17055}
+    .lg-feat-row{display:flex;gap:0.4rem;margin-bottom:0.4rem;align-items:center}
+    .lg-feat-row input{flex:1;margin-bottom:0}
+    .lg-feat-row button{background:#fee2e2;color:#dc2626;border:none;width:30px;height:30px;border-radius:6px;cursor:pointer;font-weight:700}
+    .lg-add-btn{background:#fef3c7;color:#92400e;border:1px dashed #fbbf24;padding:0.4rem;border-radius:6px;cursor:pointer;font-size:0.78rem;width:100%;font-weight:600}
+    .lg-preview-wrap{display:flex;flex-direction:column;background:#f1f5f9;overflow:hidden}
+    .lg-preview-bar{display:flex;gap:0.5rem;padding:0.5rem;background:#fff;border-bottom:1px solid #e2e8f0;align-items:center}
+    .lg-preview-bar button{padding:0.4rem 0.8rem;border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:6px;cursor:pointer;font-size:0.78rem;font-weight:600}
+    .lg-preview-bar button.active{background:#0f172a;color:#fff;border-color:#0f172a}
+    .lg-iframe-wrap{flex:1;position:relative;overflow:hidden}
+    .lg-iframe-wrap iframe{width:100%;height:100%;border:none;background:#fff}
+    .lg-code-view{flex:1;overflow:auto;background:#0f172a;color:#e2e8f0;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:0.78rem;white-space:pre;white-space:pre-wrap;word-break:break-word}
+    .lg-color-row{display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem}
+    .lg-color-row input[type=color]{width:40px;height:34px;border:1px solid #cbd5e1;border-radius:6px;cursor:pointer;padding:2px;background:#fff}
+    .lg-mode-toggle{display:flex;gap:0.25rem}
+    .lg-mode-toggle button{padding:0.4rem 0.7rem;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;font-size:0.78rem;font-weight:600}
+    .lg-mode-toggle button.active{background:#0f172a;color:#fff}
+    .lg-download-btn{background:#20A779;color:#fff;border:none;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;font-weight:700;font-size:0.85rem;margin-left:auto}
+    .lg-hint{font-size:0.72rem;color:#94a3b8;margin:0 0 0.5rem}
+  </style>
+  <div class="lg-wrap">
+    <div class="lg-panel">
+      <div class="lg-tabs">
+        <button data-tpl="saas" class="active">SaaS</button>
+        <button data-tpl="launch">Product Launch</button>
+        <button data-tpl="course">Course</button>
+      </div>
+
+      <h3>Nội dung / Content</h3>
+      <label>Tên sản phẩm / Product name</label>
+      <input id="f-name" value="FlowTask" />
+      <label>Slogan / Tagline</label>
+      <input id="f-tagline" value="Quản lý công việc, đơn giản hơn bao giờ hết" />
+      <label>Mô tả / Description</label>
+      <textarea id="f-desc">FlowTask giúp đội ngũ của bạn lập kế hoạch, theo dõi và hoàn thành công việc nhanh hơn với tự động hóa thông minh.</textarea>
+
+      <h3>Tính năng / Features</h3>
+      <p class="lg-hint">Mỗi dòng 1 tính năng / One feature per line</p>
+      <div id="f-features"></div>
+      <button class="lg-add-btn" id="f-add-feature">+ Thêm tính năng</button>
+
+      <h3>Giá / Pricing Tiers</h3>
+      <div id="f-pricing"></div>
+      <button class="lg-add-btn" id="f-add-pricing">+ Thêm gói giá</button>
+
+      <h3>Đánh giá / Testimonials</h3>
+      <div id="f-testimonials"></div>
+      <button class="lg-add-btn" id="f-add-testi">+ Thêm đánh giá</button>
+
+      <h3>FAQ</h3>
+      <div id="f-faq"></div>
+      <button class="lg-add-btn" id="f-add-faq">+ Thêm câu hỏi</button>
+
+      <h3>Call to Action</h3>
+      <label>Text CTA</label>
+      <input id="f-cta-text" value="Dùng thử miễn phí" />
+      <label>Link CTA</label>
+      <input id="f-cta-link" value="https://example.com/signup" />
+
+      <h3>Giao diện / Theme</h3>
+      <label>Màu chính / Primary color</label>
+      <div class="lg-color-row">
+        <input type="color" id="f-color" value="#E17055" />
+        <div class="lg-mode-toggle">
+          <button id="f-light" class="active">Light</button>
+          <button id="f-dark">Dark</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg-preview-wrap">
+      <div class="lg-preview-bar">
+        <button id="view-preview" class="active">Preview</button>
+        <button id="view-code">HTML Code</button>
+        <button class="lg-download-btn" id="btn-download">⬇ Tải .html / Download</button>
+      </div>
+      <div class="lg-iframe-wrap" id="iframe-wrap">
+        <iframe id="preview-iframe" title="Landing preview"></iframe>
+      </div>
+      <div class="lg-code-view" id="code-view" style="display:none"></div>
+    </div>
+  </div>
+</ProductLayout>
+
+<script type="module">
+  const $ = (s) => document.querySelector(s);
+  const state = {
+    template: 'saas',
+    name: 'FlowTask',
+    tagline: 'Quản lý công việc, đơn giản hơn bao giờ hết',
+    desc: 'FlowTask giúp đội ngũ của bạn lập kế hoạch, theo dõi và hoàn thành công việc nhanh hơn với tự động hóa thông minh.',
+    features: ['Tự động hóa quy trình làm việc', 'Bảng Kanban trực quan', 'Báo cáo real-time', 'Tích hợp 100+ ứng dụng'],
+    pricing: [
+      { name: 'Starter', price: '0', period: '/mo', features: '5 users, 3 projects', popular: false },
+      { name: 'Pro', price: '12', period: '/mo', features: 'Unlimited users, all features', popular: true },
+      { name: 'Enterprise', price: '49', period: '/mo', features: 'SSO, SLA, dedicated support', popular: false },
+    ],
+    testimonials: [
+      { name: 'Nguyễn Văn A', role: 'CEO, TechStart', text: 'FlowTask đã tăng năng suất đội ngũ chúng tôi lên 40%.' },
+      { name: 'Sarah Chen', role: 'PM, LaunchLab', text: 'Best project management tool I have ever used.' },
+    ],
+    faq: [
+      { q: 'Có dùng thử miễn phí không?', a: 'Có, bạn được 14 ngày dùng thử tất cả tính năng Pro.' },
+      { q: 'Is there a free trial?', a: 'Yes, you get 14 days of Pro features for free.' },
+    ],
+    ctaText: 'Dùng thử miễn phí',
+    ctaLink: 'https://example.com/signup',
+    color: '#E17055',
+    mode: 'light',
+  };
+
+  const tplDefaults = {
+    saas: { name: 'FlowTask', tagline: 'Quản lý công việc, đơn giản hơn bao giờ hết', desc: 'FlowTask giúp đội ngũ của bạn lập kế hoạch, theo dõi và hoàn thành công việc nhanh hơn với tự động hóa thông minh.', ctaText: 'Dùng thử miễn phí' },
+    launch: { name: 'Nimbus One', tagline: 'Thiết bị nghe nhạc thế hệ mới', desc: 'Nimbus One mang đến trải nghiệm âm thanh không dây đỉnh cao với công nghệ khử tiếng ồn AI.', ctaText: 'Đặt trước ngay' },
+    course: { name: 'Code Mastery 2024', tagline: 'Khóa học lập trình full-stack từ zero đến hero', desc: '12 tuần học intensively, 1-on-1 mentor, dự án thật, chứng chỉ nghề. Trở thành developer trong 3 tháng.', ctaText: 'Đăng ký khóa học' },
+  };
+
+  // --- Render dynamic form rows ---
+  function renderFeatures() {
+    const c = $('#f-features');
+    c.innerHTML = '';
+    state.features.forEach((f, i) => {
+      const row = document.createElement('div');
+      row.className = 'lg-feat-row';
+      const inp = document.createElement('input');
+      inp.value = f;
+      inp.oninput = (e) => { state.features[i] = e.target.value; update(); };
+      const del = document.createElement('button');
+      del.textContent = '×';
+      del.onclick = () => { state.features.splice(i, 1); renderFeatures(); update(); };
+      row.appendChild(inp); row.appendChild(del);
+      c.appendChild(row);
+    });
+  }
+  function renderPricing() {
+    const c = $('#f-pricing');
+    c.innerHTML = '';
+    state.pricing.forEach((p, i) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'border:1px solid #e2e8f0;border-radius:8px;padding:0.5rem;margin-bottom:0.5rem';
+      row.innerHTML = `
+        <div style="display:flex;gap:0.4rem;margin-bottom:0.3rem">
+          <input placeholder="Tên gói" value="${p.name}" style="flex:1;margin-bottom:0" data-k="name">
+          <input placeholder="Giá" value="${p.price}" style="width:70px;margin-bottom:0" data-k="price">
+          <input placeholder="/mo" value="${p.period}" style="width:50px;margin-bottom:0" data-k="period">
+        </div>
+        <input placeholder="Tính năng gói" value="${p.features}" style="margin-bottom:0.3rem" data-k="features">
+        <label style="font-size:0.75rem;display:flex;align-items:center;gap:0.3rem;cursor:pointer">
+          <input type="checkbox" ${p.popular ? 'checked' : ''} data-k="popular" style="width:auto;margin:0"> Gói nổi bật
+        </label>
+        <button style="margin-top:0.3rem" class="lg-add-btn" data-del="1">× Xóa gói</button>
+      `;
+      row.querySelectorAll('input').forEach(inp => {
+        inp.oninput = (e) => {
+          const k = e.target.dataset.k;
+          if (k === 'popular') state.pricing[i].popular = e.target.checked;
+          else state.pricing[i][k] = e.target.value;
+          update();
+        };
+      });
+      row.querySelector('[data-del]').onclick = () => { state.pricing.splice(i, 1); renderPricing(); update(); };
+      c.appendChild(row);
+    });
+  }
+  function renderTestimonials() {
+    const c = $('#f-testimonials');
+    c.innerHTML = '';
+    state.testimonials.forEach((t, i) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'border:1px solid #e2e8f0;border-radius:8px;padding:0.5rem;margin-bottom:0.5rem';
+      row.innerHTML = `
+        <input placeholder="Tên khách hàng" value="${t.name}" style="margin-bottom:0.3rem" data-k="name">
+        <input placeholder="Vai trò" value="${t.role}" style="margin-bottom:0.3rem" data-k="role">
+        <textarea placeholder="Nội dung đánh giá" style="min-height:40px" data-k="text">${t.text}</textarea>
+        <button class="lg-add-btn" data-del="1">× Xóa</button>
+      `;
+      row.querySelectorAll('input,textarea').forEach(inp => {
+        inp.oninput = (e) => { state.testimonials[i][e.target.dataset.k] = e.target.value; update(); };
+      });
+      row.querySelector('[data-del]').onclick = () => { state.testimonials.splice(i, 1); renderTestimonials(); update(); };
+      c.appendChild(row);
+    });
+  }
+  function renderFaq() {
+    const c = $('#f-faq');
+    c.innerHTML = '';
+    state.faq.forEach((item, i) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'border:1px solid #e2e8f0;border-radius:8px;padding:0.5rem;margin-bottom:0.5rem';
+      row.innerHTML = `
+        <input placeholder="Câu hỏi" value="${item.q}" style="margin-bottom:0.3rem" data-k="q">
+        <textarea placeholder="Câu trả lời" style="min-height:40px" data-k="a">${item.a}</textarea>
+        <button class="lg-add-btn" data-del="1">× Xóa</button>
+      `;
+      row.querySelectorAll('input,textarea').forEach(inp => {
+        inp.oninput = (e) => { state.faq[i][e.target.dataset.k] = e.target.value; update(); };
+      });
+      row.querySelector('[data-del]').onclick = () => { state.faq.splice(i, 1); renderFaq(); update(); };
+      c.appendChild(row);
+    });
+  }
+
+  // --- Generate HTML ---
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function generateHTML() {
+    const dark = state.mode === 'dark';
+    const bg = dark ? '#0f172a' : '#ffffff';
+    const bgAlt = dark ? '#1e293b' : '#f8fafc';
+    const text = dark ? '#e2e8f0' : '#1e293b';
+    const textMuted = dark ? '#94a3b8' : '#64748b';
+    const cardBg = dark ? '#1e293b' : '#ffffff';
+    const border = dark ? '#334155' : '#e2e8f0';
+    const c = state.color;
+    const cLight = c + '22';
+
+    let featuresHTML = state.features.filter(f => f.trim()).map(f => `
+      <div style="display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:1rem">
+        <div style="min-width:28px;width:28px;height:28px;background:${c};border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.8rem">✓</div>
+        <div style="font-size:1rem;color:${text}">${esc(f)}</div>
+      </div>`).join('');
+
+    let pricingHTML = state.pricing.map(p => `
+      <div style="flex:1;min-width:200px;background:${cardBg};border:${p.popular ? `2px solid ${c}` : `1px solid ${border}`};border-radius:12px;padding:1.5rem;text-align:center;position:relative">
+        ${p.popular ? `<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:${c};color:#fff;padding:0.2rem 0.8rem;border-radius:20px;font-size:0.7rem;font-weight:700">Phổ biến</div>` : ''}
+        <div style="font-size:1.1rem;font-weight:700;color:${text};margin-bottom:0.5rem">${esc(p.name)}</div>
+        <div style="font-size:2.2rem;font-weight:800;color:${c};margin-bottom:0.25rem">$${esc(p.price)}<span style="font-size:0.9rem;color:${textMuted};font-weight:400">${esc(p.period)}</span></div>
+        <div style="font-size:0.85rem;color:${textMuted};margin-bottom:1rem">${esc(p.features)}</div>
+        <a href="${esc(state.ctaLink)}" style="display:block;background:${p.popular ? c : 'transparent'};color:${p.popular ? '#fff' : c};border:1px solid ${c};padding:0.6rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:0.85rem">Chọn gói</a>
+      </div>`).join('');
+
+    let testiHTML = state.testimonials.map(t => `
+      <div style="background:${cardBg};border:1px solid ${border};border-radius:12px;padding:1.5rem;flex:1;min-width:250px">
+        <div style="color:${c};font-size:1.5rem;margin-bottom:0.5rem">"</div>
+        <p style="color:${text};font-size:0.95rem;line-height:1.6;margin:0 0 1rem">${esc(t.text)}</p>
+        <div style="font-weight:700;color:${text};font-size:0.9rem">${esc(t.name)}</div>
+        <div style="color:${textMuted};font-size:0.8rem">${esc(t.role)}</div>
+      </div>`).join('');
+
+    let faqHTML = state.faq.map(item => `
+      <details style="border-bottom:1px solid ${border};padding:1rem 0">
+        <summary style="font-weight:600;color:${text};cursor:pointer;font-size:1rem">${esc(item.q)}</summary>
+        <p style="color:${textMuted};margin:0.5rem 0 0;line-height:1.6;font-size:0.9rem">${esc(item.a)}</p>
+      </details>`).join('');
+
+    const heroBadge = state.template === 'launch' ? '🚀 Sắp ra mắt' : state.template === 'course' ? '🎓 Khóa học mới' : '⚡ SaaS Platform';
+    const heroImg = state.template === 'launch'
+      ? `<div style="margin-top:2rem;background:${cLight};border-radius:12px;padding:2rem;text-align:center;font-size:3rem">📱</div>`
+      : state.template === 'course'
+      ? `<div style="margin-top:2rem;background:${cLight};border-radius:12px;padding:2rem;text-align:center;font-size:3rem">💻</div>`
+      : `<div style="margin-top:2rem;background:${cLight};border-radius:12px;padding:2rem;text-align:center;font-size:3rem">📊</div>`;
+
+    return `<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(state.name)} — ${esc(state.tagline)}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:${bg};color:${text};line-height:1.6}
+  .container{max-width:1100px;margin:0 auto;padding:0 1.5rem}
+  nav{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;max-width:1100px;margin:0 auto}
+  .logo{font-size:1.3rem;font-weight:800;color:${text}}
+  .logo span{color:${c}}
+  nav a{color:${textMuted};text-decoration:none;margin-left:1.5rem;font-size:0.9rem}
+  .hero{text-align:center;padding:3rem 1.5rem 2rem}
+  .badge{display:inline-block;background:${cLight};color:${c};padding:0.3rem 1rem;border-radius:20px;font-size:0.8rem;font-weight:600;margin-bottom:1rem}
+  .hero h1{font-size:2.8rem;font-weight:800;margin-bottom:1rem;line-height:1.2}
+  .hero p{font-size:1.15rem;color:${textMuted};max-width:600px;margin:0 auto 1.5rem}
+  .btn{display:inline-block;background:${c};color:#fff;padding:0.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:700;font-size:1rem}
+  .section{padding:3rem 1.5rem}
+  .section h2{text-align:center;font-size:2rem;margin-bottom:0.5rem}
+  .section .sub{text-align:center;color:${textMuted};margin-bottom:2rem}
+  .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;max-width:900px;margin:0 auto}
+  .pricing-wrap{display:flex;flex-wrap:wrap;gap:1.5rem;justify-content:center;max-width:900px;margin:0 auto}
+  .testi-wrap{display:flex;flex-wrap:wrap;gap:1.5rem;justify-content:center;max-width:900px;margin:0 auto}
+  .faq{max-width:700px;margin:0 auto}
+  footer{background:${bgAlt};text-align:center;padding:2rem 1.5rem;color:${textMuted};font-size:0.85rem}
+  @media(max-width:600px){.hero h1{font-size:2rem}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">${esc(state.name)}<span>.</span></div>
+  <div><a href="#features">Tính năng</a><a href="#pricing">Giá</a><a href="#faq">FAQ</a></div>
+</nav>
+<section class="hero container">
+  <div class="badge">${heroBadge}</div>
+  <h1>${esc(state.tagline)}</h1>
+  <p>${esc(state.desc)}</p>
+  <a href="${esc(state.ctaLink)}" class="btn">${esc(state.ctaText)}</a>
+  ${heroImg}
+</section>
+${featuresHTML ? `<section class="section" id="features" style="background:${bgAlt}">
+  <div class="container">
+    <h2>Tính năng nổi bật</h2>
+    <p class="sub">Mọi thứ bạn cần trong một nền tảng</p>
+    <div class="features">${featuresHTML}</div>
+  </div>
+</section>` : ''}
+${pricingHTML ? `<section class="section" id="pricing">
+  <div class="container">
+    <h2>Bảng giá</h2>
+    <p class="sub">Chọn gói phù hợp với bạn</p>
+    <div class="pricing-wrap">${pricingHTML}</div>
+  </div>
+</section>` : ''}
+${testiHTML ? `<section class="section" style="background:${bgAlt}">
+  <div class="container">
+    <h2>Khách hàng nói gì</h2>
+    <p class="sub">Hàng nghìn đội ngũ tin tưởng ${esc(state.name)}</p>
+    <div class="testi-wrap">${testiHTML}</div>
+  </div>
+</section>` : ''}
+${faqHTML ? `<section class="section" id="faq">
+  <div class="container">
+    <h2>Câu hỏi thường gặp</h2>
+    <div class="faq">${faqHTML}</div>
+  </div>
+</section>` : ''}
+<section class="section" style="text-align:center;background:${c}">
+  <div class="container">
+    <h2 style="color:#fff;margin-bottom:0.5rem">Sẵn sàng bắt đầu?</h2>
+    <p style="color:rgba(255,255,255,0.85);margin-bottom:1.5rem">Tham gia cùng hàng nghìn người dùng ${esc(state.name)}</p>
+    <a href="${esc(state.ctaLink)}" style="display:inline-block;background:#fff;color:${c};padding:0.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:700;font-size:1rem">${esc(state.ctaText)}</a>
+  </div>
+</section>
+<footer>© 2024 ${esc(state.name)}. All rights reserved.</footer>
+</body>
+</html>`;
+  }
+
+  let debounceTimer;
+  function update() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const html = generateHTML();
+      const iframe = $('#preview-iframe');
+      iframe.srcdoc = html;
+      $('#code-view').textContent = html;
+    }, 200);
+  }
+
+  // --- Event bindings ---
+  document.querySelectorAll('.lg-tabs button').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.lg-tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.template = btn.dataset.tpl;
+      const d = tplDefaults[state.template];
+      state.name = d.name; state.tagline = d.tagline; state.desc = d.desc; state.ctaText = d.ctaText;
+      $('#f-name').value = d.name;
+      $('#f-tagline').value = d.tagline;
+      $('#f-desc').value = d.desc;
+      $('#f-cta-text').value = d.ctaText;
+      update();
+    };
+  });
+
+  $('#f-name').oninput = (e) => { state.name = e.target.value; update(); };
+  $('#f-tagline').oninput = (e) => { state.tagline = e.target.value; update(); };
+  $('#f-desc').oninput = (e) => { state.desc = e.target.value; update(); };
+  $('#f-cta-text').oninput = (e) => { state.ctaText = e.target.value; update(); };
+  $('#f-cta-link').oninput = (e) => { state.ctaLink = e.target.value; update(); };
+  $('#f-color').oninput = (e) => { state.color = e.target.value; update(); };
+
+  $('#f-light').onclick = () => { state.mode = 'light'; $('#f-light').classList.add('active'); $('#f-dark').classList.remove('active'); update(); };
+  $('#f-dark').onclick = () => { state.mode = 'dark'; $('#f-dark').classList.add('active'); $('#f-light').classList.remove('active'); update(); };
+
+  $('#f-add-feature').onclick = () => { state.features.push('Tính năng mới'); renderFeatures(); update(); };
+  $('#f-add-pricing').onclick = () => { state.pricing.push({ name: 'New', price: '9', period: '/mo', features: 'Features here', popular: false }); renderPricing(); update(); };
+  $('#f-add-testi').onclick = () => { state.testimonials.push({ name: 'Khách hàng', role: 'Role', text: 'Đánh giá...' }); renderTestimonials(); update(); };
+  $('#f-add-faq').onclick = () => { state.faq.push({ q: 'Câu hỏi mới?', a: 'Câu trả lời.' }); renderFaq(); update(); };
+
+  $('#view-preview').onclick = () => {
+    $('#view-preview').classList.add('active'); $('#view-code').classList.remove('active');
+    $('#iframe-wrap').style.display = ''; $('#code-view').style.display = 'none';
+  };
+  $('#view-code').onclick = () => {
+    $('#view-code').classList.add('active'); $('#view-preview').classList.remove('active');
+    $('#code-view').style.display = ''; $('#iframe-wrap').style.display = 'none';
+  };
+
+  $('#btn-download').onclick = () => {
+    const html = generateHTML();
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${state.name.toLowerCase().replace(/\s+/g, '-')}-landing.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Init
+  renderFeatures(); renderPricing(); renderTestimonials(); renderFaq();
+  update();
+</script>

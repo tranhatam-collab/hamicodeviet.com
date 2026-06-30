@@ -1,0 +1,90 @@
+---
+import ProductLayout from '../../layouts/ProductLayout.astro';
+---
+
+<ProductLayout title="Markdown → PDF" ageGroup="16-20" ageColor="#6C5CE7" productType="Sản phẩm" description="Viết Markdown, xuất PDF đẹp">
+  <div style="padding:1.5rem;max-width:1000px;margin:0 auto">
+    <div style="display:flex;gap:0.5rem;margin-bottom:1rem;justify-content:center">
+      <button id="export-pdf-btn" style="padding:0.5rem 1rem;background:#6C5CE7;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">📄 Xuất PDF</button>
+      <button id="export-html-btn" style="padding:0.5rem 1rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">📥 Tải HTML</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;height:600px">
+      <div style="display:flex;flex-direction:column">
+        <div style="background:#f0f0f0;padding:0.5rem 1rem;border-radius:8px 8px 0 0;font-size:0.85rem;font-weight:600">📝 Markdown Editor</div>
+        <textarea id="md-input" style="flex:1;padding:1rem;border:1px solid #ddd;border-radius:0 0 8px 8px;font-family:'JetBrains Mono',monospace;font-size:0.9rem;line-height:1.6;resize:none" spellcheck="false"># Tiêu đề lớn / Heading 1
+
+## Tiêu đề vừa / Heading 2
+
+Đây là **chữ đậm** và *chữ nghiêng*.
+
+### Danh sách / List
+- Mục 1
+- Mục 2
+- Mục 3
+
+### Code block
+```javascript
+function hello() {
+  console.log("Hello, HaMi!");
+}
+```
+
+### Bảng / Table
+| Tên | Tuổi |
+|-----|------|
+| An  | 12   |
+| Bình | 14  |
+
+> Đây là blockquote / This is a quote
+
+[Link đến HaMi](https://hamicodeviet.com)</textarea>
+      </div>
+      <div style="display:flex;flex-direction:column">
+        <div style="background:#f0f0f0;padding:0.5rem 1rem;border-radius:8px 8px 0 0;font-size:0.85rem;font-weight:600">👁️ Preview</div>
+        <div id="preview" style="flex:1;padding:1.5rem;border:1px solid #ddd;border-radius:0 0 8px 8px;overflow-y:auto;background:white;line-height:1.7"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <script type="module">
+    const input = document.getElementById('md-input') as HTMLTextAreaElement;
+    const preview = document.getElementById('preview')!;
+
+    function render() {
+      const md = input.value;
+      const html = (window as any).marked.parse(md);
+      preview.innerHTML = html;
+      // Style elements
+      preview.querySelectorAll('h1').forEach((el: any) => el.style.cssText = 'font-size:1.8rem;border-bottom:2px solid #6C5CE7;padding-bottom:0.3rem');
+      preview.querySelectorAll('h2').forEach((el: any) => el.style.cssText = 'font-size:1.4rem;color:#6C5CE7');
+      preview.querySelectorAll('h3').forEach((el: any) => el.style.cssText = 'font-size:1.1rem;color:#102A43');
+      preview.querySelectorAll('code').forEach((el: any) => { if (el.tagName === 'CODE') { el.style.cssText = 'background:#f0f0f0;padding:0.15rem 0.4rem;border-radius:3px;font-family:monospace;font-size:0.85rem'; } });
+      preview.querySelectorAll('pre').forEach((el: any) => el.style.cssText = 'background:#081826;color:#0f0;padding:1rem;border-radius:8px;overflow-x:auto');
+      preview.querySelectorAll('pre code').forEach((el: any) => { el.style.cssText = 'background:none;color:inherit'; });
+      preview.querySelectorAll('table').forEach((el: any) => el.style.cssText = 'border-collapse:collapse;width:100%');
+      preview.querySelectorAll('th,td').forEach((el: any) => el.style.cssText = 'border:1px solid #ddd;padding:0.5rem;text-align:left');
+      preview.querySelectorAll('th').forEach((el: any) => el.style.background = '#f0f0f0');
+      preview.querySelectorAll('blockquote').forEach((el: any) => el.style.cssText = 'border-left:4px solid #6C5CE7;padding-left:1rem;color:#666;font-style:italic');
+      preview.querySelectorAll('a').forEach((el: any) => el.style.color = '#6C5CE7');
+    }
+
+    input.addEventListener('input', render);
+
+    document.getElementById('export-pdf-btn')!.addEventListener('click', () => {
+      const printWin = window.open('', '_blank');
+      if (!printWin) return;
+      printWin.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Document</title><style>body{font-family:Inter,sans-serif;max-width:700px;margin:2rem auto;padding:1rem;line-height:1.7;color:#102A43}h1{font-size:1.8rem;border-bottom:2px solid #6C5CE7;padding-bottom:0.3rem}h2{font-size:1.4rem;color:#6C5CE7}h3{font-size:1.1rem}code{background:#f0f0f0;padding:0.15rem 0.4rem;border-radius:3px;font-family:monospace}pre{background:#081826;color:#0f0;padding:1rem;border-radius:8px;overflow-x:auto}pre code{background:none;color:inherit}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:0.5rem;text-align:left}th{background:#f0f0f0}blockquote{border-left:4px solid #6C5CE7;padding-left:1rem;color:#666;font-style:italic}a{color:#6C5CE7}</style></head><body>${preview.innerHTML}</body></html>`);
+      printWin.document.close();
+      setTimeout(() => { printWin.print(); }, 500);
+    });
+
+    document.getElementById('export-html-btn')!.addEventListener('click', () => {
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Document</title><style>body{font-family:Inter,sans-serif;max-width:700px;margin:2rem auto;padding:1rem;line-height:1.7;color:#102A43}h1{font-size:1.8rem;border-bottom:2px solid #6C5CE7;padding-bottom:0.3rem}h2{font-size:1.4rem;color:#6C5CE7}code{background:#f0f0f0;padding:0.15rem 0.4rem;border-radius:3px}pre{background:#081826;color:#0f0;padding:1rem;border-radius:8px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:0.5rem}th{background:#f0f0f0}</style></head><body>${preview.innerHTML}</body></html>`;
+      const blob = new Blob([html], { type: 'text/html' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'document.html'; a.click();
+    });
+
+    render();
+  </script>
+</ProductLayout>

@@ -1,0 +1,488 @@
+---
+import ProductLayout from '../../layouts/ProductLayout.astro';
+---
+
+<ProductLayout
+  title="Meme Generator"
+  ageGroup="11-13"
+  ageColor="#00A8CC"
+  productType="Hình ảnh"
+  description="Tạo meme từ ảnh + chữ, tải xuống PNG"
+>
+  <div class="mm-wrap">
+    <div class="mm-toolbar">
+      <div class="mm-section">
+        <h3 data-vi>Ảnh nguồn</h3>
+        <h3 data-en>Source image</h3>
+        <div class="mm-template-grid" id="mm-templates"></div>
+        <label class="mm-btn mm-btn-upload">
+          <span data-vi>⬆ Tải ảnh lên</span>
+          <span data-en>⬆ Upload image</span>
+          <input type="file" id="mm-file" accept="image/*" hidden />
+        </label>
+      </div>
+
+      <div class="mm-section">
+        <h3 data-vi>Chữ trên</h3>
+        <h3 data-en>Top text</h3>
+        <input type="text" id="mm-top" placeholder="TOP TEXT / CHỮ TRÊN" maxlength="80" />
+        <h3 data-vi>Chữ dưới</h3>
+        <h3 data-en>Bottom text</h3>
+        <input type="text" id="mm-bottom" placeholder="BOTTOM TEXT / CHỮ DƯỚI" maxlength="80" />
+
+        <h3 data-vi>Cỡ chữ</h3>
+        <h3 data-en>Font size</h3>
+        <div class="mm-row">
+          <input type="range" id="mm-size" min="20" max="120" value="48" />
+          <span id="mm-size-val" class="mm-val">48</span>
+        </div>
+
+        <h3 data-vi>Màu chữ</h3>
+        <h3 data-en>Text color</h3>
+        <div class="mm-row">
+          <input type="color" id="mm-color" value="#ffffff" />
+          <label class="mm-check">
+            <input type="checkbox" id="mm-stroke" checked />
+            <span data-vi>Viền đen</span>
+            <span data-en>Black outline</span>
+          </label>
+        </div>
+
+        <h3 data-vi>Vị trí chữ</h3>
+        <h3 data-en>Text position</h3>
+        <p class="mm-hint" data-vi>Kéo chữ trên canvas để di chuyển</p>
+        <p class="mm-hint" data-en>Drag text on canvas to reposition</p>
+        <button class="mm-btn mm-btn-ghost" id="mm-reset-pos">
+          <span data-vi>↺ Đặt lại vị trí</span>
+          <span data-en>↺ Reset position</span>
+        </button>
+      </div>
+
+      <div class="mm-section">
+        <h3 data-vi>Xuất file</h3>
+        <h3 data-en>Export</h3>
+        <button class="mm-btn mm-btn-primary" id="mm-download">
+          <span data-vi>⬇ Tải PNG</span>
+          <span data-en>⬇ Download PNG</span>
+        </button>
+        <button class="mm-btn mm-btn-ghost" id="mm-clear">
+          <span data-vi>🗑 Xoá chữ</span>
+          <span data-en>🗑 Clear text</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mm-canvas-wrap">
+      <canvas id="mm-canvas" width="600" height="600"></canvas>
+      <div class="mm-status" id="mm-status">
+        <span data-vi>Chọn ảnh mẫu hoặc tải ảnh lên để bắt đầu</span>
+        <span data-en>Pick a template or upload an image to start</span>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .mm-wrap {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    @media (max-width: 900px) {
+      .mm-wrap { grid-template-columns: 1fr; }
+    }
+    .mm-toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .mm-section {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1rem;
+    }
+    .mm-section h3 {
+      margin: 0 0 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #475569;
+    }
+    .mm-section h3 + h3 { display: none; }
+    html[data-lang='en'] .mm-section h3[data-vi] { display: none; }
+    html[data-lang='vi'] .mm-section h3[data-en] { display: none; }
+    .mm-section input[type='text'],
+    .mm-section input[type='number'] {
+      width: 100%;
+      padding: 0.55rem 0.7rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .mm-section input[type='text']:focus {
+      outline: 2px solid #00a8cc;
+      border-color: #00a8cc;
+    }
+    .mm-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .mm-row input[type='range'] { flex: 1; }
+    .mm-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #00a8cc;
+      min-width: 2.5rem;
+      text-align: right;
+    }
+    .mm-check {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .mm-check span { color: #475569; }
+    html[data-lang='en'] .mm-check span[data-vi] { display: none; }
+    html[data-lang='vi'] .mm-check span[data-en] { display: none; }
+    .mm-hint {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin: 0 0 0.5rem;
+    }
+    html[data-lang='en'] .mm-hint[data-vi] { display: none; }
+    html[data-lang='vi'] .mm-hint[data-en] { display: none; }
+    .mm-template-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .mm-template {
+      aspect-ratio: 1;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      background: #f1f5f9;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .mm-template:hover { transform: scale(1.04); }
+    .mm-template.active { border-color: #00a8cc; }
+    .mm-template img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .mm-btn {
+      width: 100%;
+      padding: 0.6rem 0.9rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      display: block;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .mm-btn:last-child { margin-bottom: 0; }
+    .mm-btn:active { transform: scale(0.97); }
+    html[data-lang='en'] .mm-btn span[data-vi] { display: none; }
+    html[data-lang='vi'] .mm-btn span[data-en] { display: none; }
+    .mm-btn-primary { background: #00a8cc; color: white; }
+    .mm-btn-primary:hover { background: #008fb0; }
+    .mm-btn-upload { background: #102a43; color: white; cursor: pointer; }
+    .mm-btn-upload:hover { background: #1e3a5f; }
+    .mm-btn-ghost { background: #f1f5f9; color: #475569; }
+    .mm-btn-ghost:hover { background: #e2e8f0; }
+    .mm-canvas-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    #mm-canvas {
+      max-width: 100%;
+      height: auto;
+      background: #0f172a;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      cursor: grab;
+      touch-action: none;
+    }
+    #mm-canvas:active { cursor: grabbing; }
+    .mm-status {
+      font-size: 0.85rem;
+      color: #64748b;
+      text-align: center;
+    }
+    html[data-lang='en'] .mm-status span[data-vi] { display: none; }
+    html[data-lang='vi'] .mm-status span[data-en] { display: none; }
+  </style>
+
+  <script type="module">
+    const canvas = document.getElementById('mm-canvas');
+    const ctx = canvas.getContext('2d');
+    const statusEl = document.getElementById('mm-status');
+    const topInput = document.getElementById('mm-top');
+    const bottomInput = document.getElementById('mm-bottom');
+    const sizeInput = document.getElementById('mm-size');
+    const sizeVal = document.getElementById('mm-size-val');
+    const colorInput = document.getElementById('mm-color');
+    const strokeCheck = document.getElementById('mm-stroke');
+    const fileInput = document.getElementById('mm-file');
+    const downloadBtn = document.getElementById('mm-download');
+    const clearBtn = document.getElementById('mm-clear');
+    const resetPosBtn = document.getElementById('mm-reset-pos');
+    const templatesEl = document.getElementById('mm-templates');
+
+    const TEMPLATES = [
+      { seed: 'doge42', label: 'Dog' },
+      { seed: 'cat77', label: 'Cat' },
+      { seed: 'monkey8', label: 'Monkey' },
+      { seed: 'wave12', label: 'Wave' },
+      { seed: 'city99', label: 'City' },
+      { seed: 'space3', label: 'Space' },
+    ];
+
+    const state = {
+      image: null,
+      topText: '',
+      bottomText: '',
+      fontSize: 48,
+      color: '#ffffff',
+      stroke: true,
+      topPos: { x: 0.5, y: 0.08 },
+      bottomPos: { x: 0.5, y: 0.92 },
+      dragging: null,
+      dragOffset: { x: 0, y: 0 },
+    };
+
+    // Build template thumbnails
+    TEMPLATES.forEach((t, i) => {
+      const div = document.createElement('div');
+      div.className = 'mm-template';
+      div.dataset.idx = i;
+      const img = document.createElement('img');
+      img.crossOrigin = 'anonymous';
+      img.src = `https://picsum.photos/seed/${t.seed}/120/120.jpg`;
+      div.appendChild(img);
+      div.addEventListener('click', () => loadTemplate(i));
+      templatesEl.appendChild(div);
+    });
+
+    function loadTemplate(i) {
+      const t = TEMPLATES[i];
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        state.image = img;
+        fitCanvas();
+        render();
+        document.querySelectorAll('.mm-template').forEach((el, idx) => {
+          el.classList.toggle('active', idx === i);
+        });
+        statusEl.querySelector('[data-vi]').textContent = 'Đã tải ảnh mẫu';
+        statusEl.querySelector('[data-en]').textContent = 'Template loaded';
+      };
+      img.onerror = () => {
+        statusEl.querySelector('[data-vi]').textContent = 'Lỗi tải ảnh — thử lại';
+        statusEl.querySelector('[data-en]').textContent = 'Load error — retry';
+      };
+      img.src = `https://picsum.photos/seed/${t.seed}/600/600.jpg`;
+    }
+
+    function fitCanvas() {
+      if (!state.image) return;
+      const maxW = 600;
+      const maxH = 600;
+      const ratio = state.image.width / state.image.height;
+      let w = maxW;
+      let h = w / ratio;
+      if (h > maxH) {
+        h = maxH;
+        w = h * ratio;
+      }
+      canvas.width = Math.round(w);
+      canvas.height = Math.round(h);
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (state.image) {
+        ctx.drawImage(state.image, 0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#64748b';
+        ctx.font = '16px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('No image / Chưa có ảnh', canvas.width / 2, canvas.height / 2);
+      }
+      drawText(state.topText, state.topPos);
+      drawText(state.bottomText, state.bottomPos);
+    }
+
+    function drawText(text, pos) {
+      if (!text) return;
+      const fs = state.fontSize;
+      ctx.font = `900 ${fs}px Impact, 'Arial Black', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      const x = pos.x * canvas.width;
+      const y = pos.y * canvas.height;
+      ctx.fillStyle = state.color;
+      ctx.lineJoin = 'round';
+      if (state.stroke) {
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = Math.max(2, fs / 12);
+        ctx.strokeText(text.toUpperCase(), x, y);
+      }
+      ctx.fillText(text.toUpperCase(), x, y);
+    }
+
+    // Inputs
+    topInput.addEventListener('input', (e) => {
+      state.topText = e.target.value;
+      render();
+    });
+    bottomInput.addEventListener('input', (e) => {
+      state.bottomText = e.target.value;
+      render();
+    });
+    sizeInput.addEventListener('input', (e) => {
+      state.fontSize = parseInt(e.target.value, 10);
+      sizeVal.textContent = state.fontSize;
+      render();
+    });
+    colorInput.addEventListener('input', (e) => {
+      state.color = e.target.value;
+      render();
+    });
+    strokeCheck.addEventListener('change', (e) => {
+      state.stroke = e.target.checked;
+      render();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          state.image = img;
+          fitCanvas();
+          render();
+          document.querySelectorAll('.mm-template').forEach((el) => el.classList.remove('active'));
+          statusEl.querySelector('[data-vi]').textContent = 'Đã tải ảnh: ' + file.name;
+          statusEl.querySelector('[data-en]').textContent = 'Loaded: ' + file.name;
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Drag text
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const sx = canvas.width / rect.width;
+      const sy = canvas.height / rect.height;
+      const cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+      return { x: cx * sx, y: cy * sy, rx: cx / rect.width, ry: cy / rect.height };
+    }
+
+    function hitTest(pos) {
+      const fs = state.fontSize;
+      ctx.font = `900 ${fs}px Impact, 'Arial Black', sans-serif`;
+      // top
+      if (state.topText) {
+        const tx = state.topPos.x * canvas.width;
+        const ty = state.topPos.y * canvas.height;
+        const w = ctx.measureText(state.topText.toUpperCase()).width;
+        if (pos.x >= tx - w / 2 - 10 && pos.x <= tx + w / 2 + 10 && pos.y >= ty - 5 && pos.y <= ty + fs + 5) {
+          return 'top';
+        }
+      }
+      if (state.bottomText) {
+        const tx = state.bottomPos.x * canvas.width;
+        const ty = state.bottomPos.y * canvas.height;
+        const w = ctx.measureText(state.bottomText.toUpperCase()).width;
+        if (pos.x >= tx - w / 2 - 10 && pos.x <= tx + w / 2 + 10 && pos.y >= ty - 5 && pos.y <= ty + fs + 5) {
+          return 'bottom';
+        }
+      }
+      return null;
+    }
+
+    function onDown(e) {
+      e.preventDefault();
+      const p = getPos(e);
+      const hit = hitTest(p);
+      if (hit) {
+        state.dragging = hit;
+        const pos = hit === 'top' ? state.topPos : state.bottomPos;
+        state.dragOffset = { x: p.rx - pos.x, y: p.ry - pos.y };
+      }
+    }
+    function onMove(e) {
+      if (!state.dragging) return;
+      e.preventDefault();
+      const p = getPos(e);
+      const nx = Math.max(0.05, Math.min(0.95, p.rx - state.dragOffset.x));
+      const ny = Math.max(0, Math.min(0.95, p.ry - state.dragOffset.y));
+      if (state.dragging === 'top') state.topPos = { x: nx, y: ny };
+      else state.bottomPos = { x: nx, y: ny };
+      render();
+    }
+    function onUp() {
+      state.dragging = null;
+    }
+
+    canvas.addEventListener('mousedown', onDown);
+    canvas.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    canvas.addEventListener('touchstart', onDown, { passive: false });
+    canvas.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onUp);
+
+    resetPosBtn.addEventListener('click', () => {
+      state.topPos = { x: 0.5, y: 0.08 };
+      state.bottomPos = { x: 0.5, y: 0.92 };
+      render();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      state.topText = '';
+      state.bottomText = '';
+      topInput.value = '';
+      bottomInput.value = '';
+      render();
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (!state.image) {
+        statusEl.querySelector('[data-vi]').textContent = 'Cần ảnh trước khi tải!';
+        statusEl.querySelector('[data-en]').textContent = 'Need an image first!';
+        return;
+      }
+      const link = document.createElement('a');
+      link.download = `meme-${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // Initial render
+    render();
+    // Auto-load first template
+    loadTemplate(0);
+  </script>
+</ProductLayout>
