@@ -2,29 +2,29 @@
 import ProductLayout from '../../layouts/ProductLayout.astro';
 ---
 
-<ProductLayout title="Animation Studio" ageGroup="8-10" ageColor="#FFC857" productType="Video" description="Studio hoạt hình từng khung hình, xuất GIF">
+<ProductLayout title="Animation Studio" ageGroup="8-10" ageColor="#FFC857" productType="Video" description="Studio hoạt hình từng khung hình, xuất GIF"titleEn="Animation Studio" productTypeEn="Video" descriptionEn="Frame-by-frame animation tool, export GIF">
   <div style="padding:1.5rem;max-width:900px;margin:0 auto">
     <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
       <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center">
         <input type="color" id="color-pick" value="#FFC857" style="width:40px;height:40px;border:none;border-radius:6px;cursor:pointer" />
         <select id="brush-size" style="padding:0.4rem;border-radius:6px;border:1px solid #ddd">
-          <option value="2">Nhỏ / Small</option>
-          <option value="5" selected>Vừa / Medium</option>
-          <option value="10">To / Large</option>
+          <option value="2"><span data-vi>Nhỏ</span><span data-en>Small</span></option>
+          <option value="5" selected><span data-vi>Vừa</span><span data-en>Medium</span></option>
+          <option value="10"><span data-vi>To</span><span data-en>Large</span></option>
         </select>
-        <button id="eraser-btn" style="padding:0.4rem 0.8rem;background:#ddd;border:none;border-radius:6px;cursor:pointer">🧹 Tẩy</button>
-        <button id="clear-frame-btn" style="padding:0.4rem 0.8rem;background:#ddd;border:none;border-radius:6px;cursor:pointer">🗑️ Xóa frame</button>
+        <button id="eraser-btn" style="padding:0.4rem 0.8rem;background:#ddd;border:none;border-radius:6px;cursor:pointer">🧹 <span data-vi>Tẩy</span><span data-en>Eraser</span></button>
+        <button id="clear-frame-btn" style="padding:0.4rem 0.8rem;background:#ddd;border:none;border-radius:6px;cursor:pointer">🗑️ <span data-vi>Xóa frame</span><span data-en>Clear frame</span></button>
         <div style="flex:1"></div>
-        <button id="add-frame-btn" style="padding:0.4rem 0.8rem;background:#00A8CC;color:white;border:none;border-radius:6px;cursor:pointer">+ Frame</button>
-        <button id="dup-frame-btn" style="padding:0.4rem 0.8rem;background:#6C5CE7;color:white;border:none;border-radius:6px;cursor:pointer">📋 Copy</button>
-        <button id="del-frame-btn" style="padding:0.4rem 0.8rem;background:#e53e3e;color:white;border:none;border-radius:6px;cursor:pointer">✕ Del</button>
+        <button id="add-frame-btn" style="padding:0.4rem 0.8rem;background:#00A8CC;color:white;border:none;border-radius:6px;cursor:pointer">+ <span data-vi>Frame</span><span data-en>Frame</span></button>
+        <button id="dup-frame-btn" style="padding:0.4rem 0.8rem;background:#6C5CE7;color:white;border:none;border-radius:6px;cursor:pointer">📋 <span data-vi>Sao chép</span><span data-en>Copy</span></button>
+        <button id="del-frame-btn" style="padding:0.4rem 0.8rem;background:#e53e3e;color:white;border:none;border-radius:6px;cursor:pointer">✕ <span data-vi>Xóa</span><span data-en>Del</span></button>
       </div>
 
       <div style="display:flex;gap:1rem;flex-wrap:wrap">
         <canvas id="canvas" width="400" height="400" style="border:2px solid #ddd;border-radius:8px;background:white;cursor:crosshair;touch-action:none"></canvas>
         <div style="flex:1;min-width:200px">
           <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem">
-            <button id="play-btn" style="padding:0.4rem 1rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer">▶ Play</button>
+            <button id="play-btn" style="padding:0.4rem 1rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer">▶ <span data-vi>Phát</span><span data-en>Play</span></button>
             <label style="font-size:0.85rem">FPS:</label>
             <input type="range" id="fps" min="1" max="24" value="8" style="width:100px" />
             <span id="fps-val" style="font-size:0.85rem">8</span>
@@ -34,7 +34,7 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
       </div>
 
       <div style="margin-top:1rem;display:flex;gap:0.5rem">
-        <button id="export-gif-btn" style="padding:0.5rem 1rem;background:#FFC857;color:#102A43;border:none;border-radius:6px;cursor:pointer;font-weight:600">📥 Xuất GIF</button>
+        <button id="export-gif-btn" style="padding:0.5rem 1rem;background:#FFC857;color:#102A43;border:none;border-radius:6px;cursor:pointer;font-weight:600">📥 <span data-vi>Xuất GIF</span><span data-en>Export GIF</span></button>
         <span id="export-status" style="font-size:0.85rem;color:#666;align-self:center"></span>
       </div>
     </div>
@@ -42,6 +42,8 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
 
   <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
   <script type="module">
+    const lang = document.documentElement.dataset.lang || 'vi';
+    const t = (vi: string, en: string) => lang === 'vi' ? vi : en;
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d')!;
     let frames: ImageData[] = [];
@@ -140,19 +142,19 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
     fpsInput.addEventListener('input', () => { document.getElementById('fps-val')!.textContent = fpsInput.value; });
 
     document.getElementById('play-btn')!.addEventListener('click', () => {
-      if (isPlaying) { clearInterval(playInterval); isPlaying=false; (document.getElementById('play-btn') as HTMLButtonElement).textContent='▶ Play'; return; }
-      isPlaying = true; (document.getElementById('play-btn') as HTMLButtonElement).textContent='⏸ Stop';
+      if (isPlaying) { clearInterval(playInterval); isPlaying=false; (document.getElementById('play-btn') as HTMLButtonElement).textContent='▶ ' + t('Phát', 'Play'); return; }
+      isPlaying = true; (document.getElementById('play-btn') as HTMLButtonElement).textContent='⏸ ' + t('Dừng', 'Stop');
       let idx = 0;
       playInterval = setInterval(() => { currentFrame = idx; renderFrame(); renderFramesList(); idx = (idx+1)%frames.length; }, 1000/parseInt(fpsInput.value));
     });
 
     document.getElementById('export-gif-btn')!.addEventListener('click', () => {
       const status = document.getElementById('export-status')!;
-      status.textContent = 'Đang tạo GIF... / Creating GIF...';
+      status.textContent = t('Đang tạo GIF...', 'Creating GIF...');
       const gif = new (window as any).GIF({ workers: 2, quality: 10, width: canvas.width, height: canvas.height, workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js' });
       frames.forEach(f => { const c = document.createElement('canvas'); c.width=canvas.width; c.height=canvas.height; c.getContext('2d')!.putImageData(f,0,0); gif.addFrame(c, { delay: 1000/parseInt(fpsInput.value) }); });
-      gif.on('finished', (blob: Blob) => { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='animation.gif'; a.click(); status.textContent='✓ Đã xuất! / Exported!'; });
-      gif.on('progress', (p: number) => { status.textContent = `Đang tạo... ${Math.round(p*100)}%`; });
+      gif.on('finished', (blob: Blob) => { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='animation.gif'; a.click(); status.textContent='✓ ' + t('Đã xuất!', 'Exported!'); });
+      gif.on('progress', (p: number) => { status.textContent = t('Đang tạo', 'Creating') + `... ${Math.round(p*100)}%`; });
       gif.render();
     });
 

@@ -2,21 +2,21 @@
 import ProductLayout from '../../layouts/ProductLayout.astro';
 ---
 
-<ProductLayout title="Pixel Art Editor" ageGroup="16-20" ageColor="#6C5CE7" productType="Hình ảnh" description="Editor pixel art đầy đủ, xuất PNG/sprite sheet">
+<ProductLayout title="Pixel Art Editor" ageGroup="16-20" ageColor="#6C5CE7" productType="Hình ảnh" description="Editor pixel art đầy đủ, xuất PNG/sprite sheet"titleEn="Pixel Art Editor" productTypeEn="Image" descriptionEn="Full pixel art editor, export PNG/sprite sheet">
   <div style="padding:1.5rem;max-width:1000px;margin:0 auto">
     <div style="display:grid;grid-template-columns:200px 1fr;gap:1.5rem">
       <div style="background:white;border-radius:12px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
-        <h2 style="margin:0 0 0.75rem;font-size:1rem">🛠️ Tools</h2>
+        <h2 style="margin:0 0 0.75rem;font-size:1rem">🛠️ <span data-vi>Công cụ</span><span data-en>Tools</span></h2>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;margin-bottom:1rem">
-          <button class="tool-btn" data-tool="pencil" style="padding:0.4rem;background:#6C5CE7;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">✏️ Pencil</button>
-          <button class="tool-btn" data-tool="eraser" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">🧹 Eraser</button>
-          <button class="tool-btn" data-tool="fill" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">🪣 Fill</button>
-          <button class="tool-btn" data-tool="picker" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">💧 Pick</button>
-          <button class="tool-btn" data-tool="line" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">📏 Line</button>
-          <button class="tool-btn" data-tool="rect" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">⬜ Rect</button>
+          <button class="tool-btn" data-tool="pencil" style="padding:0.4rem;background:#6C5CE7;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">✏️ <span data-vi>Bút chì</span><span data-en>Pencil</span></button>
+          <button class="tool-btn" data-tool="eraser" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">🧹 <span data-vi>Tẩy</span><span data-en>Eraser</span></button>
+          <button class="tool-btn" data-tool="fill" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">🪣 <span data-vi>Đổ màu</span><span data-en>Fill</span></button>
+          <button class="tool-btn" data-tool="picker" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">💧 <span data-vi>Chọn màu</span><span data-en>Pick</span></button>
+          <button class="tool-btn" data-tool="line" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">📏 <span data-vi>Đường thẳng</span><span data-en>Line</span></button>
+          <button class="tool-btn" data-tool="rect" style="padding:0.4rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">⬜ <span data-vi>Hình chữ nhật</span><span data-en>Rect</span></button>
         </div>
         <div style="margin-bottom:1rem">
-          <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.25rem">Grid size</label>
+          <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.25rem"><span data-vi>Kích thước lưới</span><span data-en>Grid size</span></label>
           <select id="grid-size" style="width:100%;padding:0.3rem;border:1px solid #ddd;border-radius:4px">
             <option value="16">16×16</option>
             <option value="32" selected>32×32</option>
@@ -24,15 +24,15 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
           </select>
         </div>
         <div style="margin-bottom:1rem">
-          <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.25rem">Palette</label>
+          <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.25rem"><span data-vi>Bảng màu</span><span data-en>Palette</span></label>
           <div id="palette" style="display:grid;grid-template-columns:repeat(8,1fr);gap:2px"></div>
           <input type="color" id="custom-color" value="#6C5CE7" style="width:100%;height:30px;margin-top:0.25rem;border:1px solid #ddd;cursor:pointer" />
         </div>
         <div style="display:flex;gap:0.3rem;margin-bottom:0.75rem">
-          <button id="undo-btn" style="flex:1;padding:0.3rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">↩ Undo</button>
-          <button id="redo-btn" style="flex:1;padding:0.3rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">↪ Redo</button>
+          <button id="undo-btn" style="flex:1;padding:0.3rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">↩ <span data-vi>Hoàn tác</span><span data-en>Undo</span></button>
+          <button id="redo-btn" style="flex:1;padding:0.3rem;background:#ddd;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem">↪ <span data-vi>Làm lại</span><span data-en>Redo</span></button>
         </div>
-        <button id="export-btn" style="width:100%;padding:0.5rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">📥 Export PNG</button>
+        <button id="export-btn" style="width:100%;padding:0.5rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">📥 <span data-vi>Xuất PNG</span><span data-en>Export PNG</span></button>
       </div>
       <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1);text-align:center">
         <canvas id="canvas" width="512" height="512" style="image-rendering:pixelated;border:1px solid #ddd;cursor:crosshair;max-width:100%"></canvas>

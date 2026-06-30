@@ -7,6 +7,9 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
   ageColor="#E17055"
   productType="Sản phẩm"
   description="Tạo landing page từ template, xuất HTML"
+  titleEn="Landing Page Generator"
+  productTypeEn="Product"
+  descriptionEn="Generate landing pages from templates, export HTML"
 >
   <style is:global>
     .lg-wrap{display:grid;grid-template-columns:380px 1fr;gap:0;height:calc(100vh - 130px);min-height:600px}
@@ -46,39 +49,39 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
         <button data-tpl="course">Course</button>
       </div>
 
-      <h3>Nội dung / Content</h3>
-      <label>Tên sản phẩm / Product name</label>
+      <h3><span data-vi>Nội dung</span><span data-en>Content</span></h3>
+      <label><span data-vi>Tên sản phẩm</span><span data-en>Product name</span></label>
       <input id="f-name" value="FlowTask" />
-      <label>Slogan / Tagline</label>
+      <label><span data-vi>Slogan</span><span data-en>Tagline</span></label>
       <input id="f-tagline" value="Quản lý công việc, đơn giản hơn bao giờ hết" />
-      <label>Mô tả / Description</label>
+      <label><span data-vi>Mô tả</span><span data-en>Description</span></label>
       <textarea id="f-desc">FlowTask giúp đội ngũ của bạn lập kế hoạch, theo dõi và hoàn thành công việc nhanh hơn với tự động hóa thông minh.</textarea>
 
-      <h3>Tính năng / Features</h3>
-      <p class="lg-hint">Mỗi dòng 1 tính năng / One feature per line</p>
+      <h3><span data-vi>Tính năng</span><span data-en>Features</span></h3>
+      <p class="lg-hint"><span data-vi>Mỗi dòng 1 tính năng</span><span data-en>One feature per line</span></p>
       <div id="f-features"></div>
-      <button class="lg-add-btn" id="f-add-feature">+ Thêm tính năng</button>
+      <button class="lg-add-btn" id="f-add-feature"><span data-vi>+ Thêm tính năng</span><span data-en>+ Add feature</span></button>
 
-      <h3>Giá / Pricing Tiers</h3>
+      <h3><span data-vi>Bảng giá</span><span data-en>Pricing Tiers</span></h3>
       <div id="f-pricing"></div>
-      <button class="lg-add-btn" id="f-add-pricing">+ Thêm gói giá</button>
+      <button class="lg-add-btn" id="f-add-pricing"><span data-vi>+ Thêm gói giá</span><span data-en>+ Add tier</span></button>
 
-      <h3>Đánh giá / Testimonials</h3>
+      <h3><span data-vi>Đánh giá</span><span data-en>Testimonials</span></h3>
       <div id="f-testimonials"></div>
-      <button class="lg-add-btn" id="f-add-testi">+ Thêm đánh giá</button>
+      <button class="lg-add-btn" id="f-add-testi"><span data-vi>+ Thêm đánh giá</span><span data-en>+ Add testimonial</span></button>
 
       <h3>FAQ</h3>
       <div id="f-faq"></div>
-      <button class="lg-add-btn" id="f-add-faq">+ Thêm câu hỏi</button>
+      <button class="lg-add-btn" id="f-add-faq"><span data-vi>+ Thêm câu hỏi</span><span data-en>+ Add question</span></button>
 
       <h3>Call to Action</h3>
-      <label>Text CTA</label>
+      <label><span data-vi>Nút CTA</span><span data-en>CTA Text</span></label>
       <input id="f-cta-text" value="Dùng thử miễn phí" />
-      <label>Link CTA</label>
+      <label><span data-vi>Link CTA</span><span data-en>CTA Link</span></label>
       <input id="f-cta-link" value="https://example.com/signup" />
 
-      <h3>Giao diện / Theme</h3>
-      <label>Màu chính / Primary color</label>
+      <h3><span data-vi>Giao diện</span><span data-en>Theme</span></h3>
+      <label><span data-vi>Màu chính</span><span data-en>Primary color</span></label>
       <div class="lg-color-row">
         <input type="color" id="f-color" value="#E17055" />
         <div class="lg-mode-toggle">
@@ -90,9 +93,9 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
 
     <div class="lg-preview-wrap">
       <div class="lg-preview-bar">
-        <button id="view-preview" class="active">Preview</button>
-        <button id="view-code">HTML Code</button>
-        <button class="lg-download-btn" id="btn-download">⬇ Tải .html / Download</button>
+        <button id="view-preview" class="active"><span data-vi>Xem trước</span><span data-en>Preview</span></button>
+        <button id="view-code"><span data-vi>Mã HTML</span><span data-en>HTML Code</span></button>
+        <button class="lg-download-btn" id="btn-download"><span data-vi>⬇ Tải .html</span><span data-en>⬇ Download</span></button>
       </div>
       <div class="lg-iframe-wrap" id="iframe-wrap">
         <iframe id="preview-iframe" title="Landing preview"></iframe>

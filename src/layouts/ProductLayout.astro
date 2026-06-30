@@ -1,29 +1,43 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from './BaseLayout.astro';
 
 interface Props {
   title: string;
+  titleEn?: string;
   ageGroup: string;
   ageColor: string;
   productType: string;
+  productTypeEn?: string;
   description: string;
+  descriptionEn?: string;
 }
 
-const { title, ageGroup, ageColor, productType, description } = Astro.props;
+const { title, titleEn = title, ageGroup, ageColor, productType, productTypeEn = productType, description, descriptionEn = description } = Astro.props;
 ---
 
-<BaseLayout title={`${title} — HaMi Code Việt`}>
+<BaseLayout title={`${title} — HaMi Code Việt`} description={description}>
   <main style="min-height:100vh">
-    <div style="background:var(--color-navy);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
-      <div style="display:flex;align-items:center;gap:1rem">
-        <a href="/san-pham" style="color:white;text-decoration:none;font-size:0.9rem">← Tất cả sản phẩm</a>
-        <div style="background:{ageColor};color:white;padding:0.3rem 0.75rem;border-radius:6px;font-size:0.75rem;font-weight:700">{ageGroup} tuổi</div>
-        <span style="color:rgba(255,255,255,0.6);font-size:0.75rem">{productType}</span>
+    <div style={`background:${ageColor};padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem`}>
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+        <a href="/san-pham" style="color:white;text-decoration:none;font-size:0.9rem">
+          <span data-vi>← Tất cả sản phẩm</span>
+          <span data-en>← All products</span>
+        </a>
+        <div style={`background:${ageColor};color:white;padding:0.3rem 0.75rem;border-radius:6px;font-size:0.75rem;font-weight:700;border:1px solid rgba(255,255,255,0.3)`}>
+          {ageGroup} <span data-vi>tuổi</span><span data-en>years</span>
+        </div>
+        <span style="color:rgba(255,255,255,0.8);font-size:0.75rem">{productType} / {productTypeEn}</span>
       </div>
-      <h1 style="color:white;font-size:1.2rem;margin:0;font-weight:700">{title}</h1>
+      <h1 style="color:white;font-size:1.2rem;margin:0;font-weight:700">
+        <span data-vi>{title}</span>
+        <span data-en>{titleEn}</span>
+      </h1>
     </div>
     <div style="padding:0.5rem 1.5rem;background:var(--color-bg-light);border-bottom:1px solid var(--color-border)">
-      <p style="margin:0;font-size:0.85rem;color:var(--color-text-muted)">{description}</p>
+      <p style="margin:0;font-size:0.85rem;color:var(--color-text-muted)">
+        <span data-vi>{description}</span>
+        <span data-en>{descriptionEn}</span>
+      </p>
     </div>
     <slot />
   </main>

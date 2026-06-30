@@ -7,6 +7,9 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
   ageColor="#20A779"
   productType="Demo"
   description="Nhập dữ liệu, tạo biểu đồ tương tác"
+  titleEn="Data Visualizer"
+  productTypeEn="Demo"
+  descriptionEn="Input data, create interactive charts"
 >
   <style>
     .dv-wrap{max-width:1200px;margin:0 auto;padding:1.5rem;font-family:Inter,system-ui,sans-serif}
@@ -46,47 +49,47 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
       <!-- Controls -->
       <div>
         <div class="dv-panel" style="margin-bottom:1rem">
-          <h3>📊 Dữ liệu / Data</h3>
-          <span class="dv-label">Dán CSV hoặc chọn mẫu / Paste CSV or pick sample</span>
+          <h3>📊 <span data-vi>Dữ liệu</span><span data-en>Data</span></h3>
+          <span class="dv-label"><span data-vi>Dán CSV hoặc chọn mẫu</span><span data-en>Paste CSV or pick sample</span></span>
           <textarea class="dv-textarea" id="dv-data" placeholder="Label,Value&#10;Tháng 1,120&#10;Tháng 2,200"></textarea>
           <div class="dv-samples" style="margin-top:.5rem">
-            <button class="dv-sample-btn" data-sample="sales">📈 Doanh số</button>
-            <button class="dv-sample-btn" data-sample="weather">🌤️ Thời tiết</button>
-            <button class="dv-sample-btn" data-sample="population">👥 Dân số</button>
+            <button class="dv-sample-btn" data-sample="sales"><span data-vi>📈 Doanh số</span><span data-en>📈 Sales</span></button>
+            <button class="dv-sample-btn" data-sample="weather"><span data-vi>🌤️ Thời tiết</span><span data-en>🌤️ Weather</span></button>
+            <button class="dv-sample-btn" data-sample="population"><span data-vi>👥 Dân số</span><span data-en>👥 Population</span></button>
           </div>
           <div class="dv-btn-row">
-            <button class="dv-btn" id="dv-render">Vẽ biểu đồ / Render</button>
+            <button class="dv-btn" id="dv-render"><span data-vi>Vẽ biểu đồ</span><span data-en>Render</span></button>
             <button class="dv-btn secondary" id="dv-export">⬇ PNG</button>
           </div>
         </div>
 
         <div class="dv-panel" style="margin-bottom:1rem">
-          <h3>🎨 Loại biểu đồ / Chart type</h3>
+          <h3>🎨 <span data-vi>Loại biểu đồ</span><span data-en>Chart type</span></h3>
           <div class="dv-charts" id="dv-chart-types">
-            <button class="dv-chart-btn active" data-type="bar">Bar</button>
-            <button class="dv-chart-btn" data-type="line">Line</button>
-            <button class="dv-chart-btn" data-type="pie">Pie</button>
-            <button class="dv-chart-btn" data-type="scatter">Scatter</button>
-            <button class="dv-chart-btn" data-type="area">Area</button>
+            <button class="dv-chart-btn active" data-type="bar"><span data-vi>Cột</span><span data-en>Bar</span></button>
+            <button class="dv-chart-btn" data-type="line"><span data-vi>Đường</span><span data-en>Line</span></button>
+            <button class="dv-chart-btn" data-type="pie"><span data-vi>Tròn</span><span data-en>Pie</span></button>
+            <button class="dv-chart-btn" data-type="scatter"><span data-vi>Phân tán</span><span data-en>Scatter</span></button>
+            <button class="dv-chart-btn" data-type="area"><span data-vi>Vùng</span><span data-en>Area</span></button>
           </div>
         </div>
 
         <div class="dv-panel">
-          <h3>⚙ Tùy chỉnh / Customize</h3>
-          <span class="dv-label">Tiêu đề / Title</span>
+          <h3>⚙ <span data-vi>Tùy chỉnh</span><span data-en>Customize</span></h3>
+          <span class="dv-label"><span data-vi>Tiêu đề</span><span data-en>Title</span></span>
           <input class="dv-input" id="dv-title" value="Biểu đồ dữ liệu" />
-          <span class="dv-label">Nhãn trục X / X-axis label</span>
+          <span class="dv-label"><span data-vi>Nhãn trục X</span><span data-en>X-axis label</span></span>
           <input class="dv-input" id="dv-xlabel" value="Danh mục" />
-          <span class="dv-label">Nhãn trục Y / Y-axis label</span>
+          <span class="dv-label"><span data-vi>Nhãn trục Y</span><span data-en>Y-axis label</span></span>
           <input class="dv-input" id="dv-ylabel" value="Giá trị" />
-          <span class="dv-label">Hiện nhãn / Show labels</span>
+          <span class="dv-label"><span data-vi>Hiện nhãn</span><span data-en>Show labels</span></span>
           <select class="dv-select" id="dv-showlabels">
-            <option value="1">Có / Yes</option>
-            <option value="0">Không / No</option>
+            <option value="1"><span data-vi>Có</span><span data-en>Yes</span></option>
+            <option value="0"><span data-vi>Không</span><span data-en>No</span></option>
           </select>
-          <span class="dv-label">Bảng màu / Color palette</span>
+          <span class="dv-label"><span data-vi>Bảng màu</span><span data-en>Color palette</span></span>
           <div class="dv-colors" id="dv-palettes"></div>
-          <p class="dv-bi">💡 Mẹo: hover lên biểu đồ để xem giá trị / Hover chart to see values</p>
+          <p class="dv-bi"><span data-vi>💡 Mẹo: hover lên biểu đồ để xem giá trị</span><span data-en>💡 Tip: hover chart to see values</span></p>
         </div>
       </div>
 
@@ -96,7 +99,7 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
           <div class="dv-canvas-wrap" id="dv-canvas-wrap">
             <canvas id="dv-canvas" width="780" height="440"></canvas>
             <div class="dv-tooltip" id="dv-tooltip"></div>
-            <div class="dv-empty" id="dv-empty">Nhập dữ liệu rồi bấm Vẽ biểu đồ<br><span style="font-size:.78rem">Enter data then click Render</span></div>
+            <div class="dv-empty" id="dv-empty"><span data-vi>Nhập dữ liệu rồi bấm Vẽ biểu đồ</span><span data-en>Enter data then click Render</span></div>
           </div>
           <div class="dv-stats" id="dv-stats" style="display:none"></div>
         </div>
@@ -105,10 +108,12 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
   </div>
 
   <script type="module">
+    const lang = document.documentElement.dataset.lang || 'vi';
+    const t = (vi, en) => lang === 'vi' ? vi : en;
     const samples = {
-      sales: { title: 'Doanh số theo tháng', x: 'Tháng', y: 'Doanh số (triệu ₫)', data: 'Tháng,Doanh số\nT1,120\nT2,185\nT3,210\nT4,175\nT5,260\nT6,320\nT7,295\nT8,380' },
-      weather: { title: 'Nhiệt độ trung bình', x: 'Tháng', y: '°C', data: 'Tháng,Nhiệt độ\nT1,18\nT2,20\nT3,24\nT4,28\nT5,31\nT6,33\nT7,34\nT8,33\nT9,30\nT10,27\nT11,23\nT12,19' },
-      population: { title: 'Dân số các vùng', x: 'Vùng', y: 'Triệu người', data: 'Vùng,Dân số\nBắc,23\nTrung,19\nNam,45\nTây Nguyên,8\nĐBSCL,18' },
+      sales: { title: t('Doanh số theo tháng','Monthly Sales'), x: t('Tháng','Month'), y: t('Doanh số (triệu ₫)','Sales (M ₫)'), data: 'Tháng,Doanh số\nT1,120\nT2,185\nT3,210\nT4,175\nT5,260\nT6,320\nT7,295\nT8,380' },
+      weather: { title: t('Nhiệt độ trung bình','Average Temperature'), x: t('Tháng','Month'), y: '°C', data: 'Tháng,Nhiệt độ\nT1,18\nT2,20\nT3,24\nT4,28\nT5,31\nT6,33\nT7,34\nT8,33\nT9,30\nT10,27\nT11,23\nT12,19' },
+      population: { title: t('Dân số các vùng','Regional Population'), x: t('Vùng','Region'), y: t('Triệu người','Million people'), data: 'Vùng,Dân số\nBắc,23\nTrung,19\nNam,45\nTây Nguyên,8\nĐBSCL,18' },
     };
     const palettes = [
       ['#20A779','#00A8CC','#FFC857','#E17055','#6C5CE7','#FD79A8','#00B894','#0984E3'],
@@ -133,7 +138,7 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
       const chip = document.createElement('div');
       chip.className = 'dv-color-chip' + (i === 0 ? ' active' : '');
       chip.style.background = `linear-gradient(135deg, ${p.slice(0,4).join(', ')})`;
-      chip.title = `Bảng ${i+1}`;
+      chip.title = t(`Bảng ${i+1}`, `Palette ${i+1}`);
       chip.addEventListener('click', () => {
         currentPalette = i;
         document.querySelectorAll('.dv-color-chip').forEach(c => c.classList.remove('active'));
@@ -434,10 +439,10 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
       const stats = $('dv-stats');
       stats.style.display = 'grid';
       stats.innerHTML = [
-        ['Tổng / Sum', sum.toFixed(1)],
-        ['Trung bình / Avg', avg.toFixed(1)],
-        ['Cao nhất / Max', max.toFixed(1)],
-        ['Thấp nhất / Min', min.toFixed(1)],
+        [t('Tổng','Sum'), sum.toFixed(1)],
+        [t('Trung bình','Avg'), avg.toFixed(1)],
+        [t('Cao nhất','Max'), max.toFixed(1)],
+        [t('Thấp nhất','Min'), min.toFixed(1)],
       ].map(([l, v]) => `<div class="dv-stat"><div class="dv-stat-val">${v}</div><div class="dv-stat-lbl">${l}</div></div>`).join('');
     }
 

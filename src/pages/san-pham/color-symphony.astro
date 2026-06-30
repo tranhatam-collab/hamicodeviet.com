@@ -2,19 +2,19 @@
 import ProductLayout from '../../layouts/ProductLayout.astro';
 ---
 
-<ProductLayout title="Color Symphony" ageGroup="8-10" ageColor="#FFC857" productType="Âm thanh + Hình ảnh" description="Vẽ tranh bằng âm thanh — nghệ thuật âm hình">
+<ProductLayout title="Color Symphony" ageGroup="8-10" ageColor="#FFC857" productType="Âm thanh + Hình ảnh" description="Vẽ tranh bằng âm thanh — nghệ thuật âm hình"titleEn="Color Symphony" productTypeEn="Audio + Image" descriptionEn="Paint with sound — audio-visual art">
   <div style="padding:1.5rem;max-width:900px;margin:0 auto">
     <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem">
         <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
-          <button id="play-btn" style="padding:0.5rem 1rem;background:#FFC857;color:#102A43;border:none;border-radius:6px;cursor:pointer;font-weight:600">🎨 Vẽ + Âm thanh</button>
-          <button id="clear-btn" style="padding:0.5rem 1rem;background:#ddd;border:none;border-radius:6px;cursor:pointer">🗑️ Xóa</button>
-          <button id="save-btn" style="padding:0.5rem 1rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer">📥 Tải PNG</button>
+          <button id="play-btn" style="padding:0.5rem 1rem;background:#FFC857;color:#102A43;border:none;border-radius:6px;cursor:pointer;font-weight:600">🎨 <span data-vi>Vẽ + Âm thanh</span><span data-en>Draw + Sound</span></button>
+          <button id="clear-btn" style="padding:0.5rem 1rem;background:#ddd;border:none;border-radius:6px;cursor:pointer">🗑️ <span data-vi>Xóa</span><span data-en>Clear</span></button>
+          <button id="save-btn" style="padding:0.5rem 1rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer">📥 <span data-vi>Tải PNG</span><span data-en>Save PNG</span></button>
         </div>
         <div style="display:flex;align-items:center;gap:0.5rem">
-          <label style="font-size:0.85rem">🎵 Âm:</label>
+          <label style="font-size:0.85rem">🎵 <span data-vi>Âm:</span><span data-en>Wave:</span></label>
           <select id="wave-type" style="padding:0.3rem;border-radius:4px;border:1px solid #ddd">
-            <option value="sine">Sine (êm)</option>
+            <option value="sine"><span data-vi>Sine (êm)</span><span data-en>Sine (smooth)</span></option>
             <option value="triangle">Triangle</option>
             <option value="square">Square</option>
             <option value="sawtooth">Sawtooth</option>
@@ -22,7 +22,7 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
         </div>
       </div>
       <canvas id="canvas" width="800" height="500" style="width:100%;border-radius:8px;background:#081826;cursor:crosshair;display:block"></canvas>
-      <p style="text-align:center;color:#666;margin-top:0.5rem;font-size:0.85rem">Vẽ trên canvas — mỗi vị trí tạo ra một nốt nhạc! / Draw on canvas — each position makes a note!</p>
+      <p style="text-align:center;color:#666;margin-top:0.5rem;font-size:0.85rem"><span data-vi>Vẽ trên canvas — mỗi vị trí tạo ra một nốt nhạc!</span><span data-en>Draw on canvas — each position makes a note!</span></p>
     </div>
   </div>
 

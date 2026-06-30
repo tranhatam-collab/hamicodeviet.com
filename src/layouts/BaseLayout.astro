@@ -15,11 +15,40 @@ const {
   title,
   description = 'HaMi Code Việt — Học ngôn ngữ. Học lập trình. Làm ra sản phẩm thật.',
   lang = 'vi',
-  ogImage = '/og-default.png',
+  ogImage = '/og-default.svg',
   noindex = false,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(ogImage, Astro.site);
+
+// JSON-LD structured data
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'HaMi Code Việt',
+  alternateName: 'HaMi Code Viet',
+  url: 'https://hamicodeviet.com',
+  logo: 'https://hamicodeviet.com/favicon.svg',
+  description: 'Nền tảng giáo dục công nghệ song ngữ Việt-Anh dành cho người học 8-24 tuổi.',
+  foundingDate: '2024',
+  founder: { '@type': 'Person', name: 'Trần Đỗ Hà Mi' },
+  address: { '@type': 'PostalAddress', addressCountry: 'VN' },
+  sameAs: ['https://hamicodeviet.com'],
+};
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'HaMi Code Việt',
+  url: 'https://hamicodeviet.com',
+  inLanguage: ['vi', 'en'],
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://hamicodeviet.com/khoa-hoc?q={search_term_string}',
+    'query-input': 'required name=search_term_string',
+  },
+};
 ---
 
 <!doctype html>
@@ -33,19 +62,31 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <link rel="canonical" href={canonicalURL} />
     {noindex && <meta name="robots" content="noindex,nofollow" />}
 
+    <!-- hreflang: bilingual signals for search engines -->
+    <link rel="alternate" hreflang="vi" href={canonicalURL} />
+    <link rel="alternate" hreflang="en" href={canonicalURL} />
+    <link rel="alternate" hreflang="x-default" href={canonicalURL} />
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={`${title} | HaMi Code Việt`} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={new URL(ogImage, Astro.site)} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:locale" content={lang === 'vi' ? 'vi_VN' : 'en_US'} />
+    <meta property="og:site_name" content="HaMi Code Việt" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={`${title} | HaMi Code Việt`} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={new URL(ogImage, Astro.site)} />
+    <meta name="twitter:image" content={ogImageURL} />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

@@ -2,13 +2,13 @@
 import ProductLayout from '../../layouts/ProductLayout.astro';
 ---
 
-<ProductLayout title="API Studio" ageGroup="16-20" ageColor="#6C5CE7" productType="Sản phẩm" description="Thiết kế & test REST API, xem response">
+<ProductLayout title="API Studio" ageGroup="16-20" ageColor="#6C5CE7" productType="Sản phẩm" description="Thiết kế & test REST API, xem response"titleEn="API Studio" productTypeEn="Product" descriptionEn="Design & test REST APIs, view responses">
   <div style="padding:1.5rem;max-width:1000px;margin:0 auto">
     <div style="display:grid;grid-template-columns:300px 1fr;gap:1.5rem">
       <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
-        <h2 style="margin:0 0 1rem;font-size:1.1rem">🔌 Endpoints</h2>
+        <h2 style="margin:0 0 1rem;font-size:1.1rem">🔌 <span data-vi>Endpoints</span><span data-en>Endpoints</span></h2>
         <div id="endpoints-list" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem"></div>
-        <button id="add-ep-btn" style="padding:0.5rem;background:#6C5CE7;color:white;border:none;border-radius:6px;cursor:pointer;width:100%">+ Add endpoint</button>
+        <button id="add-ep-btn" style="padding:0.5rem;background:#6C5CE7;color:white;border:none;border-radius:6px;cursor:pointer;width:100%">+ <span data-vi>Thêm endpoint</span><span data-en>Add endpoint</span></button>
         <div style="margin-top:1.5rem;display:flex;gap:0.5rem">
           <button id="export-openapi-btn" style="padding:0.4rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;flex:1">OpenAPI JSON</button>
           <button id="export-docs-btn" style="padding:0.4rem;background:#00A8CC;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;flex:1">Docs MD</button>
@@ -20,18 +20,21 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
             <option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option>
           </select>
           <input type="text" id="test-path" placeholder="/api/users" value="/api/users" style="flex:1;padding:0.5rem;border:1px solid #ddd;border-radius:6px;font-family:monospace" />
-          <button id="test-send" style="padding:0.5rem 1rem;background:#6C5CE7;color:white;border:none;border-radius:6px;cursor:pointer">Send</button>
+          <button id="test-send" style="padding:0.5rem 1rem;background:#6C5CE7;color:white;border:none;border-radius:6px;cursor:pointer"><span data-vi>Gửi</span><span data-en>Send</span></button>
         </div>
         <div style="margin-bottom:1rem">
-          <label style="font-size:0.85rem;font-weight:600">Body (JSON)</label>
+          <label style="font-size:0.85rem;font-weight:600"><span data-vi>Body (JSON)</span><span data-en>Body (JSON)</span></label>
           <textarea id="test-body" rows="3" placeholder='{"name":"test"}' style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px;font-family:monospace;font-size:0.85rem"></textarea>
         </div>
-        <div style="background:#081826;color:#0f0;border-radius:8px;padding:1rem;font-family:monospace;font-size:0.85rem;min-height:150px;max-height:300px;overflow-y:auto" id="response-view">Response sẽ hiển thị ở đây...</div>
+        <div style="background:#081826;color:#0f0;border-radius:8px;padding:1rem;font-family:monospace;font-size:0.85rem;min-height:150px;max-height:300px;overflow-y:auto" id="response-view"><span data-vi>Response sẽ hiển thị ở đây...</span><span data-en>Response will appear here...</span></div>
       </div>
     </div>
   </div>
 
   <script type="module">
+    const lang = document.documentElement.dataset.lang || 'vi';
+    const t = (vi: string, en: string) => lang === 'vi' ? vi : en;
+
     interface Endpoint { id: number; method: string; path: string; response: string; }
     let endpoints: Endpoint[] = [
       { id: 1, method: 'GET', path: '/api/users', response: '[{"id":1,"name":"Alice"},{"id":2,"name":"Bob"}]' },
@@ -89,8 +92,8 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
     }
 
     document.getElementById('add-ep-btn')!.addEventListener('click', () => {
-      const method = prompt('Method (GET/POST/PUT/DELETE):', 'GET');
-      const path = prompt('Path:', '/api/new');
+      const method = prompt(t('Method (GET/POST/PUT/DELETE):', 'Method (GET/POST/PUT/DELETE):'), 'GET');
+      const path = prompt(t('Đường dẫn:', 'Path:'), '/api/new');
       if (method && path) { endpoints.push({ id: Date.now(), method: method.toUpperCase(), path, response: '{}' }); renderEndpoints(); }
     });
     document.getElementById('test-send')!.addEventListener('click', sendRequest);

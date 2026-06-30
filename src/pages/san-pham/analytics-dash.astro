@@ -2,7 +2,7 @@
 import ProductLayout from '../../layouts/ProductLayout.astro';
 ---
 
-<ProductLayout title="Analytics Dashboard" ageGroup="18-24" ageColor="#E17055" productType="Demo" description="Dashboard phân tích real-time template">
+<ProductLayout title="Analytics Dashboard" ageGroup="18-24" ageColor="#E17055" productType="Demo" description="Dashboard phân tích real-time template"titleEn="Analytics Dashboard" productTypeEn="Demo" descriptionEn="Real-time analytics dashboard template">
   <div style="padding:1.5rem;max-width:1100px;margin:0 auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.5rem">
       <h2 style="margin:0;font-size:1.3rem">📈 Analytics Dashboard</h2>
@@ -21,28 +21,36 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
 
     <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1rem">
       <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
-        <h3 style="margin:0 0 1rem;font-size:1rem">Doanh thu / Revenue</h3>
+        <h3 style="margin:0 0 1rem;font-size:1rem"><span data-vi>Doanh thu</span><span data-en>Revenue</span></h3>
         <canvas id="revenue-chart" width="600" height="250" style="width:100%"></canvas>
       </div>
       <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
-        <h3 style="margin:0 0 1rem;font-size:1rem">Nguồn traffic</h3>
+        <h3 style="margin:0 0 1rem;font-size:1rem"><span data-vi>Nguồn traffic</span><span data-en>Traffic Sources</span></h3>
         <canvas id="source-chart" width="250" height="250" style="width:100%"></canvas>
       </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
       <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
-        <h3 style="margin:0 0 1rem;font-size:1rem">Top sản phẩm</h3>
+        <h3 style="margin:0 0 1rem;font-size:1rem"><span data-vi>Top sản phẩm</span><span data-en>Top Products</span></h3>
         <canvas id="products-chart" width="400" height="200" style="width:100%"></canvas>
       </div>
       <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
-        <h3 style="margin:0 0 1rem;font-size:1rem">Giao dịch gần đây</h3>
+        <h3 style="margin:0 0 1rem;font-size:1rem"><span data-vi>Giao dịch gần đây</span><span data-en>Recent Transactions</span></h3>
         <div id="transactions" style="font-size:0.85rem;max-height:200px;overflow-y:auto"></div>
       </div>
     </div>
   </div>
 
   <script type="module">
+    const lang = document.documentElement.dataset.lang || 'vi';
+    const t = (vi: string, en: string) => lang === 'vi' ? vi : en;
+
+    // Update select options based on language
+    const rangeSelect = document.getElementById('range') as HTMLSelectElement;
+    const rangeLabels: Record<string, string> = { '7': t('7 ngày', '7 days'), '30': t('30 ngày', '30 days'), '90': t('90 ngày', '90 days') };
+    Array.from(rangeSelect.options).forEach(opt => { opt.textContent = rangeLabels[opt.value]; });
+
     function genData(days: number) {
       const revenue: {date:string, value:number}[] = [];
       let base = 5000000;
@@ -56,10 +64,10 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
 
     function genKPIs() {
       return [
-        { label: 'Doanh thu', value: '₫45.2M', change: '+12%', spark: [3,5,4,6,5,7,8], color: '#20A779' },
-        { label: 'Người dùng', value: '1,234', change: '+8%', spark: [2,3,3,4,5,5,6], color: '#00A8CC' },
-        { label: 'Conversion', value: '3.4%', change: '+0.5%', spark: [1,2,2,3,3,4,4], color: '#6C5CE7' },
-        { label: 'Churn', value: '2.1%', change: '-0.3%', spark: [4,3,3,3,2,2,2], color: '#E17055' },
+        { label: t('Doanh thu', 'Revenue'), value: '₫45.2M', change: '+12%', spark: [3,5,4,6,5,7,8], color: '#20A779' },
+        { label: t('Người dùng', 'Users'), value: '1,234', change: '+8%', spark: [2,3,3,4,5,5,6], color: '#00A8CC' },
+        { label: t('Conversion', 'Conversion'), value: '3.4%', change: '+0.5%', spark: [1,2,2,3,3,4,4], color: '#6C5CE7' },
+        { label: t('Churn', 'Churn'), value: '2.1%', change: '-0.3%', spark: [4,3,3,3,2,2,2], color: '#E17055' },
       ];
     }
 
@@ -148,18 +156,18 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
     }
 
     function renderTransactions() {
-      const names = ['Nguyễn V.A', 'Trần T.B', 'Lê M.C', 'Phạm K.D', 'Hoàng N.E'];
-      const products = ['Khóa học Web', 'Khóa học Python', 'CodeLab Pro', 'AI Tutor', 'Marketplace'];
+      const names = lang === 'vi' ? ['Nguyễn V.A', 'Trần T.B', 'Lê M.C', 'Phạm K.D', 'Hoàng N.E'] : ['John A.', 'Sarah B.', 'Mike C.', 'Emma D.', 'Alex E.'];
+      const products = lang === 'vi' ? ['Khóa học Web', 'Khóa học Python', 'CodeLab Pro', 'AI Tutor', 'Marketplace'] : ['Web Course', 'Python Course', 'CodeLab Pro', 'AI Tutor', 'Marketplace'];
       const txs = Array.from({length: 8 }, () => ({
         name: names[Math.floor(Math.random()*names.length)],
         product: products[Math.floor(Math.random()*products.length)],
         amount: Math.floor(Math.random()*5000000) + 500000,
-        time: new Date().toLocaleTimeString('vi-VN'),
+        time: new Date().toLocaleTimeString(lang === 'vi' ? 'vi-VN' : 'en-US'),
       }));
       document.getElementById('transactions')!.innerHTML = txs.map(t => `
         <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid #f0f0f0">
           <div><span style="font-weight:600">${t.name}</span><br><span style="color:#999;font-size:0.75rem">${t.product}</span></div>
-          <div style="text-align:right"><span style="font-weight:600;color:#20A779">${new Intl.NumberFormat('vi-VN').format(t.amount)}₫</span><br><span style="color:#999;font-size:0.75rem">${t.time}</span></div>
+          <div style="text-align:right"><span style="font-weight:600;color:#20A779">${new Intl.NumberFormat(lang === 'vi' ? 'vi-VN' : 'en-US').format(t.amount)}₫</span><br><span style="color:#999;font-size:0.75rem">${t.time}</span></div>
         </div>
       `).join('');
     }

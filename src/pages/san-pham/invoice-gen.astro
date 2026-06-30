@@ -2,42 +2,42 @@
 import ProductLayout from '../../layouts/ProductLayout.astro';
 ---
 
-<ProductLayout title="Invoice Generator" ageGroup="18-24" ageColor="#E17055" productType="Sản phẩm" description="Tạo hóa đơn chuyên nghiệp, xuất PDF">
+<ProductLayout title="Invoice Generator" ageGroup="18-24" ageColor="#E17055" productType="Sản phẩm" description="Tạo hóa đơn chuyên nghiệp, xuất PDF"titleEn="Invoice Generator" productTypeEn="Product" descriptionEn="Create professional invoices, export PDF">
   <div style="padding:1.5rem;max-width:1000px;margin:0 auto">
     <div style="display:grid;grid-template-columns:350px 1fr;gap:1.5rem">
       <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
-        <h2 style="margin:0 0 1rem;font-size:1.1rem">🧾 Thông tin hóa đơn</h2>
+        <h2 style="margin:0 0 1rem;font-size:1.1rem">🧾 <span data-vi>Thông tin hóa đơn</span><span data-en>Invoice Details</span></h2>
         <div style="display:flex;flex-direction:column;gap:0.75rem">
           <div>
-            <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem">Số hóa đơn / Invoice #</label>
+            <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem"><span data-vi>Số hóa đơn</span><span data-en>Invoice #</span></label>
             <input type="text" id="inv-num" value="INV-001" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px" />
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
-            <div><label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem">Ngày / Date</label><input type="date" id="inv-date" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px" /></div>
-            <div><label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem">Han tra / Due</label><input type="date" id="inv-due" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px" /></div>
+            <div><label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem"><span data-vi>Ngày</span><span data-en>Date</span></label><input type="date" id="inv-date" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px" /></div>
+            <div><label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem"><span data-vi>Hạn trả</span><span data-en>Due</span></label><input type="date" id="inv-due" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px" /></div>
           </div>
           <div>
-            <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem">Từ / From (Công ty)</label>
+            <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem"><span data-vi>Từ (Công ty)</span><span data-en>From (Company)</span></label>
             <input type="text" id="from-name" value="Công ty TNHH Thành Tâm Phát" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px;margin-bottom:0.25rem" />
-            <input type="text" id="from-addr" placeholder="Địa chỉ" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px;margin-bottom:0.25rem" />
+            <input type="text" id="from-addr" placeholder="Địa chỉ / Address" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px;margin-bottom:0.25rem" />
             <input type="text" id="from-email" placeholder="Email" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px" />
           </div>
           <div>
-            <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem">Đến / To (Khách hàng)</label>
-            <input type="text" id="to-name" placeholder="Tên khách hàng" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px;margin-bottom:0.25rem" />
-            <input type="text" id="to-addr" placeholder="Địa chỉ" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px;margin-bottom:0.25rem" />
+            <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem"><span data-vi>Đến (Khách hàng)</span><span data-en>To (Customer)</span></label>
+            <input type="text" id="to-name" placeholder="Tên khách hàng / Customer name" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px;margin-bottom:0.25rem" />
+            <input type="text" id="to-addr" placeholder="Địa chỉ / Address" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px;margin-bottom:0.25rem" />
             <input type="text" id="to-email" placeholder="Email" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px" />
           </div>
           <div>
-            <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem">Mặt hàng / Items</label>
+            <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem"><span data-vi>Mặt hàng</span><span data-en>Items</span></label>
             <div id="items-list"></div>
-            <button id="add-item-btn" style="margin-top:0.5rem;padding:0.3rem 0.6rem;background:#E17055;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem">+ Thêm</button>
+            <button id="add-item-btn" style="margin-top:0.5rem;padding:0.3rem 0.6rem;background:#E17055;color:white;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem">+ <span data-vi>Thêm</span><span data-en>Add</span></button>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
-            <div><label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem">Thuế / Tax %</label><input type="number" id="tax-rate" value="10" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px" /></div>
-            <div><label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem">Tiền tệ / Currency</label><select id="currency" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px"><option value="VND">VND ₫</option><option value="USD">USD $</option><option value="EUR">EUR €</option></select></div>
+            <div><label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem"><span data-vi>Thuế %</span><span data-en>Tax %</span></label><input type="number" id="tax-rate" value="10" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px" /></div>
+            <div><label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.2rem"><span data-vi>Tiền tệ</span><span data-en>Currency</span></label><select id="currency" style="width:100%;padding:0.4rem;border:1px solid #ddd;border-radius:6px"><option value="VND">VND ₫</option><option value="USD">USD $</option><option value="EUR">EUR €</option></select></div>
           </div>
-          <button id="export-pdf-btn" style="padding:0.6rem;background:#E17055;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">📄 Xuất PDF</button>
+          <button id="export-pdf-btn" style="padding:0.6rem;background:#E17055;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">📄 <span data-vi>Xuất PDF</span><span data-en>Export PDF</span></button>
         </div>
       </div>
       <div style="background:white;border-radius:12px;padding:2rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
@@ -47,7 +47,10 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
   </div>
 
   <script type="module">
-    let items = [{ desc: 'Dịch vụ lập trình web', qty: 1, price: 5000000 }];
+    const lang = document.documentElement.dataset.lang || 'vi';
+    const t = (vi: string, en: string) => lang === 'vi' ? vi : en;
+
+    let items = [{ desc: t('Dịch vụ lập trình web', 'Web development service'), qty: 1, price: 5000000 }];
 
     function fmt(amount: number, curr: string) {
       if (curr === 'VND') return new Intl.NumberFormat('vi-VN').format(amount) + ' ₫';
@@ -59,7 +62,7 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
       const list = document.getElementById('items-list')!;
       list.innerHTML = items.map((it, i) => `
         <div data-idx="${i}" style="display:grid;grid-template-columns:1fr 50px 80px 24px;gap:0.25rem;margin-bottom:0.25rem">
-          <input type="text" class="it-desc" value="${it.desc}" placeholder="Mô tả" style="padding:0.3rem;border:1px solid #ddd;border-radius:4px;font-size:0.8rem" />
+          <input type="text" class="it-desc" value="${it.desc}" placeholder="${t('Mô tả', 'Description')}" style="padding:0.3rem;border:1px solid #ddd;border-radius:4px;font-size:0.8rem" />
           <input type="number" class="it-qty" value="${it.qty}" style="padding:0.3rem;border:1px solid #ddd;border-radius:4px;font-size:0.8rem" />
           <input type="number" class="it-price" value="${it.price}" style="padding:0.3rem;border:1px solid #ddd;border-radius:4px;font-size:0.8rem" />
           <button class="it-del" style="background:#e53e3e;color:white;border:none;border-radius:4px;cursor:pointer">✕</button>
@@ -83,18 +86,18 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
       const itemsHTML = items.map(it => `<tr><td style="padding:0.5rem;border-bottom:1px solid #eee">${it.desc}</td><td style="padding:0.5rem;text-align:center;border-bottom:1px solid #eee">${it.qty}</td><td style="padding:0.5rem;text-align:right;border-bottom:1px solid #eee">${fmt(it.price, curr)}</td><td style="padding:0.5rem;text-align:right;border-bottom:1px solid #eee;font-weight:600">${fmt(it.qty*it.price, curr)}</td></tr>`).join('');
       document.getElementById('invoice-preview')!.innerHTML = `
         <div style="display:flex;justify-content:space-between;margin-bottom:2rem">
-          <div><h1 style="font-size:2rem;color:#E17055;margin:0">HÓA ĐƠN</h1><p style="color:#999;margin:0">Invoice</p></div>
-          <div style="text-align:right"><p style="font-size:1.2rem;font-weight:700;margin:0">${(document.getElementById('inv-num') as HTMLInputElement).value}</p><p style="color:#666;margin:0.25rem 0 0;font-size:0.85rem">Ngày: ${(document.getElementById('inv-date') as HTMLInputElement).value}</p><p style="color:#666;margin:0;font-size:0.85rem">Hạn: ${(document.getElementById('inv-due') as HTMLInputElement).value}</p></div>
+          <div><h1 style="font-size:2rem;color:#E17055;margin:0">${t('HÓA ĐƠN', 'INVOICE')}</h1><p style="color:#999;margin:0">${t('Hóa đơn', 'Invoice')}</p></div>
+          <div style="text-align:right"><p style="font-size:1.2rem;font-weight:700;margin:0">${(document.getElementById('inv-num') as HTMLInputElement).value}</p><p style="color:#666;margin:0.25rem 0 0;font-size:0.85rem">${t('Ngày', 'Date')}: ${(document.getElementById('inv-date') as HTMLInputElement).value}</p><p style="color:#666;margin:0;font-size:0.85rem">${t('Hạn', 'Due')}: ${(document.getElementById('inv-due') as HTMLInputElement).value}</p></div>
         </div>
         <div style="display:flex;justify-content:space-between;margin-bottom:1.5rem">
-          <div><p style="font-weight:700;margin:0 0 0.25rem">Từ / From:</p><p style="margin:0;font-size:0.85rem">${(document.getElementById('from-name') as HTMLInputElement).value}</p><p style="margin:0;font-size:0.85rem;color:#666">${(document.getElementById('from-addr') as HTMLInputElement).value}</p><p style="margin:0;font-size:0.85rem;color:#666">${(document.getElementById('from-email') as HTMLInputElement).value}</p></div>
-          <div><p style="font-weight:700;margin:0 0 0.25rem">Đến / To:</p><p style="margin:0;font-size:0.85rem">${(document.getElementById('to-name') as HTMLInputElement).value}</p><p style="margin:0;font-size:0.85rem;color:#666">${(document.getElementById('to-addr') as HTMLInputElement).value}</p><p style="margin:0;font-size:0.85rem;color:#666">${(document.getElementById('to-email') as HTMLInputElement).value}</p></div>
+          <div><p style="font-weight:700;margin:0 0 0.25rem">${t('Từ', 'From')}:</p><p style="margin:0;font-size:0.85rem">${(document.getElementById('from-name') as HTMLInputElement).value}</p><p style="margin:0;font-size:0.85rem;color:#666">${(document.getElementById('from-addr') as HTMLInputElement).value}</p><p style="margin:0;font-size:0.85rem;color:#666">${(document.getElementById('from-email') as HTMLInputElement).value}</p></div>
+          <div><p style="font-weight:700;margin:0 0 0.25rem">${t('Đến', 'To')}:</p><p style="margin:0;font-size:0.85rem">${(document.getElementById('to-name') as HTMLInputElement).value}</p><p style="margin:0;font-size:0.85rem;color:#666">${(document.getElementById('to-addr') as HTMLInputElement).value}</p><p style="margin:0;font-size:0.85rem;color:#666">${(document.getElementById('to-email') as HTMLInputElement).value}</p></div>
         </div>
-        <table style="width:100%;border-collapse:collapse;margin-bottom:1rem"><thead><tr style="background:#f5f5f5"><th style="padding:0.5rem;text-align:left">Mô tả</th><th style="padding:0.5rem">SL</th><th style="padding:0.5rem;text-align:right">Đơn giá</th><th style="padding:0.5rem;text-align:right">Tổng</th></tr></thead><tbody>${itemsHTML}</tbody></table>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:1rem"><thead><tr style="background:#f5f5f5"><th style="padding:0.5rem;text-align:left">${t('Mô tả', 'Description')}</th><th style="padding:0.5rem">${t('SL', 'Qty')}</th><th style="padding:0.5rem;text-align:right">${t('Đơn giá', 'Unit Price')}</th><th style="padding:0.5rem;text-align:right">${t('Tổng', 'Total')}</th></tr></thead><tbody>${itemsHTML}</tbody></table>
         <div style="text-align:right;margin-top:1rem">
-          <p style="margin:0.25rem 0;font-size:0.9rem">Tạm tính: <strong>${fmt(subtotal, curr)}</strong></p>
-          <p style="margin:0.25rem 0;font-size:0.9rem">Thuế (${taxRate}%): <strong>${fmt(tax, curr)}</strong></p>
-          <p style="margin:0.5rem 0;font-size:1.3rem;color:#E17055;font-weight:700">TỔNG: ${fmt(total, curr)}</p>
+          <p style="margin:0.25rem 0;font-size:0.9rem">${t('Tạm tính', 'Subtotal')}: <strong>${fmt(subtotal, curr)}</strong></p>
+          <p style="margin:0.25rem 0;font-size:0.9rem">${t('Thuế', 'Tax')} (${taxRate}%): <strong>${fmt(tax, curr)}</strong></p>
+          <p style="margin:0.5rem 0;font-size:1.3rem;color:#E17055;font-weight:700">${t('TỔNG', 'TOTAL')}: ${fmt(total, curr)}</p>
         </div>
       `;
     }

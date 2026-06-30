@@ -2,14 +2,14 @@
 import ProductLayout from '../../layouts/ProductLayout.astro';
 ---
 
-<ProductLayout title="QR Studio" ageGroup="14-17" ageColor="#20A779" productType="Sản phẩm" description="Tạo mã QR có logo, màu sắc tùy chỉnh">
+<ProductLayout title="QR Studio" ageGroup="14-17" ageColor="#20A779" productType="Sản phẩm" description="Tạo mã QR có logo, màu sắc tùy chỉnh"titleEn="QR Studio" productTypeEn="Product" descriptionEn="Create QR codes with logo and custom colors">
   <div style="padding:1.5rem;max-width:800px;margin:0 auto">
     <div style="display:grid;grid-template-columns:1fr 350px;gap:1.5rem">
       <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
-        <h2 style="margin:0 0 1rem;font-size:1.1rem">Nội dung / Content</h2>
+        <h2 style="margin:0 0 1rem;font-size:1.1rem"><span data-vi>Nội dung</span><span data-en>Content</span></h2>
         <div style="display:flex;flex-direction:column;gap:1rem">
           <div>
-            <label style="font-weight:600;font-size:0.85rem;display:block;margin-bottom:0.25rem">Loại / Type</label>
+            <label style="font-weight:600;font-size:0.85rem;display:block;margin-bottom:0.25rem"><span data-vi>Loại</span><span data-en>Type</span></label>
             <select id="qr-type" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px">
               <option value="text">Văn bản / Text</option>
               <option value="url">URL</option>
@@ -24,18 +24,18 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
         <canvas id="qr-canvas" width="256" height="256" style="border:1px solid #ddd;border-radius:8px"></canvas>
         <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.75rem">
           <div style="display:flex;gap:0.5rem;justify-content:center">
-            <div><label style="font-size:0.75rem;display:block">Màu mã</label><input type="color" id="fg-color" value="#102A43" style="width:50px;height:30px;border:none;cursor:pointer" /></div>
-            <div><label style="font-size:0.75rem;display:block">Nền</label><input type="color" id="bg-color" value="#ffffff" style="width:50px;height:30px;border:none;cursor:pointer" /></div>
+            <div><label style="font-size:0.75rem;display:block"><span data-vi>Màu mã</span><span data-en>Code color</span></label><input type="color" id="fg-color" value="#102A43" style="width:50px;height:30px;border:none;cursor:pointer" /></div>
+            <div><label style="font-size:0.75rem;display:block"><span data-vi>Nền</span><span data-en>Background</span></label><input type="color" id="bg-color" value="#ffffff" style="width:50px;height:30px;border:none;cursor:pointer" /></div>
           </div>
           <div>
-            <label style="font-size:0.75rem;display:block;margin-bottom:0.25rem">Kích thước / Size</label>
+            <label style="font-size:0.75rem;display:block;margin-bottom:0.25rem"><span data-vi>Kích thước</span><span data-en>Size</span></label>
             <input type="range" id="qr-size" min="128" max="512" value="256" style="width:100%" />
           </div>
           <div>
-            <label style="font-size:0.75rem;display:block;margin-bottom:0.25rem">Logo (tùy chọn)</label>
+            <label style="font-size:0.75rem;display:block;margin-bottom:0.25rem"><span data-vi>Logo (tùy chọn)</span><span data-en>Logo (optional)</span></label>
             <input type="file" id="logo-input" accept="image/*" style="font-size:0.75rem" />
           </div>
-          <button id="download-btn" style="padding:0.6rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">📥 Tải PNG</button>
+          <button id="download-btn" style="padding:0.6rem;background:#20A779;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">📥 <span data-vi>Tải PNG</span><span data-en>Download PNG</span></button>
         </div>
       </div>
     </div>
@@ -43,8 +43,20 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
 
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script type="module">
+    const lang = document.documentElement.dataset.lang || 'vi';
+    const t = (vi: string, en: string) => lang === 'vi' ? vi : en;
     const canvas = document.getElementById('qr-canvas') as HTMLCanvasElement;
     let logoImg: HTMLImageElement | null = null;
+
+    // Update select option labels based on current language
+    const qrTypeSelect = document.getElementById('qr-type') as HTMLSelectElement;
+    const optionLabels: Record<string, { vi: string; en: string }> = {
+      text: { vi: 'Văn bản', en: 'Text' },
+      vcard: { vi: 'Liên hệ (vCard)', en: 'Contact (vCard)' },
+    };
+    Array.from(qrTypeSelect.options).forEach(opt => {
+      if (optionLabels[opt.value]) opt.text = t(optionLabels[opt.value].vi, optionLabels[opt.value].en);
+    });
 
     function getContent(): string {
       const type = (document.getElementById('qr-type') as HTMLSelectElement).value;
@@ -68,10 +80,10 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
     function renderFields() {
       const type = (document.getElementById('qr-type') as HTMLSelectElement).value;
       const c = document.getElementById('input-fields')!;
-      if (type === 'text') c.innerHTML = `<textarea id="f-text" rows="4" placeholder="Nhập văn bản..." style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px">Hello, HaMi Code Việt!</textarea>`;
+      if (type === 'text') c.innerHTML = `<textarea id="f-text" rows="4" placeholder="${t('Nhập văn bản...','Enter text...')}" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px">${t('Hello, HaMi Code Việt!','Hello, HaMi Code Việt!')}</textarea>`;
       else if (type === 'url') c.innerHTML = `<input type="text" id="f-url" value="https://hamicodeviet.com" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px" />`;
-      else if (type === 'wifi') c.innerHTML = `<div style="display:flex;flex-direction:column;gap:0.5rem"><input type="text" id="f-ssid" placeholder="WiFi Name / SSID" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /><input type="text" id="f-pass" placeholder="Password" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /><select id="f-enc" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px"><option value="WPA">WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">No password</option></select></div>`;
-      else if (type === 'vcard') c.innerHTML = `<div style="display:flex;flex-direction:column;gap:0.5rem"><input type="text" id="f-name" placeholder="Họ tên / Name" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /><input type="text" id="f-phone" placeholder="Số điện thoại / Phone" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /><input type="text" id="f-email" placeholder="Email" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /></div>`;
+      else if (type === 'wifi') c.innerHTML = `<div style="display:flex;flex-direction:column;gap:0.5rem"><input type="text" id="f-ssid" placeholder="${t('Tên WiFi / SSID','WiFi Name / SSID')}" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /><input type="text" id="f-pass" placeholder="${t('Mật khẩu','Password')}" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /><select id="f-enc" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px"><option value="WPA">WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">${t('Không mật khẩu','No password')}</option></select></div>`;
+      else if (type === 'vcard') c.innerHTML = `<div style="display:flex;flex-direction:column;gap:0.5rem"><input type="text" id="f-name" placeholder="${t('Họ tên','Name')}" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /><input type="text" id="f-phone" placeholder="${t('Số điện thoại','Phone')}" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /><input type="text" id="f-email" placeholder="Email" style="padding:0.5rem;border:1px solid #ddd;border-radius:6px" /></div>`;
       c.querySelectorAll('input,textarea,select').forEach(el => el.addEventListener('input', generateQR));
       generateQR();
     }
