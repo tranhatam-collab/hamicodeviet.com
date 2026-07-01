@@ -10,7 +10,8 @@ import AppLayout from '../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiCall, clearToken } from '../lib/api';
 
-    const root = document.getElementById('settings-root')!;
+    const root = document.getElementById('settings-root');
+    if (!root) throw new Error('Root element not found: root');
 
     async function renderSettings() {
       const user = await getCurrentUser();

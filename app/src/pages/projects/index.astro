@@ -10,7 +10,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiFetch } from '../../lib/api';
 
-    const root = document.getElementById('pw-root')!;
+    const root = document.getElementById('pw-root');
+    if (!root) throw new Error('Root element not found: root');
 
     const STEPS = [
       { step: 0, name: 'Quan sát', name_en: 'Observe', icon: '👁' },
@@ -91,7 +92,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
 
     async function loadProjects() {
       currentView = 'list';
-      const content = document.getElementById('pw-content')!;
+      const content = document.getElementById('pw-content');
+    if (!content) throw new Error('Root element not found: content');
       try {
         const data = await apiFetch('/projects');
         renderProjectList(data.projects || []);
@@ -101,13 +103,14 @@ import AppLayout from '../../layouts/AppLayout.astro';
     }
 
     function renderProjectList(items: any[]) {
-      const content = document.getElementById('pw-content')!;
+      const content = document.getElementById('pw-content');
+    if (!content) throw new Error('Root element not found: content');
       const cards = items.map(p => {
         const domain = DOMAINS[p.domain] || { vi: p.domain, en: p.domain, icon: '📦' };
         const statusColor = STATUS_COLORS[p.status] || '#6b7280';
         const progress = Math.round(((p.current_step + 1) / 10) * 100);
         return `
-          <div class="card" style="padding:1.25rem;cursor:pointer" onclick="window.location.href='/projects/detail?id=${p.id}'">
+          <div class="card project-card-link" style="padding:1.25rem;cursor:pointer" data-pid="${p.id}">
             <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.5rem">
               <div>
                 <h3 style="font-size:1rem;margin:0">${domain.icon} ${p.title}</h3>
@@ -151,19 +154,27 @@ import AppLayout from '../../layouts/AppLayout.astro';
       document.getElementById('btn-new-project')?.addEventListener('click', showTemplates);
       document.getElementById('btn-custom-project')?.addEventListener('click', showCustomForm);
       document.getElementById('btn-mentors')?.addEventListener('click', showMentors);
+      content.querySelectorAll('.project-card-link').forEach(el => {
+        el.addEventListener('click', () => {
+          const pid = el.getAttribute('data-pid');
+          if (pid) window.location.href = `/projects/detail?id=${pid}`;
+        });
+      });
     }
 
     async function showTemplates() {
-      const modal = document.getElementById('modal-root')!;
-      modal.innerHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem"><div class="card" style="padding:1.5rem;max-width:700px;max-height:80vh;overflow:auto;width:100%"><h3 style="margin:0 0 1rem">Chọn mẫu dự án</h3><p id="tpl-loading">Đang tải...</p><button class="btn" onclick="document.getElementById('modal-root').innerHTML=''" style="margin-top:1rem">Đóng</button></div></div>`;
+      const modal = document.getElementById('modal-root');
+    if (!modal) throw new Error('Root element not found: modal');
+      modal.innerHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem"><div class="card" style="padding:1.5rem;max-width:700px;max-height:80vh;overflow:auto;width:100%"><h3 style="margin:0 0 1rem">Chọn mẫu dự án</h3><p id="tpl-loading">Đang tải...</p><button class="btn modal-close" style="margin-top:1rem">Đóng</button></div></div>`;
+      modal.querySelector('.modal-close')?.addEventListener('click', () => { modal.innerHTML = ''; });
       try {
         const data = await apiFetch('/projects/templates');
         const tpls = data.templates || [];
-        document.getElementById('tpl-loading')!.innerHTML = tpls.length === 0
+        const _e = document.getElementById('tpl-loading'); if (_e) _e.innerHTML = tpls.length === 0
           ? '<p>Chưa có mẫu nào. Tạo dự án tự do.</p>'
           : `<div style="display:flex;flex-direction:column;gap:0.75rem">${tpls.map((t: any) => {
               const d = DOMAINS[t.domain] || { vi: t.domain, icon: '📦' };
-              return `<div class="card" style="padding:1rem;cursor:pointer;border:2px solid transparent" onmouseover="this.style.borderColor='var(--color-primary)'" onmouseout="this.style.borderColor='transparent'" onclick="window.__startTemplate('${t.id}')">
+              return `<div class="card tpl-card" style="padding:1rem;cursor:pointer;border:2px solid transparent" data-tid="${t.id}">
                 <h4 style="margin:0 0 0.25rem">${d.icon} ${t.title}</h4>
                 <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 0.5rem">${t.description}</p>
                 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;font-size:0.7rem">
@@ -174,9 +185,13 @@ import AppLayout from '../../layouts/AppLayout.astro';
                 </div>
               </div>`;
             }).join('')}</div>`;
-        (window as any).__startTemplate = startTemplate;
+        document.querySelectorAll('.tpl-card').forEach(el => {
+          el.addEventListener('click', () => startTemplate(el.getAttribute('data-tid') || ''));
+          el.addEventListener('mouseover', () => { el.style.borderColor = 'var(--color-primary)'; });
+          el.addEventListener('mouseout', () => { el.style.borderColor = 'transparent'; });
+        });
       } catch (err: any) {
-        document.getElementById('tpl-loading')!.innerHTML = `<p style="color:#e53e3e">${err.message}</p>`;
+        const _e = document.getElementById('tpl-loading'); if (_e) _e.innerHTML = `<p style="color:#e53e3e">${err.message}</p>`;
       }
     }
 
@@ -203,7 +218,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
     }
 
     function showCustomForm() {
-      const modal = document.getElementById('modal-root')!;
+      const modal = document.getElementById('modal-root');
+    if (!modal) throw new Error('Root element not found: modal');
       const domainOpts = Object.entries(DOMAINS).map(([k, v]) => `<option value="${k}">${v.icon} ${v.vi}</option>`).join('');
       modal.innerHTML = `
         <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem">
@@ -228,11 +244,12 @@ import AppLayout from '../../layouts/AppLayout.astro';
               <input type="date" id="c-deadline" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" />
               <button type="submit" class="btn btn--primary">Tạo dự án</button>
             </form>
-            <button class="btn" onclick="document.getElementById('modal-root').innerHTML=''" style="margin-top:0.75rem">Hủy</button>
+            <button class="btn modal-close" style="margin-top:0.75rem">Hủy</button>
             <div id="c-msg" style="margin-top:0.5rem"></div>
           </div>
         </div>
       `;
+      modal.querySelector('.modal-close')?.addEventListener('click', () => { modal.innerHTML = ''; });
       document.getElementById('custom-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         try {
@@ -248,18 +265,20 @@ import AppLayout from '../../layouts/AppLayout.astro';
           await apiFetch(`/projects/${data.project.id}/start`, 'POST');
           window.location.href = `/projects/detail?id=${data.project.id}`;
         } catch (err: any) {
-          document.getElementById('c-msg')!.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+          const _e = document.getElementById('c-msg'); if (_e) _e.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
         }
       });
     }
 
     async function showMentors() {
-      const modal = document.getElementById('modal-root')!;
-      modal.innerHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem"><div class="card" style="padding:1.5rem;max-width:600px;max-height:80vh;overflow:auto;width:100%"><h3 style="margin:0 0 1rem">👤 Mentors</h3><p id="m-loading">Đang tải...</p><button class="btn" onclick="document.getElementById('modal-root').innerHTML=''" style="margin-top:1rem">Đóng</button></div></div>`;
+      const modal = document.getElementById('modal-root');
+    if (!modal) throw new Error('Root element not found: modal');
+      modal.innerHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem"><div class="card" style="padding:1.5rem;max-width:600px;max-height:80vh;overflow:auto;width:100%"><h3 style="margin:0 0 1rem">👤 Mentors</h3><p id="m-loading">Đang tải...</p><button class="btn modal-close" style="margin-top:1rem">Đóng</button></div></div>`;
+      modal.querySelector('.modal-close')?.addEventListener('click', () => { modal.innerHTML = ''; });
       try {
         const data = await apiFetch('/projects/mentors');
         const mentors = data.mentors || [];
-        document.getElementById('m-loading')!.innerHTML = mentors.length === 0
+        const _e = document.getElementById('m-loading'); if (_e) _e.innerHTML = mentors.length === 0
           ? '<p>Chưa có mentor. <a href="/projects/mentors/register" style="color:var(--color-primary)">Đăng ký làm mentor</a></p>'
           : `<div style="display:flex;flex-direction:column;gap:0.75rem">${mentors.map((m: any) => `
               <div class="card" style="padding:1rem">
@@ -272,7 +291,7 @@ import AppLayout from '../../layouts/AppLayout.astro';
                 </div>
               </div>`).join('')}</div>`;
       } catch (err: any) {
-        document.getElementById('m-loading')!.innerHTML = `<p style="color:#e53e3e">${err.message}</p>`;
+        const _e = document.getElementById('m-loading'); if (_e) _e.innerHTML = `<p style="color:#e53e3e">${err.message}</p>`;
       }
     }
 

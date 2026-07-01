@@ -96,9 +96,15 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
       const size = parseInt((document.getElementById('qr-size') as HTMLInputElement).value);
       canvas.width = size; canvas.height = size;
       try {
+        if (!(window as any).QRCode) {
+          const status = document.getElementById('qr-status');
+          if (status) status.textContent = '⚠ Thư viện QRCode chưa tải được. Vui lòng tải lại trang. / QRCode library failed to load. Please reload.';
+          return;
+        }
         await (window as any).QRCode.toCanvas(canvas, text, { width: size, color: { dark: fg, light: bg }, margin: 2 });
         if (logoImg) {
-          const ctx = canvas.getContext('2d')!;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return;
           const logoSize = size * 0.2;
           const x = (size - logoSize) / 2;
           ctx.fillStyle = bg;

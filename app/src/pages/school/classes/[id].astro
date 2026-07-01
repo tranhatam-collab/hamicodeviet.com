@@ -14,7 +14,8 @@ export function getStaticPaths() {
   <script type="module">
     import { getCurrentUser, apiFetch } from '../../../lib/api';
 
-    const root = document.getElementById('class-root')!;
+    const root = document.getElementById('class-root');
+    if (!root) throw new Error('Root element not found: root');
     const classId = window.location.pathname.split('/').pop();
 
     async function renderClass() {
@@ -85,7 +86,8 @@ export function getStaticPaths() {
       `;
 
       document.getElementById('create-assign-btn')?.addEventListener('click', () => {
-        const form = document.getElementById('create-assign-form')!;
+        const form = document.getElementById('create-assign-form');
+    if (!form) throw new Error('Root element not found: form');
         form.style.display = form.style.display === 'none' ? 'block' : 'none';
       });
       document.getElementById('submit-assign-btn')?.addEventListener('click', createAssignment);

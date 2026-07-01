@@ -16,7 +16,8 @@ import AppLayout from '../layouts/AppLayout.astro';
   <script type="module">
     import { setToken } from '../lib/api';
 
-    const status = document.getElementById('cb-status')!;
+    const status = document.getElementById('cb-status');
+    if (!status) throw new Error('Root element not found: status');
 
     // Token comes in URL fragment (after #) to keep it out of server logs
     const hash = window.location.hash.substring(1);

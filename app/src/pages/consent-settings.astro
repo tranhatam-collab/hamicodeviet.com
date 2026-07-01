@@ -14,7 +14,8 @@ import AppLayout from '../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiFetch, clearToken } from '../lib/api';
 
-    const root = document.getElementById('consent-root')!;
+    const root = document.getElementById('consent-root');
+    if (!root) throw new Error('Root element not found: root');
 
     async function renderConsentPage() {
       const user = await getCurrentUser();
@@ -160,7 +161,7 @@ import AppLayout from '../layouts/AppLayout.astro';
       `;
 
       // Logout
-      document.getElementById('logout-btn')!.addEventListener('click', async (e) => {
+      document.getElementById('logout-btn')?.addEventListener('click', async (e) => {
         e.preventDefault();
         clearToken();
         window.location.href = '/login';
@@ -181,7 +182,8 @@ import AppLayout from '../layouts/AppLayout.astro';
             // Show assent confirmation
             pendingConsentType = consentType!;
             target.checked = false; // uncheck until confirmed
-            const assentBox = document.getElementById('assent-confirm')!;
+            const assentBox = document.getElementById('assent-confirm');
+    if (!assentBox) throw new Error('Root element not found: assentBox');
             assentBox.style.display = 'block';
             const assentCheckbox = document.getElementById('child-assent-confirm') as HTMLInputElement;
             const proceedBtn = document.getElementById('assent-proceed') as HTMLButtonElement;
@@ -209,7 +211,7 @@ import AppLayout from '../layouts/AppLayout.astro';
                 showToast('Lỗi: ' + err.message, true);
               }
             };
-            document.getElementById('assent-cancel')!.onclick = () => {
+            const _el = document.getElementById('assent-cancel'); if (_el) _el.onclick = () => {
               assentBox.style.display = 'none';
               pendingConsentType = null;
             };
@@ -234,7 +236,8 @@ import AppLayout from '../layouts/AppLayout.astro';
       });
 
       function showToast(msg: string, isError = false) {
-        const toast = document.getElementById('toast')!;
+        const toast = document.getElementById('toast');
+    if (!toast) throw new Error('Root element not found: toast');
         toast.textContent = msg;
         toast.className = 'toast' + (isError ? ' toast--error' : '');
         toast.style.display = 'block';
@@ -245,7 +248,7 @@ import AppLayout from '../layouts/AppLayout.astro';
     renderConsentPage();
   </script>
 
-  <style>
+  <style is:global>
     .consent-item {
       padding: 16px;
       border: 1px solid var(--color-border, #e2e8f0);

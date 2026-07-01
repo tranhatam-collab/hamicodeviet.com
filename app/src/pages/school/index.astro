@@ -10,7 +10,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiFetch } from '../../lib/api';
 
-    const root = document.getElementById('school-root')!;
+    const root = document.getElementById('school-root');
+    if (!root) throw new Error('Root element not found: root');
 
     async function renderSchool() {
       const user = await getCurrentUser();
@@ -75,7 +76,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
 
     async function createSchool(e: Event) {
       e.preventDefault();
-      const status = document.getElementById('school-status')!;
+      const status = document.getElementById('school-status');
+    if (!status) throw new Error('Root element not found: status');
       try {
         await apiFetch('/school', 'POST', {
           name: (document.getElementById('s-name') as HTMLInputElement).value,
@@ -142,7 +144,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
         `;
 
         document.getElementById('create-class-btn')?.addEventListener('click', () => {
-          const form = document.getElementById('create-class-form')!;
+          const form = document.getElementById('create-class-form');
+    if (!form) throw new Error('Root element not found: form');
           form.style.display = form.style.display === 'none' ? 'block' : 'none';
         });
         document.getElementById('submit-class-btn')?.addEventListener('click', createClass.bind(null, school.id));

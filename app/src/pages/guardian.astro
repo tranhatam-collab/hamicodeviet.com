@@ -14,7 +14,8 @@ import AppLayout from '../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiFetch, clearToken } from '../lib/api';
 
-    const root = document.getElementById('guardian-root')!;
+    const root = document.getElementById('guardian-root');
+    if (!root) throw new Error('Root element not found: root');
 
     async function renderGuardianPage() {
       const user = await getCurrentUser();
@@ -172,19 +173,21 @@ import AppLayout from '../layouts/AppLayout.astro';
       `;
 
       // Logout
-      document.getElementById('logout-btn')!.addEventListener('click', async (e) => {
+      document.getElementById('logout-btn')?.addEventListener('click', async (e) => {
         e.preventDefault();
         clearToken();
         window.location.href = '/login';
       });
 
       // Submit declaration
-      document.getElementById('submit-declaration')!.addEventListener('click', async () => {
+      document.getElementById('submit-declaration')?.addEventListener('click', async () => {
         const childEmail = (document.getElementById('child-email') as HTMLInputElement).value.trim();
         const relationship = (document.getElementById('relationship') as HTMLSelectElement).value;
         const verificationMethod = (document.getElementById('verification-method') as HTMLSelectElement).value;
-        const errBox = document.getElementById('declare-error')!;
-        const successBox = document.getElementById('declare-success')!;
+        const errBox = document.getElementById('declare-error');
+    if (!errBox) throw new Error('Root element not found: errBox');
+        const successBox = document.getElementById('declare-success');
+    if (!successBox) throw new Error('Root element not found: successBox');
         errBox.style.display = 'none';
         successBox.style.display = 'none';
 
@@ -260,7 +263,7 @@ import AppLayout from '../layouts/AppLayout.astro';
     renderGuardianPage();
   </script>
 
-  <style>
+  <style is:global>
     .form-group { margin-bottom: 16px; }
     .form-label {
       display: block;

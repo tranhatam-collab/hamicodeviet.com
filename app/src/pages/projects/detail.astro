@@ -10,7 +10,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiFetch } from '../../lib/api';
 
-    const root = document.getElementById('pw-detail-root')!;
+    const root = document.getElementById('pw-detail-root');
+    if (!root) throw new Error('Root element not found: root');
     const projectId = new URLSearchParams(window.location.search).get('id');
 
     const STEPS = [
@@ -92,7 +93,7 @@ import AppLayout from '../../layouts/AppLayout.astro';
                 }).join('')}</div>` : ''}
               </div>
               ${!isCompleted && project.status !== 'submitted' && project.status !== 'reviewed' && project.status !== 'published' ? `
-                <button class="btn btn--primary" style="font-size:0.75rem;padding:0.3rem 0.6rem" onclick="window.__completeStep(${s.step})">Hoàn thành</button>
+                <button class="btn btn--primary step-complete-btn" style="font-size:0.75rem;padding:0.3rem 0.6rem" data-step="${s.step}">Hoàn thành</button>
               ` : ''}
             </div>
           </div>
@@ -182,7 +183,9 @@ import AppLayout from '../../layouts/AppLayout.astro';
       document.getElementById('btn-mentor')?.addEventListener('click', showMentorAssign);
       document.getElementById('btn-submit')?.addEventListener('click', showSubmitForm);
       document.getElementById('btn-publish')?.addEventListener('click', publishProject);
-      (window as any).__completeStep = completeStep;
+      document.querySelectorAll('.step-complete-btn').forEach(el => {
+        el.addEventListener('click', () => completeStep(parseInt(el.getAttribute('data-step') || '0', 10)));
+      });
     }
 
     async function completeStep(step: number) {
@@ -197,7 +200,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
     }
 
     function showEvidenceForm() {
-      const modal = document.getElementById('modal-root')!;
+      const modal = document.getElementById('modal-root');
+    if (!modal) throw new Error('Root element not found: modal');
       const milestoneOpts = (projectData.milestones || []).map((m: any) => {
         const s = STEPS[m.step];
         return `<option value="${m.id}">Bước ${m.step + 1}: ${s?.name || ''}</option>`;
@@ -239,14 +243,15 @@ import AppLayout from '../../layouts/AppLayout.astro';
               </div>
               <button type="submit" class="btn btn--primary">Thêm bằng chứng</button>
             </form>
-            <button class="btn" onclick="document.getElementById('modal-root').innerHTML=''" style="margin-top:0.75rem">Hủy</button>
+            <button class="btn modal-close" style="margin-top:0.75rem">Hủy</button>
             <div id="ev-msg" style="margin-top:0.5rem"></div>
           </div>
         </div>
       `;
+      modal.querySelector('.modal-close')?.addEventListener('click', () => { modal.innerHTML = ''; });
 
       document.getElementById('ev-ai')?.addEventListener('change', (e) => {
-        document.getElementById('ev-ai-detail')!.style.display = (e.target as HTMLInputElement).checked ? 'block' : 'none';
+        const _s = document.getElementById('ev-ai-detail'); if (_s) _s.style.display = (e.target as HTMLInputElement).checked ? 'block' : 'none';
       });
 
       document.getElementById('ev-form')?.addEventListener('submit', async (e) => {
@@ -266,40 +271,45 @@ import AppLayout from '../../layouts/AppLayout.astro';
               declaration: (document.getElementById('ev-ai-decl') as HTMLTextAreaElement).value,
             } : {},
           });
-          document.getElementById('modal-root')!.innerHTML = '';
+          const _e = document.getElementById('modal-root'); if (_e) _e.innerHTML = '';
           await loadProject();
         } catch (err: any) {
-          document.getElementById('ev-msg')!.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+          const _e = document.getElementById('ev-msg'); if (_e) _e.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
         }
       });
     }
 
     async function showMentorAssign() {
-      const modal = document.getElementById('modal-root')!;
-      modal.innerHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem"><div class="card" style="padding:1.5rem;max-width:500px;width:100%;max-height:80vh;overflow:auto"><h3 style="margin:0 0 1rem">👤 Gán mentor</h3><p id="ma-loading">Đang tải danh sách mentor...</p><button class="btn" onclick="document.getElementById('modal-root').innerHTML=''" style="margin-top:1rem">Đóng</button></div></div>`;
+      const modal = document.getElementById('modal-root');
+    if (!modal) throw new Error('Root element not found: modal');
+      modal.innerHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem"><div class="card" style="padding:1.5rem;max-width:500px;width:100%;max-height:80vh;overflow:auto"><h3 style="margin:0 0 1rem">👤 Gán mentor</h3><p id="ma-loading">Đang tải danh sách mentor...</p><button class="btn modal-close" style="margin-top:1rem">Đóng</button></div></div>`;
+      modal.querySelector('.modal-close')?.addEventListener('click', () => { modal.innerHTML = ''; });
       try {
         const data = await apiFetch(`/projects/mentors?domain=${projectData.project.domain}`);
         const mentors = data.mentors || [];
         if (mentors.length === 0) {
-          document.getElementById('ma-loading')!.innerHTML = '<p>Chưa có mentor cho lĩnh vực này.</p>';
+          const ml = document.getElementById('ma-loading'); if (ml) ml.innerHTML = '<p>Chưa có mentor cho lĩnh vực này.</p>';
           return;
         }
-        document.getElementById('ma-loading')!.innerHTML = `<div style="display:flex;flex-direction:column;gap:0.5rem">${mentors.map((m: any) => `
-          <div class="card" style="padding:0.75rem;cursor:pointer" onclick="window.__assignMentor('${m.id}')">
+        const ml2 = document.getElementById('ma-loading');
+        if (ml2) ml2.innerHTML = `<div style="display:flex;flex-direction:column;gap:0.5rem">${mentors.map((m: any) => `
+          <div class="card mentor-card" style="padding:0.75rem;cursor:pointer" data-mid="${m.id}">
             <strong>${m.display_name}</strong>
             <p style="font-size:0.75rem;color:var(--color-text-muted);margin:0.25rem 0">${m.bio || ''}</p>
             <div style="font-size:0.7rem">⭐ ${m.rating} · ${m.total_projects} dự án</div>
           </div>`).join('')}</div>`;
-        (window as any).__assignMentor = assignMentor;
+        document.querySelectorAll('.mentor-card').forEach(el => {
+          el.addEventListener('click', () => assignMentor(el.getAttribute('data-mid') || ''));
+        });
       } catch (err: any) {
-        document.getElementById('ma-loading')!.innerHTML = `<p style="color:#e53e3e">${err.message}</p>`;
+        const _e = document.getElementById('ma-loading'); if (_e) _e.innerHTML = `<p style="color:#e53e3e">${err.message}</p>`;
       }
     }
 
     async function assignMentor(mentorId: string) {
       try {
         await apiFetch(`/projects/${projectId}/mentor`, 'POST', { mentorId });
-        document.getElementById('modal-root')!.innerHTML = '';
+        const _e = document.getElementById('modal-root'); if (_e) _e.innerHTML = '';
         await loadProject();
       } catch (err: any) {
         alert('Lỗi: ' + err.message);
@@ -307,7 +317,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
     }
 
     function showSubmitForm() {
-      const modal = document.getElementById('modal-root')!;
+      const modal = document.getElementById('modal-root');
+    if (!modal) throw new Error('Root element not found: modal');
       modal.innerHTML = `
         <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem">
           <div class="card" style="padding:1.5rem;max-width:550px;width:100%">
@@ -321,11 +332,12 @@ import AppLayout from '../../layouts/AppLayout.astro';
               </div>
               <button type="submit" class="btn btn--primary">Nộp dự án</button>
             </form>
-            <button class="btn" onclick="document.getElementById('modal-root').innerHTML=''" style="margin-top:0.75rem">Hủy</button>
+            <button class="btn modal-close" style="margin-top:0.75rem">Hủy</button>
             <div id="s-msg" style="margin-top:0.5rem"></div>
           </div>
         </div>
       `;
+      modal.querySelector('.modal-close')?.addEventListener('click', () => { modal.innerHTML = ''; });
       document.getElementById('submit-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         try {
@@ -336,10 +348,10 @@ import AppLayout from '../../layouts/AppLayout.astro';
               declaration: (document.getElementById('s-ai-decl') as HTMLTextAreaElement).value,
             },
           });
-          document.getElementById('modal-root')!.innerHTML = '';
+          const _e = document.getElementById('modal-root'); if (_e) _e.innerHTML = '';
           await loadProject();
         } catch (err: any) {
-          document.getElementById('s-msg')!.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+          const _e = document.getElementById('s-msg'); if (_e) _e.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
         }
       });
     }

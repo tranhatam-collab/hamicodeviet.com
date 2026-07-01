@@ -10,7 +10,8 @@ import AppLayout from '../../../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiFetch } from '../../../lib/api';
 
-    const root = document.getElementById('mr-root')!;
+    const root = document.getElementById('mr-root');
+    if (!root) throw new Error('Root element not found: root');
 
     const DOMAINS = [
       { value: 'agriculture', label: '🌾 Nông nghiệp' },
@@ -127,10 +128,10 @@ import AppLayout from '../../../layouts/AppLayout.astro';
             availabilityHoursPerWeek: parseInt((document.getElementById('m-hours') as HTMLInputElement).value),
             hourlyRateVnd: parseInt((document.getElementById('m-rate') as HTMLInputElement).value),
           });
-          document.getElementById('m-msg')!.innerHTML = '<span style="color:var(--color-success)">✓ Đã đăng ký! Hồ sơ sẽ được xét duyệt trước khi hiển thị công khai.</span>';
+          const _e = document.getElementById('m-msg'); if (_e) _e.innerHTML = '<span style="color:var(--color-success)">✓ Đã đăng ký! Hồ sơ sẽ được xét duyệt trước khi hiển thị công khai.</span>';
           setTimeout(() => window.location.href = '/projects', 2000);
         } catch (err: any) {
-          document.getElementById('m-msg')!.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+          const _e = document.getElementById('m-msg'); if (_e) _e.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
         }
       });
     }

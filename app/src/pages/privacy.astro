@@ -10,7 +10,8 @@ import AppLayout from '../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiFetch } from '../lib/api';
 
-    const root = document.getElementById('privacy-root')!;
+    const root = document.getElementById('privacy-root');
+    if (!root) throw new Error('Root element not found: root');
 
     async function renderPrivacy() {
       const user = await getCurrentUser();
@@ -83,7 +84,8 @@ import AppLayout from '../layouts/AppLayout.astro';
     }
 
     async function exportData() {
-      const status = document.getElementById('export-status')!;
+      const status = document.getElementById('export-status');
+    if (!status) throw new Error('Root element not found: status');
       const btn = document.getElementById('export-btn') as HTMLButtonElement;
       btn.disabled = true;
       status.innerHTML = '<span style="color:var(--color-text-muted)">Đang xuất... / Exporting...</span>';
@@ -104,7 +106,8 @@ import AppLayout from '../layouts/AppLayout.astro';
     }
 
     async function requestDeletion() {
-      const status = document.getElementById('delete-status')!;
+      const status = document.getElementById('delete-status');
+    if (!status) throw new Error('Root element not found: status');
       if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ dữ liệu? Hành động này không thể hoàn tác sau 30 ngày.')) return;
       try {
         await apiFetch('/gdpr/deletion-request', 'POST', {});

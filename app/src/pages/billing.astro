@@ -10,7 +10,8 @@ import AppLayout from '../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiCall, clearToken } from '../lib/api';
 
-    const root = document.getElementById('billing-root')!;
+    const root = document.getElementById('billing-root');
+    if (!root) throw new Error('Root element not found: root');
 
     async function renderBilling() {
       const user = await getCurrentUser();

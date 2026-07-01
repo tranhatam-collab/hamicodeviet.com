@@ -115,10 +115,14 @@ import AppLayout from '../layouts/AppLayout.astro';
       window.location.href = '/login';
     }
 
-    const reportBtn = document.getElementById('report-btn')!;
-    const reportForm = document.getElementById('report-form')!;
-    const reportSubmit = document.getElementById('report-submit')!;
-    const reportSuccess = document.getElementById('report-success')!;
+    const reportBtn = document.getElementById('report-btn');
+    if (!reportBtn) throw new Error('Root element not found: reportBtn');
+    const reportForm = document.getElementById('report-form');
+    if (!reportForm) throw new Error('Root element not found: reportForm');
+    const reportSubmit = document.getElementById('report-submit');
+    if (!reportSubmit) throw new Error('Root element not found: reportSubmit');
+    const reportSuccess = document.getElementById('report-success');
+    if (!reportSuccess) throw new Error('Root element not found: reportSuccess');
 
     reportBtn.addEventListener('click', () => {
       reportForm.style.display = 'block';

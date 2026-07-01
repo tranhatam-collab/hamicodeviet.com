@@ -24,7 +24,8 @@ export function getStaticPaths() {
   <script type="module">
     import { getCurrentUser, apiFetch } from '../../lib/api';
 
-    const root = document.getElementById('codelab-exercise-root')!;
+    const root = document.getElementById('codelab-exercise-root');
+    if (!root) throw new Error('Root element not found: root');
     const slug = window.location.pathname.split('/').pop();
 
     let editor: any = null;
@@ -130,7 +131,8 @@ export function getStaticPaths() {
 
     async function submitCode() {
       const btn = document.getElementById('submit-btn') as HTMLButtonElement;
-      const panel = document.getElementById('results-panel')!;
+      const panel = document.getElementById('results-panel');
+    if (!panel) throw new Error('Root element not found: panel');
       btn.disabled = true;
       btn.textContent = 'Đang chạy... / Running...';
       panel.innerHTML = '<span style="color:#FFC857">⏳ Đang chạy code và chấm điểm...</span>';

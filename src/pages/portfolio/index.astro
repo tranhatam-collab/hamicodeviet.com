@@ -101,7 +101,7 @@ const sampleProjects = [
         </p>
         <div style="max-width:480px;margin:0 auto;display:flex;gap:0.75rem">
           <input type="text" id="cert-id" placeholder="HAMI-XXXX-XXXX" style="flex:1;border:1px solid var(--color-border);border-radius:10px;padding:0.75rem 1rem;font-size:1rem" />
-          <button class="btn btn--primary" id="cert-verify-btn" onclick="verifyCert()">
+          <button class="btn btn--primary" id="cert-verify-btn" type="button">
             <span data-vi>Xác minh</span>
             <span data-en>Verify</span>
           </button>
@@ -127,9 +127,41 @@ const sampleProjects = [
       </a>
     </div>
   </section>
-</BaseLayout>
 
-<style>
+<script is:inline>
+(function() {
+  async function verifyCert() {
+    const idInput = document.getElementById('cert-id');
+    const result = document.getElementById('cert-result');
+    if (!idInput || !result) return;
+    const id = idInput.value.trim();
+    if (!id) {
+      result.innerHTML = '<span style="color:#e53e3e">Vui lòng nhập ID chứng chỉ / Please enter a certificate ID</span>';
+      return;
+    }
+    result.innerHTML = '<span style="color:var(--color-text-muted)">Đang xác minh... / Verifying...</span>';
+    try {
+      const res = await fetch('https://api.hamicodeviet.com/certificates/' + encodeURIComponent(id));
+      if (res.ok) {
+        const data = await res.json();
+        result.innerHTML = '<span style="color:var(--color-success);font-weight:600">✓ Chứng chỉ hợp lệ! / Certificate valid!</span><br><span style="font-size:0.9rem;color:var(--color-text-muted)">' + (data.certificate?.recipient_name || '') + ' — ' + (data.certificate?.course_title || '') + '</span>';
+      } else if (res.status === 404) {
+        result.innerHTML = '<span style="color:#e53e3e">✗ Không tìm thấy chứng chỉ / Certificate not found</span>';
+      } else {
+        result.innerHTML = '<span style="color:#e53e3e">Hệ thống xác minh chưa sẵn sàng / Verification system not ready</span>';
+      }
+    } catch (e) {
+      result.innerHTML = '<span style="color:var(--color-text-muted)">Tính năng xác minh sẽ sớm có mặt / Verification coming soon</span>';
+    }
+  }
+  const btn = document.getElementById('cert-verify-btn');
+  if (btn) btn.addEventListener('click', verifyCert);
+  const idInput = document.getElementById('cert-id');
+  if (idInput) idInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') verifyCert(); });
+})();
+</script>
+
+<style is:global>
   .hero-subtitle { max-width: 720px; margin: 0 auto; }
   .feature-card { text-align: center; }
   .feature-card h3 { font-size: 1.1rem; color: var(--color-navy); }
@@ -147,29 +179,4 @@ const sampleProjects = [
   .development-card p { margin-bottom: 0; color: var(--color-text-muted); }
   @media (max-width: 600px) { .profile-header { flex-direction: column; text-align: center; } }
 </style>
-
-<script is:inline>
-async function verifyCert() {
-  const id = document.getElementById('cert-id')?.value.trim();
-  const result = document.getElementById('cert-result');
-  if (!id) {
-    result.innerHTML = '<span style="color:#e53e3e">Vui lòng nhập ID chứng chỉ / Please enter a certificate ID</span>';
-    return;
-  }
-  result.innerHTML = '<span style="color:var(--color-text-muted)">Đang xác minh... / Verifying...</span>';
-  try {
-    const res = await fetch('https://api.hamicodeviet.com/certificates/' + encodeURIComponent(id));
-    if (res.ok) {
-      const data = await res.json();
-      result.innerHTML = '<span style="color:var(--color-success);font-weight:600">✓ Chứng chỉ hợp lệ! / Certificate valid!</span><br><span style="font-size:0.9rem;color:var(--color-text-muted)">' + (data.certificate?.recipient_name || '') + ' — ' + (data.certificate?.course_title || '') + '</span>';
-    } else if (res.status === 404) {
-      result.innerHTML = '<span style="color:#e53e3e">✗ Không tìm thấy chứng chỉ / Certificate not found</span>';
-    } else {
-      result.innerHTML = '<span style="color:#e53e3e">Hệ thống xác minh chưa sẵn sàng / Verification system not ready</span>';
-    }
-  } catch (e) {
-    result.innerHTML = '<span style="color:var(--color-text-muted)">Tính năng xác minh sẽ sớm có mặt / Verification coming soon</span>';
-  }
-}
-window.verifyCert = verifyCert;
-</script>
+</BaseLayout>

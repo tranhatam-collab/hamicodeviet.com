@@ -14,7 +14,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiFetch, apiCall } from '../../lib/api';
 
-    const root = document.getElementById('codelab-root')!;
+    const root = document.getElementById('codelab-root');
+    if (!root) throw new Error('Root element not found: root');
 
     async function renderCodeLab() {
       const user = await getCurrentUser();

@@ -14,7 +14,8 @@ import AppLayout from '../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiCall } from '../lib/api';
 
-    const root = document.getElementById('courses-root')!;
+    const root = document.getElementById('courses-root');
+    if (!root) throw new Error('Root element not found: root');
 
     async function renderCourses() {
       const user = await getCurrentUser();

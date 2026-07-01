@@ -103,10 +103,10 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
       <div class="lg-code-view" id="code-view" style="display:none"></div>
     </div>
   </div>
-</ProductLayout>
 
 <script type="module">
   const $ = (s) => document.querySelector(s);
+  if ($('#preview-iframe')) {
   const state = {
     template: 'saas',
     name: 'FlowTask',
@@ -417,4 +417,6 @@ ${faqHTML ? `<section class="section" id="faq">
   // Init
   renderFeatures(); renderPricing(); renderTestimonials(); renderFaq();
   update();
+  }
 </script>
+</ProductLayout>

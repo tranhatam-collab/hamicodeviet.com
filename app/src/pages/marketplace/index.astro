@@ -14,7 +14,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiFetch } from '../../lib/api';
 
-    const root = document.getElementById('marketplace-root')!;
+    const root = document.getElementById('marketplace-root');
+    if (!root) throw new Error('Root element not found: root');
 
     async function renderMarketplace() {
       const user = await getCurrentUser();

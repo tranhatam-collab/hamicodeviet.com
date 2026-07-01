@@ -120,37 +120,41 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 </section>
 
 <script is:inline>
-document.getElementById('contact-form')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const status = document.getElementById('contact-status');
-  const btn = document.getElementById('contact-submit');
-  const form = e.target;
-  const data = {
-    name: form.name.value,
-    email: form.email.value,
-    subject: form.subject.value,
-    message: form.message.value,
-  };
-  btn.disabled = true;
-  status.innerHTML = '<span style="color:var(--color-text-muted)">Đang gửi... / Sending...</span>';
-  try {
-    const res = await fetch('https://api.hamicodeviet.com/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    const result = await res.json();
-    if (res.ok) {
-      status.innerHTML = '<span style="color:var(--color-success);font-weight:600">✓ Tin nhắn đã được gửi thành công! / Message sent successfully!</span>';
-      form.reset();
-    } else {
-      status.innerHTML = '<span style="color:#e53e3e">' + (result.message || 'Có lỗi xảy ra. / An error occurred.') + '</span>';
+(function() {
+  const form = document.getElementById('contact-form');
+  if (!form) return;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const status = document.getElementById('contact-status');
+    const btn = document.getElementById('contact-submit');
+    if (!status || !btn) return;
+    const data = {
+      name: form.name.value,
+      email: form.email.value,
+      subject: form.subject.value,
+      message: form.message.value,
+    };
+    btn.disabled = true;
+    status.innerHTML = '<span style="color:var(--color-text-muted)">Đang gửi... / Sending...</span>';
+    try {
+      const res = await fetch('https://api.hamicodeviet.com/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (res.ok) {
+        status.innerHTML = '<span style="color:var(--color-success);font-weight:600">✓ Tin nhắn đã được gửi thành công! / Message sent successfully!</span>';
+        form.reset();
+      } else {
+        status.innerHTML = '<span style="color:#e53e3e">' + (result.message || 'Có lỗi xảy ra. / An error occurred.') + '</span>';
+      }
+    } catch (err) {
+      status.innerHTML = '<span style="color:#e53e3e">Lỗi kết nối. / Connection error.</span>';
     }
-  } catch (err) {
-    status.innerHTML = '<span style="color:#e53e3e">Lỗi kết nối. / Connection error.</span>';
-  }
-  btn.disabled = false;
-});
+    btn.disabled = false;
+  });
+})();
 </script>
 
 </BaseLayout>

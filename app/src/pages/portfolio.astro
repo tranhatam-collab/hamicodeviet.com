@@ -10,7 +10,8 @@ import AppLayout from '../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiFetch } from '../lib/api';
 
-    const root = document.getElementById('portfolio-root')!;
+    const root = document.getElementById('portfolio-root');
+    if (!root) throw new Error('Root element not found: root');
 
     async function renderPortfolio() {
       const user = await getCurrentUser();
@@ -108,7 +109,8 @@ import AppLayout from '../layouts/AppLayout.astro';
 
     async function createPortfolio(e: Event) {
       e.preventDefault();
-      const status = document.getElementById('p-status-msg')!;
+      const status = document.getElementById('p-status-msg');
+    if (!status) throw new Error('Root element not found: status');
       try {
         await apiFetch('/portfolio', 'POST', {
           title: (document.getElementById('p-title') as HTMLInputElement).value,

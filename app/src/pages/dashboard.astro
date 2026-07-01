@@ -15,7 +15,8 @@ import AppLayout from '../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, clearToken } from '../lib/api';
 
-    const root = document.getElementById('dashboard-root')!;
+    const root = document.getElementById('dashboard-root');
+    if (!root) throw new Error('Root element not found: root');
 
     async function renderDashboard() {
       const user = await getCurrentUser();
@@ -113,7 +114,8 @@ import AppLayout from '../layouts/AppLayout.astro';
         </div>
       `;
 
-      const logoutBtn = document.getElementById('logout-btn')!;
+      const logoutBtn = document.getElementById('logout-btn');
+    if (!logoutBtn) throw new Error('Root element not found: logoutBtn');
       logoutBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         clearToken();

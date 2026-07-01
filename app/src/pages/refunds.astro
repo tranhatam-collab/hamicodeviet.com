@@ -10,7 +10,8 @@ import AppLayout from '../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiFetch } from '../lib/api';
 
-    const root = document.getElementById('refunds-root')!;
+    const root = document.getElementById('refunds-root');
+    if (!root) throw new Error('Root element not found: root');
 
     async function renderRefunds() {
       const user = await getCurrentUser();
@@ -87,7 +88,8 @@ import AppLayout from '../layouts/AppLayout.astro';
 
     async function requestRefund(e: Event) {
       e.preventDefault();
-      const status = document.getElementById('r-status')!;
+      const status = document.getElementById('r-status');
+    if (!status) throw new Error('Root element not found: status');
       try {
         await apiFetch('/refunds/request', 'POST', {
           paymentId: (document.getElementById('r-payment-id') as HTMLInputElement).value,

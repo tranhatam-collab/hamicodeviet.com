@@ -148,11 +148,16 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
       playInterval = setInterval(() => { currentFrame = idx; renderFrame(); renderFramesList(); idx = (idx+1)%frames.length; }, 1000/parseInt(fpsInput.value));
     });
 
-    document.getElementById('export-gif-btn')!.addEventListener('click', () => {
-      const status = document.getElementById('export-status')!;
+    document.getElementById('export-gif-btn')?.addEventListener('click', () => {
+      const status = document.getElementById('export-status');
+      if (!status) return;
+      if (!(window as any).GIF) {
+        status.textContent = '⚠ ' + t('Thư viện GIF chưa tải được. Vui lòng tải lại trang.', 'GIF library failed to load. Please reload.');
+        return;
+      }
       status.textContent = t('Đang tạo GIF...', 'Creating GIF...');
       const gif = new (window as any).GIF({ workers: 2, quality: 10, width: canvas.width, height: canvas.height, workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js' });
-      frames.forEach(f => { const c = document.createElement('canvas'); c.width=canvas.width; c.height=canvas.height; c.getContext('2d')!.putImageData(f,0,0); gif.addFrame(c, { delay: 1000/parseInt(fpsInput.value) }); });
+      frames.forEach(f => { const c = document.createElement('canvas'); c.width=canvas.width; c.height=canvas.height; const ctx = c.getContext('2d'); if (ctx) ctx.putImageData(f,0,0); gif.addFrame(c, { delay: 1000/parseInt(fpsInput.value) }); });
       gif.on('finished', (blob: Blob) => { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='animation.gif'; a.click(); status.textContent='✓ ' + t('Đã xuất!', 'Exported!'); });
       gif.on('progress', (p: number) => { status.textContent = t('Đang tạo', 'Creating') + `... ${Math.round(p*100)}%`; });
       gif.render();

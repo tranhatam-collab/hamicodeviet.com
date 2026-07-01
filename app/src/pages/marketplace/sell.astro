@@ -10,7 +10,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiFetch } from '../../lib/api';
 
-    const root = document.getElementById('sell-root')!;
+    const root = document.getElementById('sell-root');
+    if (!root) throw new Error('Root element not found: root');
 
     async function renderSell() {
       const user = await getCurrentUser();
@@ -96,7 +97,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
 
     async function createListing(e: Event) {
       e.preventDefault();
-      const status = document.getElementById('create-status')!;
+      const status = document.getElementById('create-status');
+    if (!status) throw new Error('Root element not found: status');
       const tags = (document.getElementById('l-tags') as HTMLInputElement).value.split(',').map(t => t.trim()).filter(Boolean);
       try {
         await apiFetch('/marketplace/listings', 'POST', {

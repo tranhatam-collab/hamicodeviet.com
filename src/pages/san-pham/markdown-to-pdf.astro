@@ -85,7 +85,12 @@ function hello() {
 
     function render() {
       const md = input.value;
-      const html = (window as any).marked.parse(md);
+      const markedFn = (window as any).marked;
+      if (!markedFn || !markedFn.parse) {
+        preview.innerHTML = '<p style="color:#e53e3e">Thư viện marked chưa tải được. Vui lòng kiểm tra kết nối mạng và tải lại trang. / marked library failed to load. Please check your connection and reload.</p>';
+        return;
+      }
+      const html = markedFn.parse(md);
       preview.innerHTML = html;
       // Style elements
       preview.querySelectorAll('h1').forEach((el: any) => el.style.cssText = 'font-size:1.8rem;border-bottom:2px solid #6C5CE7;padding-bottom:0.3rem');

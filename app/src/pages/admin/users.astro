@@ -10,7 +10,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
   <script type="module">
     import { apiCall, clearToken } from '../../lib/api';
 
-    const root = document.getElementById('admin-users-root')!;
+    const root = document.getElementById('admin-users-root');
+    if (!root) throw new Error('Root element not found: root');
     let currentPage = 1;
 
     async function renderUsers(page = 1) {

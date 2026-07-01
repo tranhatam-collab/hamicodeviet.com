@@ -14,7 +14,8 @@ import AppLayout from '../layouts/AppLayout.astro';
   <script type="module">
     import { getCurrentUser, apiFetch } from '../lib/api';
 
-    const root = document.getElementById('ai-root')!;
+    const root = document.getElementById('ai-root');
+    if (!root) throw new Error('Root element not found: root');
     let selectedAgent: any = null;
     let currentConversation: any = null;
     let messages: any[] = [];
@@ -186,7 +187,8 @@ import AppLayout from '../layouts/AppLayout.astro';
       btn.disabled = true;
       input.value = '';
 
-      const chatDiv = document.getElementById('chat-messages')!;
+      const chatDiv = document.getElementById('chat-messages');
+    if (!chatDiv) throw new Error('Root element not found: chatDiv');
       chatDiv.innerHTML += `<div style="padding:1rem;background:var(--color-tech-blue);color:white;border-radius:10px;align-self:flex-end;max-width:80%"><strong>You:</strong> ${escapeHtml(msg)}</div>`;
       chatDiv.innerHTML += `<div id="loading-msg" style="padding:1rem;background:var(--color-surface);border-radius:10px;border:1px solid var(--color-border)"><strong>AI:</strong> <span style="color:var(--color-text-muted)">Đang suy nghĩ...</span></div>`;
       chatDiv.scrollTop = chatDiv.scrollHeight;

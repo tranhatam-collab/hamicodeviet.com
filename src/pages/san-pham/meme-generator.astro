@@ -292,12 +292,12 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
         document.querySelectorAll('.mm-template').forEach((el, idx) => {
           el.classList.toggle('active', idx === i);
         });
-        statusEl.querySelector('[data-vi]').textContent = 'Đã tải ảnh mẫu';
-        statusEl.querySelector('[data-en]').textContent = 'Template loaded';
+        const sv1 = statusEl.querySelector('[data-vi]'); if (sv1) sv1.textContent = 'Đã tải ảnh mẫu';
+        const se1 = statusEl.querySelector('[data-en]'); if (se1) se1.textContent = 'Template loaded';
       };
       img.onerror = () => {
-        statusEl.querySelector('[data-vi]').textContent = 'Lỗi tải ảnh — thử lại';
-        statusEl.querySelector('[data-en]').textContent = 'Load error — retry';
+        const sv2 = statusEl.querySelector('[data-vi]'); if (sv2) sv2.textContent = 'Lỗi tải ảnh — thử lại';
+        const se2 = statusEl.querySelector('[data-en]'); if (se2) se2.textContent = 'Load error — retry';
       };
       img.src = `https://picsum.photos/seed/${t.seed}/600/600.jpg`;
     }
@@ -385,8 +385,8 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
           fitCanvas();
           render();
           document.querySelectorAll('.mm-template').forEach((el) => el.classList.remove('active'));
-          statusEl.querySelector('[data-vi]').textContent = 'Đã tải ảnh: ' + file.name;
-          statusEl.querySelector('[data-en]').textContent = 'Loaded: ' + file.name;
+          const sv3 = statusEl.querySelector('[data-vi]'); if (sv3) sv3.textContent = 'Đã tải ảnh: ' + file.name;
+          const se3 = statusEl.querySelector('[data-en]'); if (se3) se3.textContent = 'Loaded: ' + file.name;
         };
         img.src = ev.target.result;
       };
@@ -473,8 +473,8 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
 
     downloadBtn.addEventListener('click', () => {
       if (!state.image) {
-        statusEl.querySelector('[data-vi]').textContent = 'Cần ảnh trước khi tải!';
-        statusEl.querySelector('[data-en]').textContent = 'Need an image first!';
+        const sv4 = statusEl.querySelector('[data-vi]'); if (sv4) sv4.textContent = 'Cần ảnh trước khi tải!';
+        const se4 = statusEl.querySelector('[data-en]'); if (se4) se4.textContent = 'Need an image first!';
         return;
       }
       const link = document.createElement('a');

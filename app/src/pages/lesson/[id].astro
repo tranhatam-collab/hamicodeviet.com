@@ -14,7 +14,8 @@ export function getStaticPaths() {
   <script type="module">
     import { getCurrentUser, apiCall, clearToken } from '../../lib/api';
 
-    const root = document.getElementById('lesson-root')!;
+    const root = document.getElementById('lesson-root');
+    if (!root) throw new Error('Root element not found: root');
     const lessonId = window.location.pathname.split('/').pop();
 
     async function renderLesson() {

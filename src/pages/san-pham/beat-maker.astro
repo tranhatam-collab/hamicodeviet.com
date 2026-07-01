@@ -451,18 +451,18 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
       nextNoteTime = audioCtx.currentTime + 0.05;
       scheduler();
       playBtn.classList.add('playing');
-      playBtn.querySelector('.bm-play-icon').textContent = '⏸';
-      playBtn.querySelector('[data-vi]').textContent = 'Tạm dừng';
-      playBtn.querySelector('[data-en]').textContent = 'Pause';
+      const pi = playBtn.querySelector('.bm-play-icon'); if (pi) pi.textContent = '⏸';
+      const pv = playBtn.querySelector('[data-vi]'); if (pv) pv.textContent = 'Tạm dừng';
+      const pe = playBtn.querySelector('[data-en]'); if (pe) pe.textContent = 'Pause';
     }
     function stopPlay() {
       playing = false;
       if (timerId) { clearTimeout(timerId); timerId = null; }
       highlightStep(-1);
       playBtn.classList.remove('playing');
-      playBtn.querySelector('.bm-play-icon').textContent = '▶';
-      playBtn.querySelector('[data-vi]').textContent = 'Phát';
-      playBtn.querySelector('[data-en]').textContent = 'Play';
+      const si = playBtn.querySelector('.bm-play-icon'); if (si) si.textContent = '▶';
+      const sv = playBtn.querySelector('[data-vi]'); if (sv) sv.textContent = 'Phát';
+      const se = playBtn.querySelector('[data-en]'); if (se) se.textContent = 'Play';
     }
 
     playBtn.addEventListener('click', () => {
@@ -564,8 +564,8 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
     });
 
     function setStatus(vi, en) {
-      statusEl.querySelector('[data-vi]').textContent = vi;
-      statusEl.querySelector('[data-en]').textContent = en;
+      const sv = statusEl.querySelector('[data-vi]'); if (sv) sv.textContent = vi;
+      const se = statusEl.querySelector('[data-en]'); if (se) se.textContent = en;
     }
 
     // ---- WAV export (offline render) ----

@@ -16,7 +16,8 @@ export function getStaticPaths() {
   <script type="module">
     import { getCurrentUser, apiFetch } from '../../lib/api';
 
-    const root = document.getElementById('marketplace-detail-root')!;
+    const root = document.getElementById('marketplace-detail-root');
+    if (!root) throw new Error('Root element not found: root');
     const id = window.location.pathname.split('/').pop();
 
     async function renderDetail() {
@@ -99,7 +100,7 @@ export function getStaticPaths() {
       document.getElementById('purchase-btn')?.addEventListener('click', purchase);
       document.getElementById('review-btn')?.addEventListener('click', () => {
         const rating = prompt('Đánh giá (1-5):');
-        if (!rating) return;
+        if (!rating) throw new Error('Root element not found: rating');
         const review = prompt('Nhận xét:');
         submitReview(parseInt(rating), review || '');
       });
@@ -112,7 +113,8 @@ export function getStaticPaths() {
 
     async function purchase() {
       const btn = document.getElementById('purchase-btn') as HTMLButtonElement;
-      const status = document.getElementById('status-msg')!;
+      const status = document.getElementById('status-msg');
+    if (!status) throw new Error('Root element not found: status');
       btn.disabled = true;
       btn.textContent = 'Đang xử lý...';
       try {
@@ -131,7 +133,8 @@ export function getStaticPaths() {
     }
 
     async function submitReview(rating: number, review: string) {
-      const status = document.getElementById('status-msg')!;
+      const status = document.getElementById('status-msg');
+    if (!status) throw new Error('Root element not found: status');
       if (rating < 1 || rating > 5) {
         status.innerHTML = '<span style="color:#e53e3e">Đánh giá từ 1-5</span>';
         return;
