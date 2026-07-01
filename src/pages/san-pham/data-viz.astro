@@ -11,7 +11,7 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
   productTypeEn="Demo"
   descriptionEn="Input data, create interactive charts"
 >
-  <style>
+  <style is:global>
     .dv-wrap{max-width:1200px;margin:0 auto;padding:1.5rem;font-family:Inter,system-ui,sans-serif}
     .dv-grid{display:grid;grid-template-columns:340px 1fr;gap:1.25rem}
     @media(max-width:900px){.dv-grid{grid-template-columns:1fr}}

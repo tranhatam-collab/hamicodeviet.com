@@ -108,7 +108,7 @@ import ProductLayout from '../../layouts/ProductLayout.astro';
     document.getElementById('add-item-btn')!.addEventListener('click', () => { items.push({ desc: '', qty: 1, price: 0 }); renderItems(); renderPreview(); });
     document.getElementById('export-pdf-btn')!.addEventListener('click', () => {
       const printWin = window.open('', '_blank'); if (!printWin) return;
-      printWin.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice</title><style>body{font-family:Inter,sans-serif;padding:2rem}table{width:100%;border-collapse:collapse}@media print{body{padding:0}}</style></head><body>${document.getElementById('invoice-preview')!.innerHTML}</body></html>`);
+      printWin.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice</title><style is:global>body{font-family:Inter,sans-serif;padding:2rem}table{width:100%;border-collapse:collapse}@media print{body{padding:0}}</style></head><body>${document.getElementById('invoice-preview')!.innerHTML}</body></html>`);
       printWin.document.close(); setTimeout(() => printWin.print(), 500);
     });
 

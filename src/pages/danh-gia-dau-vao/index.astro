@@ -4,99 +4,7 @@ import { tracks } from '../../data/tracks';
 
 const title = 'Bài đánh giá đầu vào / Intake Assessment';
 const description = 'Làm bài đánh giá 8 câu hỏi để HaMi Code Việt gợi ý lộ trình học phù hợp nhất. / Take the 8-question assessment to get a recommended learning track.';
-
-const questionData = [
-  {
-    id: 'age',
-    vi: 'Bạn bao nhiêu tuổi?',
-    en: 'How old are you?',
-    options: [
-      { vi: '8–10', en: '8–10', value: '8-10' },
-      { vi: '11–13', en: '11–13', value: '11-13' },
-      { vi: '14–17', en: '14–17', value: '14-17' },
-      { vi: '18–20', en: '18–20', value: '18-20' },
-      { vi: '21–24', en: '21–24', value: '21-24' },
-    ],
-  },
-  {
-    id: 'experience',
-    vi: 'Bạn đã từng lập trình chưa?',
-    en: 'Have you coded before?',
-    options: [
-      { vi: 'Chưa bao giờ', en: 'Never', value: '0' },
-      { vi: 'Một chút', en: 'A little', value: '1' },
-      { vi: 'Vài tháng', en: 'Several months', value: '2' },
-      { vi: 'Hơn 1 năm', en: 'Over a year', value: '3' },
-    ],
-  },
-  {
-    id: 'english',
-    vi: 'Trình độ tiếng Anh của bạn?',
-    en: 'Your English level?',
-    options: [
-      { vi: 'Chưa biết', en: 'None', value: '0' },
-      { vi: 'Cơ bản (A1–A2)', en: 'Basic (A1–A2)', value: '1' },
-      { vi: 'Trung cấp (B1–B2)', en: 'Intermediate (B1–B2)', value: '2' },
-      { vi: 'Tốt (C1+)', en: 'Good (C1+)', value: '3' },
-    ],
-  },
-  {
-    id: 'goal',
-    vi: 'Bạn muốn tạo ra gì?',
-    en: 'What do you want to create?',
-    options: [
-      { vi: 'Game', en: 'Game', value: 'game' },
-      { vi: 'Website', en: 'Website', value: 'web' },
-      { vi: 'Ứng dụng / App', en: 'App', value: 'app' },
-      { vi: 'AI tool', en: 'AI tool', value: 'ai' },
-      { vi: 'Chưa biết', en: 'Not sure', value: 'unsure' },
-    ],
-  },
-  {
-    id: 'hours',
-    vi: 'Bạn có bao nhiêu giờ/tuần để học?',
-    en: 'Hours per week?',
-    options: [
-      { vi: 'Dưới 2 giờ', en: '<2h', value: '1' },
-      { vi: '2–5 giờ', en: '2–5h', value: '2' },
-      { vi: '5–10 giờ', en: '5–10h', value: '3' },
-      { vi: '10+ giờ', en: '10+h', value: '4' },
-    ],
-  },
-  {
-    id: 'objective',
-    vi: 'Mục tiêu của bạn?',
-    en: 'Your goal?',
-    options: [
-      { vi: 'Học cho vui', en: 'For fun', value: 'fun' },
-      { vi: 'Xây portfolio', en: 'Portfolio', value: 'portfolio' },
-      { vi: 'Tìm việc', en: 'Job', value: 'job' },
-      { vi: 'Khởi nghiệp', en: 'Startup', value: 'startup' },
-    ],
-  },
-  {
-    id: 'htmlcss',
-    vi: 'Bạn đã biết HTML/CSS chưa?',
-    en: 'Do you know HTML/CSS?',
-    options: [
-      { vi: 'Chưa', en: 'No', value: '0' },
-      { vi: 'Cơ bản', en: 'Basic', value: '1' },
-      { vi: 'Khá tốt', en: 'Good', value: '2' },
-    ],
-  },
-  {
-    id: 'device',
-    vi: 'Thiết bị bạn dùng?',
-    en: 'Your device?',
-    options: [
-      { vi: 'Điện thoại', en: 'Phone only', value: 'phone' },
-      { vi: 'Máy tính', en: 'Computer', value: 'computer' },
-      { vi: 'Cả hai', en: 'Both', value: 'both' },
-    ],
-  },
-];
 ---
-
 <BaseLayout title={title} description={description}>
   <section class="hero">
     <div class="container text-center">
@@ -169,245 +77,255 @@ const questionData = [
       </div>
     </div>
   </section>
-</BaseLayout>
 
-<script is:inline>
-  const questions = [
-    {
-      id: 'age',
-      vi: 'Bạn bao nhiêu tuổi?',
-      en: 'How old are you?',
-      options: [
-        { vi: '8–10', en: '8–10', value: '8-10' },
-        { vi: '11–13', en: '11–13', value: '11-13' },
-        { vi: '14–17', en: '14–17', value: '14-17' },
-        { vi: '18–20', en: '18–20', value: '18-20' },
-        { vi: '21–24', en: '21–24', value: '21-24' },
-      ],
-    },
-    {
-      id: 'experience',
-      vi: 'Bạn đã từng lập trình chưa?',
-      en: 'Have you coded before?',
-      options: [
-        { vi: 'Chưa bao giờ', en: 'Never', value: '0' },
-        { vi: 'Một chút', en: 'A little', value: '1' },
-        { vi: 'Vài tháng', en: 'Several months', value: '2' },
-        { vi: 'Hơn 1 năm', en: 'Over a year', value: '3' },
-      ],
-    },
-    {
-      id: 'english',
-      vi: 'Trình độ tiếng Anh của bạn?',
-      en: 'Your English level?',
-      options: [
-        { vi: 'Chưa biết', en: 'None', value: '0' },
-        { vi: 'Cơ bản (A1–A2)', en: 'Basic (A1–A2)', value: '1' },
-        { vi: 'Trung cấp (B1–B2)', en: 'Intermediate (B1–B2)', value: '2' },
-        { vi: 'Tốt (C1+)', en: 'Good (C1+)', value: '3' },
-      ],
-    },
-    {
-      id: 'goal',
-      vi: 'Bạn muốn tạo ra gì?',
-      en: 'What do you want to create?',
-      options: [
-        { vi: 'Game', en: 'Game', value: 'game' },
-        { vi: 'Website', en: 'Website', value: 'web' },
-        { vi: 'Ứng dụng / App', en: 'App', value: 'app' },
-        { vi: 'AI tool', en: 'AI tool', value: 'ai' },
-        { vi: 'Chưa biết', en: 'Not sure', value: 'unsure' },
-      ],
-    },
-    {
-      id: 'hours',
-      vi: 'Bạn có bao nhiêu giờ/tuần để học?',
-      en: 'Hours per week?',
-      options: [
-        { vi: 'Dưới 2 giờ', en: '<2h', value: '1' },
-        { vi: '2–5 giờ', en: '2–5h', value: '2' },
-        { vi: '5–10 giờ', en: '5–10h', value: '3' },
-        { vi: '10+ giờ', en: '10+h', value: '4' },
-      ],
-    },
-    {
-      id: 'objective',
-      vi: 'Mục tiêu của bạn?',
-      en: 'Your goal?',
-      options: [
-        { vi: 'Học cho vui', en: 'For fun', value: 'fun' },
-        { vi: 'Xây portfolio', en: 'Portfolio', value: 'portfolio' },
-        { vi: 'Tìm việc', en: 'Job', value: 'job' },
-        { vi: 'Khởi nghiệp', en: 'Startup', value: 'startup' },
-      ],
-    },
-    {
-      id: 'htmlcss',
-      vi: 'Bạn đã biết HTML/CSS chưa?',
-      en: 'Do you know HTML/CSS?',
-      options: [
-        { vi: 'Chưa', en: 'No', value: '0' },
-        { vi: 'Cơ bản', en: 'Basic', value: '1' },
-        { vi: 'Khá tốt', en: 'Good', value: '2' },
-      ],
-    },
-    {
-      id: 'device',
-      vi: 'Thiết bị bạn dùng?',
-      en: 'Your device?',
-      options: [
-        { vi: 'Điện thoại', en: 'Phone only', value: 'phone' },
-        { vi: 'Máy tính', en: 'Computer', value: 'computer' },
-        { vi: 'Cả hai', en: 'Both', value: 'both' },
-      ],
-    },
-  ];
+  <script is:inline>
+  (function() {
+    const questions = [
+      {
+        id: 'age',
+        vi: 'Bạn bao nhiêu tuổi?',
+        en: 'How old are you?',
+        options: [
+          { vi: '8–10', en: '8–10', value: '8-10' },
+          { vi: '11–13', en: '11–13', value: '11-13' },
+          { vi: '14–17', en: '14–17', value: '14-17' },
+          { vi: '18–20', en: '18–20', value: '18-20' },
+          { vi: '21–24', en: '21–24', value: '21-24' },
+        ],
+      },
+      {
+        id: 'experience',
+        vi: 'Bạn đã từng lập trình chưa?',
+        en: 'Have you coded before?',
+        options: [
+          { vi: 'Chưa bao giờ', en: 'Never', value: '0' },
+          { vi: 'Một chút', en: 'A little', value: '1' },
+          { vi: 'Vài tháng', en: 'Several months', value: '2' },
+          { vi: 'Hơn 1 năm', en: 'Over a year', value: '3' },
+        ],
+      },
+      {
+        id: 'english',
+        vi: 'Trình độ tiếng Anh của bạn?',
+        en: 'Your English level?',
+        options: [
+          { vi: 'Chưa biết', en: 'None', value: '0' },
+          { vi: 'Cơ bản (A1–A2)', en: 'Basic (A1–A2)', value: '1' },
+          { vi: 'Trung cấp (B1–B2)', en: 'Intermediate (B1–B2)', value: '2' },
+          { vi: 'Tốt (C1+)', en: 'Good (C1+)', value: '3' },
+        ],
+      },
+      {
+        id: 'goal',
+        vi: 'Bạn muốn tạo ra gì?',
+        en: 'What do you want to create?',
+        options: [
+          { vi: 'Game', en: 'Game', value: 'game' },
+          { vi: 'Website', en: 'Website', value: 'web' },
+          { vi: 'Ứng dụng / App', en: 'App', value: 'app' },
+          { vi: 'AI tool', en: 'AI tool', value: 'ai' },
+          { vi: 'Chưa biết', en: 'Not sure', value: 'unsure' },
+        ],
+      },
+      {
+        id: 'hours',
+        vi: 'Bạn có bao nhiêu giờ/tuần để học?',
+        en: 'Hours per week?',
+        options: [
+          { vi: 'Dưới 2 giờ', en: '<2h', value: '1' },
+          { vi: '2–5 giờ', en: '2–5h', value: '2' },
+          { vi: '5–10 giờ', en: '5–10h', value: '3' },
+          { vi: '10+ giờ', en: '10+h', value: '4' },
+        ],
+      },
+      {
+        id: 'objective',
+        vi: 'Mục tiêu của bạn?',
+        en: 'Your goal?',
+        options: [
+          { vi: 'Học cho vui', en: 'For fun', value: 'fun' },
+          { vi: 'Xây portfolio', en: 'Portfolio', value: 'portfolio' },
+          { vi: 'Tìm việc', en: 'Job', value: 'job' },
+          { vi: 'Khởi nghiệp', en: 'Startup', value: 'startup' },
+        ],
+      },
+      {
+        id: 'htmlcss',
+        vi: 'Bạn đã biết HTML/CSS chưa?',
+        en: 'Do you know HTML/CSS?',
+        options: [
+          { vi: 'Chưa', en: 'No', value: '0' },
+          { vi: 'Cơ bản', en: 'Basic', value: '1' },
+          { vi: 'Khá tốt', en: 'Good', value: '2' },
+        ],
+      },
+      {
+        id: 'device',
+        vi: 'Thiết bị bạn dùng?',
+        en: 'Your device?',
+        options: [
+          { vi: 'Điện thoại', en: 'Phone only', value: 'phone' },
+          { vi: 'Máy tính', en: 'Computer', value: 'computer' },
+          { vi: 'Cả hai', en: 'Both', value: 'both' },
+        ],
+      },
+    ];
 
-  const tracks = [
-    { slug: 'creative-explorer', age: '8–10', name: { vi: 'Creative Explorer', en: 'Creative Explorer' }, desc: { vi: 'Khơi dậy sự tò mò và tư duy sáng tạo qua Scratch và kể chuyện tương tác.', en: 'Spark curiosity and creative thinking through Scratch and interactive storytelling.' }, icon: '✦' },
-    { slug: 'junior-builder', age: '11–13', name: { vi: 'Junior Builder', en: 'Junior Builder' }, desc: { vi: 'Xây dựng website đầu tiên, làm game với JavaScript và học an toàn số.', en: 'Build your first website, create games with JavaScript, and learn digital safety.' }, icon: '⚡' },
-    { slug: 'young-creator', age: '14–17', name: { vi: 'Young Creator', en: 'Young Creator' }, desc: { vi: 'Python, web động, game 2D, Git và AI literacy — bắt đầu portfolio kỹ thuật.', en: 'Python, dynamic web, 2D games, Git, and AI literacy — start your technical portfolio.' }, icon: '◆' },
-    { slug: 'product-developer', age: '18–20', name: { vi: 'Product Developer', en: 'Product Developer' }, desc: { vi: 'Full-stack, API, database, AI Agent và triển khai sản phẩm thực.', en: 'Full-stack, API, database, AI Agent integration, and real product deployment.' }, icon: '⬡' },
-    { slug: 'builder-entrepreneur', age: '21–24', name: { vi: 'Builder & Entrepreneur', en: 'Builder & Entrepreneur' }, desc: { vi: 'SaaS, cloud, bảo mật, thương mại hóa sản phẩm và khởi nghiệp.', en: 'SaaS, cloud, security, product commercialization, and startup.' }, icon: '◈' },
-  ];
+    const tracks = [
+      { slug: 'creative-explorer', age: '8–10', name: { vi: 'Creative Explorer', en: 'Creative Explorer' }, desc: { vi: 'Khơi dậy sự tò mò và tư duy sáng tạo qua Scratch và kể chuyện tương tác.', en: 'Spark curiosity and creative thinking through Scratch and interactive storytelling.' }, icon: '✦' },
+      { slug: 'junior-builder', age: '11–13', name: { vi: 'Junior Builder', en: 'Junior Builder' }, desc: { vi: 'Xây dựng website đầu tiên, làm game với JavaScript và học an toàn số.', en: 'Build your first website, create games with JavaScript, and learn digital safety.' }, icon: '⚡' },
+      { slug: 'young-creator', age: '14–17', name: { vi: 'Young Creator', en: 'Young Creator' }, desc: { vi: 'Python, web động, game 2D, Git và AI literacy — bắt đầu portfolio kỹ thuật.', en: 'Python, dynamic web, 2D games, Git, and AI literacy — start your technical portfolio.' }, icon: '◆' },
+      { slug: 'product-developer', age: '18–20', name: { vi: 'Product Developer', en: 'Product Developer' }, desc: { vi: 'Full-stack, API, database, AI Agent và triển khai sản phẩm thực.', en: 'Full-stack, API, database, AI Agent integration, and real product deployment.' }, icon: '⬡' },
+      { slug: 'builder-entrepreneur', age: '21–24', name: { vi: 'Builder & Entrepreneur', en: 'Builder & Entrepreneur' }, desc: { vi: 'SaaS, cloud, bảo mật, thương mại hóa sản phẩm và khởi nghiệp.', en: 'SaaS, cloud, security, product commercialization, and startup.' }, icon: '◈' },
+    ];
 
-  let current = 0;
-  const answers = {};
+    let current = 0;
+    const answers = {};
 
-  const questionCard = document.getElementById('question-card');
-  const resultCard = document.getElementById('result-card');
-  const titleEl = document.getElementById('question-title');
-  const optionsEl = document.getElementById('question-options');
-  const prevBtn = document.getElementById('prev-btn');
-  const nextBtn = document.getElementById('next-btn');
-  const progressFill = document.getElementById('progress-fill');
-  const progressText = document.getElementById('progress-text');
-  const retryBtn = document.getElementById('retry-btn');
+    const questionCard = document.getElementById('question-card');
+    const resultCard = document.getElementById('result-card');
+    const titleEl = document.getElementById('question-title');
+    const optionsEl = document.getElementById('question-options');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    const retryBtn = document.getElementById('retry-btn');
 
-  function getLang() {
-    return document.documentElement.getAttribute('data-lang') || 'vi';
-  }
+    function getLang() {
+      return document.documentElement.getAttribute('data-lang') || 'vi';
+    }
 
-  function render() {
-    const q = questions[current];
-    const lang = getLang();
-    titleEl.textContent = q[lang];
-    optionsEl.innerHTML = '';
+    function render() {
+      const q = questions[current];
+      const lang = getLang();
+      titleEl.textContent = q[lang];
+      optionsEl.innerHTML = '';
 
-    q.options.forEach((opt) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'option-btn';
-      btn.textContent = opt[lang];
-      if (answers[q.id] === opt.value) btn.classList.add('selected');
-      btn.addEventListener('click', () => selectOption(q.id, opt.value, btn));
-      optionsEl.appendChild(btn);
+      q.options.forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'option-btn';
+        btn.textContent = opt[lang];
+        if (answers[q.id] === opt.value) btn.classList.add('selected');
+        btn.addEventListener('click', () => selectOption(q.id, opt.value, btn));
+        optionsEl.appendChild(btn);
+      });
+
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = !answers[q.id];
+      if (current === questions.length - 1) {
+        const viSpan = nextBtn.querySelector('[data-vi]');
+        const enSpan = nextBtn.querySelector('[data-en]');
+        if (viSpan) viSpan.textContent = 'Nộp bài';
+        if (enSpan) enSpan.textContent = 'Submit';
+      } else {
+        const viSpan = nextBtn.querySelector('[data-vi]');
+        const enSpan = nextBtn.querySelector('[data-en]');
+        if (viSpan) viSpan.textContent = 'Tiếp';
+        if (enSpan) enSpan.textContent = 'Next';
+      }
+
+      const progress = (current / questions.length) * 100;
+      progressFill.style.width = progress + '%';
+      progressFill.setAttribute('aria-valuenow', String(current));
+      const viP = progressText.querySelector('[data-vi]');
+      const enP = progressText.querySelector('[data-en]');
+      if (viP) viP.textContent = current + ' / ' + questions.length;
+      if (enP) enP.textContent = current + ' / ' + questions.length;
+    }
+
+    function selectOption(qid, value, btn) {
+      answers[qid] = value;
+      optionsEl.querySelectorAll('.option-btn').forEach((b) => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      nextBtn.disabled = false;
+    }
+
+    function next() {
+      if (current < questions.length - 1) {
+        current++;
+        render();
+      } else {
+        showResult();
+      }
+    }
+
+    function prev() {
+      if (current > 0) {
+        current--;
+        render();
+      }
+    }
+
+    function calculateTrack() {
+      const ageMap = {
+        '8-10': 'creative-explorer',
+        '11-13': 'junior-builder',
+        '14-17': 'young-creator',
+        '18-20': 'product-developer',
+        '21-24': 'builder-entrepreneur',
+      };
+      const base = ageMap[answers.age] || 'young-creator';
+
+      const experience = parseInt(answers.experience || '0', 10);
+      const objective = answers.objective;
+
+      if (experience >= 2 && answers.age === '11-13') return 'junior-builder';
+      if (experience >= 3 && answers.age === '14-17') return 'young-creator';
+      if (objective === 'startup' && ['18-20', '21-24'].includes(answers.age)) return 'builder-entrepreneur';
+      if (objective === 'job' && ['18-20', '21-24'].includes(answers.age)) return 'product-developer';
+      if (answers.goal === 'ai' && experience >= 2) {
+        if (answers.age === '14-17') return 'young-creator';
+        if (answers.age === '18-20') return 'product-developer';
+        if (answers.age === '21-24') return 'builder-entrepreneur';
+      }
+      return base;
+    }
+
+    function showResult() {
+      questionCard.hidden = true;
+      resultCard.hidden = false;
+      progressFill.style.width = '100%';
+      const viP = progressText.querySelector('[data-vi]');
+      const enP = progressText.querySelector('[data-en]');
+      if (viP) viP.textContent = questions.length + ' / ' + questions.length;
+      if (enP) enP.textContent = questions.length + ' / ' + questions.length;
+
+      const slug = calculateTrack();
+      const track = tracks.find((t) => t.slug === slug);
+      const lang = getLang();
+
+      document.getElementById('result-icon').textContent = track.icon;
+      document.getElementById('result-track-name').textContent = track.name[lang];
+      document.getElementById('result-track-desc').textContent = track.desc[lang];
+      document.getElementById('result-track-link').href = '/lo-trinh/' + track.slug;
+    }
+
+    function reset() {
+      current = 0;
+      Object.keys(answers).forEach((k) => delete answers[k]);
+      questionCard.hidden = false;
+      resultCard.hidden = true;
+      render();
+    }
+
+    nextBtn.addEventListener('click', next);
+    prevBtn.addEventListener('click', prev);
+    retryBtn.addEventListener('click', reset);
+
+    document.documentElement.addEventListener('click', (e) => {
+      if (e.target.closest('.lang-toggle button')) {
+        setTimeout(render, 50);
+      }
     });
 
-    prevBtn.disabled = current === 0;
-    nextBtn.disabled = !answers[q.id];
-    if (current === questions.length - 1) {
-      nextBtn.querySelector('[data-vi]').textContent = 'Nộp bài';
-      nextBtn.querySelector('[data-en]').textContent = 'Submit';
-    } else {
-      nextBtn.querySelector('[data-vi]').textContent = 'Tiếp';
-      nextBtn.querySelector('[data-en]').textContent = 'Next';
-    }
-
-    const progress = ((current) / questions.length) * 100;
-    progressFill.style.width = `${progress}%`;
-    progressFill.setAttribute('aria-valuenow', current);
-    progressText.querySelector('[data-vi]').textContent = `${current} / ${questions.length}`;
-    progressText.querySelector('[data-en]').textContent = `${current} / ${questions.length}`;
-  }
-
-  function selectOption(qid, value, btn) {
-    answers[qid] = value;
-    optionsEl.querySelectorAll('.option-btn').forEach((b) => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    nextBtn.disabled = false;
-  }
-
-  function next() {
-    if (current < questions.length - 1) {
-      current++;
-      render();
-    } else {
-      showResult();
-    }
-  }
-
-  function prev() {
-    if (current > 0) {
-      current--;
-      render();
-    }
-  }
-
-  function calculateTrack() {
-    const ageMap = {
-      '8-10': 'creative-explorer',
-      '11-13': 'junior-builder',
-      '14-17': 'young-creator',
-      '18-20': 'product-developer',
-      '21-24': 'builder-entrepreneur',
-    };
-    const base = ageMap[answers.age] || 'young-creator';
-
-    const experience = parseInt(answers.experience || '0', 10);
-    const objective = answers.objective;
-
-    if (experience >= 2 && answers.age === '11-13') return 'junior-builder';
-    if (experience >= 3 && answers.age === '14-17') return 'young-creator';
-    if (objective === 'startup' && ['18-20', '21-24'].includes(answers.age)) return 'builder-entrepreneur';
-    if (objective === 'job' && ['18-20', '21-24'].includes(answers.age)) return 'product-developer';
-    if (answers.goal === 'ai' && experience >= 2) {
-      if (answers.age === '14-17') return 'young-creator';
-      if (answers.age === '18-20') return 'product-developer';
-      if (answers.age === '21-24') return 'builder-entrepreneur';
-    }
-    return base;
-  }
-
-  function showResult() {
-    questionCard.hidden = true;
-    resultCard.hidden = false;
-    progressFill.style.width = '100%';
-    progressText.querySelector('[data-vi]').textContent = `${questions.length} / ${questions.length}`;
-    progressText.querySelector('[data-en]').textContent = `${questions.length} / ${questions.length}`;
-
-    const slug = calculateTrack();
-    const track = tracks.find((t) => t.slug === slug);
-    const lang = getLang();
-
-    document.getElementById('result-icon').textContent = track.icon;
-    document.getElementById('result-track-name').textContent = track.name[lang];
-    document.getElementById('result-track-desc').textContent = track.desc[lang];
-    document.getElementById('result-track-link').href = `/lo-trinh/${track.slug}`;
-  }
-
-  function reset() {
-    current = 0;
-    Object.keys(answers).forEach((k) => delete answers[k]);
-    questionCard.hidden = false;
-    resultCard.hidden = true;
     render();
-  }
+  })();
+  </script>
+</BaseLayout>
 
-  nextBtn.addEventListener('click', next);
-  prevBtn.addEventListener('click', prev);
-  retryBtn.addEventListener('click', reset);
-
-  document.documentElement.addEventListener('click', (e) => {
-    if (e.target.closest('.lang-toggle button')) {
-      setTimeout(render, 50);
-    }
-  });
-
-  render();
-</script>
-
-<style>
+<style is:global>
   .hero-subtitle { max-width: 600px; margin: 0 auto; }
   .assessment-wrapper { max-width: 720px; margin: 0 auto; }
   .progress-header { margin-bottom: var(--space-lg); }
@@ -419,6 +337,7 @@ const questionData = [
     display: block; width: 100%; text-align: left; padding: var(--space-md) var(--space-lg);
     border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface);
     font-size: 1rem; cursor: pointer; transition: all var(--transition-fast); color: var(--color-text);
+    font-family: inherit;
   }
   .option-btn:hover { border-color: var(--color-tech-blue); background: rgba(0, 168, 204, 0.05); }
   .option-btn.selected { border-color: var(--color-tech-blue); background: rgba(0, 168, 204, 0.1); font-weight: 600; }
