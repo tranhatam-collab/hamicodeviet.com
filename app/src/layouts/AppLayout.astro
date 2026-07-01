@@ -4,9 +4,36 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  noindex?: boolean;
 }
 
-const { title = 'HaMi Code Việt', description = 'Học ngôn ngữ. Học lập trình. Làm ra sản phẩm thật.' } = Astro.props;
+const {
+  title = 'HaMi Code Việt',
+  description = 'Học ngôn ngữ. Học lập trình. Làm ra sản phẩm thật.',
+  noindex = true,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, 'https://app.hamicodeviet.com');
+const fullTitle = title.includes('HaMi Code') ? title : `${title} — HaMi Code Việt`;
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'HaMi Code Việt',
+  url: 'https://hamicodeviet.com',
+  logo: 'https://hamicodeviet.com/favicon.svg',
+};
+
+const webAppSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'HaMi Code Việt App',
+  url: 'https://app.hamicodeviet.com',
+  applicationCategory: 'EducationalApplication',
+  operatingSystem: 'Any',
+  inLanguage: ['vi', 'en'],
+  isAccessibleForFree: true,
+};
 ---
 
 <!DOCTYPE html>
@@ -14,14 +41,49 @@ const { title = 'HaMi Code Việt', description = 'Học ngôn ngữ. Học lậ
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{title}</title>
+  <meta name="generator" content={Astro.generator} />
+  <title>{fullTitle}</title>
   <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalURL} />
+  {noindex && <meta name="robots" content="noindex, nofollow, noarchive" />}
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:site_name" content="HaMi Code Việt" />
+  <meta property="og:locale" content="vi_VN" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={fullTitle} />
+  <meta name="twitter:description" content={description} />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(webAppSchema)} />
+
+  <!-- Favicon + PWA -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- DNS prefetch + preconnect for API -->
+  <link rel="dns-prefetch" href="https://api.hamicodeviet.com" />
+  <link rel="preconnect" href="https://api.hamicodeviet.com" />
+
+  <!-- Theme color -->
+  <meta name="theme-color" content="#102A43" />
 </head>
 <body>
-  <slot />
+  <a href="#main-content" class="skip-link">Bỏ qua đến nội dung chính</a>
+  <main id="main-content">
+    <slot />
+  </main>
 </body>
 </html>

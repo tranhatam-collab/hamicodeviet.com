@@ -1,0 +1,20 @@
+{
+  "name": "HaMi Code Việt",
+  "short_name": "HaMi Code",
+  "description": "Học ngôn ngữ. Học lập trình. Làm ra sản phẩm thật.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#081826",
+  "theme_color": "#102A43",
+  "orientation": "portrait-primary",
+  "lang": "vi",
+  "categories": ["education", "productivity", "developer"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

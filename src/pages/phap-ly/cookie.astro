@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = 'Chính sách Cookie — HaMi Code Việt';
+const description = 'Chính sách cookie HaMi Code Việt: loại cookie, mục đích, thời gian lưu trữ, cách tắt cookie.';
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="legal-page">
+    <div class="legal-container">
+      <h1>Chính sách Cookie</h1>
+      <p class="legal-intro">Phiên bản 1.0 — Cập nhật: 2026-07-01</p>
+
+      <h2>1. Cookie là gì?</h2>
+      <p>Cookie là file văn bản nhỏ được lưu trữ trên thiết bị của bạn khi truy cập trang web. Cookie giúp chúng tôi nhận ra người dùng, lưu tùy chọn ngôn ngữ, và duy trì phiên đăng nhập.</p>
+
+      <h2>2. HaMi Code Việt sử dụng cookie nào?</h2>
+      <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+        <thead>
+          <tr style="border-bottom: 2px solid #e2e8f0;">
+            <th style="text-align: left; padding: 8px;">Tên</th>
+            <th style="text-align: left; padding: 8px;">Mục đích</th>
+            <th style="text-align: left; padding: 8px;">Thời gian</th>
+            <th style="text-align: left; padding: 8px;">Loại</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 8px;"><code>hmcv-lang</code></td>
+            <td style="padding: 8px;">Lưu tùy chọn ngôn ngữ (Việt/Anh)</td>
+            <td style="padding: 8px;">Vĩnh viễn</td>
+            <td style="padding: 8px;">Essential</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 8px;"><code>hmcv-token</code></td>
+            <td style="padding: 8px;">Phiên đăng nhập (JWT)</td>
+            <td style="padding: 8px;">7 ngày</td>
+            <td style="padding: 8px;">Essential</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px;">Không có</td>
+            <td style="padding: 8px;">—</td>
+            <td style="padding: 8px;">—</td>
+            <td style="padding: 8px;">Analytics / Marketing</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>3. Chúng tôi KHÔNG sử dụng cookie nào?</h2>
+      <ul>
+        <li><strong>Cookie quảng cáo</strong> — không có quảng cáo bên thứ ba.</li>
+        <li><strong>Cookie theo dõi hành vi</strong> — không theo dõi người dùng bên ngoài site.</li>
+        <li><strong>Cookie phân tích bên thứ ba</strong> — không dùng Google Analytics, Facebook Pixel, hay công cụ tương tự.</li>
+      </ul>
+
+      <h2>4. Cách tắt cookie</h2>
+      <p>Bạn có thể tắt cookie trong trình duyệt:</p>
+      <ul>
+        <li><strong>Chrome:</strong> Cài đặt → Quyền riêng tư và bảo mật → Cookie</li>
+        <li><strong>Safari:</strong> Cài đặt → Safari → Quyền riêng tư</li>
+        <li><strong>Firefox:</strong> Cài đặt → Quyền riêng tư & Bảo mật → Cookie</li>
+      </ul>
+      <p><strong>Lưu ý:</strong> Nếu tắt cookie <code>hmcv-token</code>, bạn sẽ không thể đăng nhập. Nếu tắt <code>hmcv-lang</code>, ngôn ngữ sẽ mặc định là Tiếng Việt mỗi lần truy cập.</p>
+
+      <h2>5. Liên hệ</h2>
+      <p>Câu hỏi về cookie: <a href="mailto:privacy@hamicodeviet.com">privacy@hamicodeviet.com</a></p>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .legal-page { background: #f7fafc; padding: 60px 0; min-height: 60vh; }
+  .legal-container { max-width: 800px; margin: 0 auto; padding: 48px; background: white; border-radius: 12px; }
+  .legal-container h1 { font-size: 2rem; color: #102a43; margin-bottom: 12px; }
+  .legal-intro { color: #64748b; margin-bottom: 32px; }
+  .legal-container h2 { font-size: 1.25rem; color: #102a43; margin: 24px 0 8px; }
+  .legal-container p { color: #334155; line-height: 1.7; margin-bottom: 12px; }
+  .legal-container ul { color: #334155; line-height: 1.8; padding-left: 20px; margin-bottom: 12px; }
+  .legal-container code { background: #f0f9ff; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  @media (max-width: 768px) { .legal-container { padding: 24px; } }
+</style>

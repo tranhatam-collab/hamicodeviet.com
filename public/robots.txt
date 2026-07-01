@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /app/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /.devin/
 
 Sitemap: https://hamicodeviet.com/sitemap.xml

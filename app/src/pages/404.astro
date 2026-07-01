@@ -1,0 +1,16 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+<AppLayout title="404 — HaMi Code Việt" noindex>
+  <div class="auth-container">
+    <div class="auth-card" style="text-align: center;">
+      <div style="font-size: 4rem; font-weight: 800; color: var(--color-primary); line-height: 1;">404</div>
+      <h1 style="margin: 1rem 0 0.5rem; font-size: 1.5rem;">Không tìm thấy trang</h1>
+      <p style="color: var(--color-text-muted); margin: 0 0 1.5rem;">Trang bạn đang tìm không tồn tại trong ứng dụng.</p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/dashboard" class="btn btn--primary">Về Dashboard</a>
+        <a href="/login" class="btn">Đăng nhập</a>
+      </div>
+    </div>
+  </div>
+</AppLayout>

@@ -25,6 +25,7 @@ const staticRoutes = [
   { path: '/tai-lieu', priority: 0.5, changefreq: 'monthly' },
   { path: '/chinh-sach-bao-mat', priority: 0.3, changefreq: 'yearly' },
   { path: '/dieu-khoan-su-dung', priority: 0.3, changefreq: 'yearly' },
+  { path: '/phap-ly/cookie', priority: 0.3, changefreq: 'yearly' },
   { path: '/status', priority: 0.4, changefreq: 'daily' },
   { path: '/verify', priority: 0.5, changefreq: 'monthly' },
 ];

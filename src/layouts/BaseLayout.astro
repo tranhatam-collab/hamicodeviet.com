@@ -62,10 +62,8 @@ const websiteSchema = {
     <link rel="canonical" href={canonicalURL} />
     {noindex && <meta name="robots" content="noindex,nofollow" />}
 
-    <!-- hreflang: bilingual signals for search engines -->
-    <link rel="alternate" hreflang="vi" href={canonicalURL} />
-    <link rel="alternate" hreflang="en" href={canonicalURL} />
-    <link rel="alternate" hreflang="x-default" href={canonicalURL} />
+    <!-- Note: Site uses client-side language toggle (data-vi/data-en), single URL per page.
+         hreflang not used because there are no separate /en/ routes. og:locale indicates language. -->
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -90,7 +88,9 @@ const websiteSchema = {
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -99,6 +99,10 @@ const websiteSchema = {
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+
+    <!-- DNS prefetch for API -->
+    <link rel="dns-prefetch" href="https://api.hamicodeviet.com" />
+    <link rel="preconnect" href="https://api.hamicodeviet.com" />
 
     <!-- Theme color -->
     <meta name="theme-color" content="#102A43" />

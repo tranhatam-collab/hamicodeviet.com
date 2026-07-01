@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="404 — Không tìm thấy trang" description="Trang bạn tìm không tồn tại." noindex>
+  <section class="hero" style="min-height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center;">
+    <div class="container">
+      <div style="font-size: 6rem; font-weight: 800; color: var(--color-primary); line-height: 1;">404</div>
+      <h1 style="margin: 1rem 0 0.5rem;">
+        <span data-vi>Không tìm thấy trang</span>
+        <span data-en>Page not found</span>
+      </h1>
+      <p style="color: var(--color-text-muted); max-width: 500px; margin: 0 auto 2rem;">
+        <span data-vi>Trang bạn đang tìm không tồn tại hoặc đã bị di chuyển. Vui lòng quay lại trang chủ hoặc tìm kiếm nội dung.</span>
+        <span data-en>The page you're looking for doesn't exist or has been moved. Please go home or search for content.</span>
+      </p>
+      <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/" class="btn btn--primary">
+          <span data-vi>Về trang chủ</span>
+          <span data-en>Go home</span>
+        </a>
+        <a href="/hoc-mien-phi" class="btn">
+          <span data-vi>Học miễn phí</span>
+          <span data-en>Learn free</span>
+        </a>
+        <a href="/bat-dau" class="btn">
+          <span data-vi>Hướng dẫn bắt đầu</span>
+          <span data-en>Getting started</span>
+        </a>
+        <a href="/lien-he" class="btn">
+          <span data-vi>Liên hệ</span>
+          <span data-en>Contact</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
