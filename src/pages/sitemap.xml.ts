@@ -26,6 +26,9 @@ const staticRoutes = [
   { path: '/chinh-sach-bao-mat', priority: 0.3, changefreq: 'yearly' },
   { path: '/dieu-khoan-su-dung', priority: 0.3, changefreq: 'yearly' },
   { path: '/phap-ly/cookie', priority: 0.3, changefreq: 'yearly' },
+  { path: '/phap-ly/gdpr', priority: 0.3, changefreq: 'yearly' },
+  { path: '/phap-ly/dpa', priority: 0.3, changefreq: 'yearly' },
+  { path: '/phap-ly/ban-quyen', priority: 0.3, changefreq: 'yearly' },
   { path: '/status', priority: 0.4, changefreq: 'daily' },
   { path: '/verify', priority: 0.5, changefreq: 'monthly' },
 ];
@@ -39,10 +42,23 @@ export const GET: APIRoute = ({ site }) => {
   const urls: string[] = [];
 
   for (const r of staticRoutes) {
+    // Vietnamese version
     urls.push(`  <url>
     <loc>${baseUrl}${r.path}</loc>
     <changefreq>${r.changefreq}</changefreq>
     <priority>${r.priority.toFixed(1)}</priority>
+    <xhtml:link rel="alternate" hreflang="vi" href="${baseUrl}${r.path}"/>
+    <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en${r.path}"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}${r.path}"/>
+  </url>`);
+    // English version
+    urls.push(`  <url>
+    <loc>${baseUrl}/en${r.path}</loc>
+    <changefreq>${r.changefreq}</changefreq>
+    <priority>${r.priority.toFixed(1)}</priority>
+    <xhtml:link rel="alternate" hreflang="vi" href="${baseUrl}${r.path}"/>
+    <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en${r.path}"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}${r.path}"/>
   </url>`);
   }
 
@@ -63,7 +79,7 @@ export const GET: APIRoute = ({ site }) => {
   }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls.join('\n')}
 </urlset>`;
 

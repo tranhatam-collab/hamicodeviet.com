@@ -62,8 +62,18 @@ const websiteSchema = {
     <link rel="canonical" href={canonicalURL} />
     {noindex && <meta name="robots" content="noindex,nofollow" />}
 
-    <!-- Note: Site uses client-side language toggle (data-vi/data-en), single URL per page.
-         hreflang not used because there are no separate /en/ routes. og:locale indicates language. -->
+    <!-- hreflang: bilingual signals for search engines -->
+    {(() => {
+      const viUrl = canonicalURL;
+      const enUrl = new URL('/en' + Astro.url.pathname, Astro.site);
+      return (
+        <>
+          <link rel="alternate" hreflang="vi" href={viUrl} />
+          <link rel="alternate" hreflang="en" href={enUrl} />
+          <link rel="alternate" hreflang="x-default" href={viUrl} />
+        </>
+      );
+    })()}
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -88,8 +98,9 @@ const websiteSchema = {
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
 
     <!-- Fonts -->
@@ -143,6 +154,13 @@ const websiteSchema = {
           setLang((btn as HTMLElement).dataset.lang ?? 'vi');
         });
       });
+
+      // Register service worker for PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
     </script>
   </body>
 </html>

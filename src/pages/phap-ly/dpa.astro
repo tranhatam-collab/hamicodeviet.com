@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const title = 'Data Processing Agreement — HaMi Code Việt';
+const description = 'Thỏa thuận xử lý dữ liệu giữa HaMi Code Việt và khách hàng doanh nghiệp.';
+---
+<BaseLayout title={title} description={description}>
+  <div class="legal-page">
+    <div class="legal-container">
+      <h1>Data Processing Agreement (DPA)</h1>
+      <p class="legal-intro">Phiên bản 1.0 — Cập nhật: 2026-07-01</p>
+      <h2>1. Phạm vi</h2>
+      <p>Thỏa thuận này áp dụng khi HaMi Code Việt xử lý dữ liệu cá nhân thay cho khách hàng doanh nghiệp (Data Controller).</p>
+      <h2>2. Vai trò</h2>
+      <ul>
+        <li><strong>Data Controller</strong> — khách hàng doanh nghiệp quyết định mục đích xử lý.</li>
+        <li><strong>Data Processor</strong> — HaMi Code Việt xử lý theo hướng dẫn của Controller.</li>
+      </ul>
+      <h2>3. Dữ liệu xử lý</h2>
+      <ul>
+        <li>Tên, email của học viên trong lớp.</li>
+        <li>Tiến độ học, bài tập, chứng chỉ.</li>
+        <li>Không xử lý dữ liệu nhạy cảm (sức khỏe, tôn giáo, sinh học).</li>
+      </ul>
+      <h2>4. Bảo mật</h2>
+      <ul>
+        <li>Mã hóa TLS 1.3 trong truyền tải.</li>
+        <li>Mã hóa at-rest trên Neon PostgreSQL.</li>
+        <li>Giới hạn truy cập theo vai trò (RBAC).</li>
+        <li>Audit log mọi truy cập dữ liệu.</li>
+      </ul>
+      <h2>5. Sub-processors</h2>
+      <ul>
+        <li><strong>Cloudflare</strong> — hosting, CDN, security.</li>
+        <li><strong>Neon</strong> — PostgreSQL database.</li>
+        <li><strong>Resend</strong> — transactional email.</li>
+        <li><strong>PayPal</strong> — thanh toán.</li>
+      </ul>
+      <h2>6. Xóa dữ liệu</h2>
+      <p>Khi hợp đồng kết thúc, HaMi Code Việt xóa toàn bộ dữ liệu trong vòng 30 ngày và cung cấp xác nhận.</p>
+      <h2>7. Liên hệ</h2>
+      <p><a href="mailto:dpo@hamicodeviet.com">dpo@hamicodeviet.com</a></p>
+    </div>
+  </div>
+</BaseLayout>
+<style>
+  .legal-page { background: #f7fafc; padding: 60px 0; min-height: 60vh; }
+  .legal-container { max-width: 800px; margin: 0 auto; padding: 48px; background: white; border-radius: 12px; }
+  .legal-container h1 { font-size: 2rem; color: #102a43; margin-bottom: 12px; }
+  .legal-intro { color: #64748b; margin-bottom: 32px; }
+  .legal-container h2 { font-size: 1.25rem; color: #102a43; margin: 24px 0 8px; }
+  .legal-container p { color: #334155; line-height: 1.7; margin-bottom: 12px; }
+  .legal-container ul { color: #334155; line-height: 1.8; padding-left: 20px; }
+  @media (max-width: 768px) { .legal-container { padding: 24px; } }
+</style>

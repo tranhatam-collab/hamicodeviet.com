@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const title = 'GDPR — HaMi Code Việt';
+const description = 'Quyền của người dùng EU theo GDPR — truy cập, xóa, di chuyển, phản đối xử lý dữ liệu.';
+---
+<BaseLayout title={title} description={description}>
+  <div class="legal-page">
+    <div class="legal-container">
+      <h1>GDPR Compliance</h1>
+      <p class="legal-intro">Phiên bản 1.0 — Cập nhật: 2026-07-01</p>
+      <h2>1. Áp dụng</h2>
+      <p>Trang này áp dụng cho người dùng từ EU/EEA/UK theo General Data Protection Regulation (GDPR).</p>
+      <h2>2. Quyền của bạn</h2>
+      <ul>
+        <li><strong>Quyền truy cập</strong> — yêu cầu bản sao dữ liệu chúng tôi lưu về bạn.</li>
+        <li><strong>Quyền xóa</strong> — yêu cầu xóa tài khoản và toàn bộ dữ liệu.</li>
+        <li><strong>Quyền di chuyển</strong> — nhận dữ liệu ở định dạng có thể đọc máy.</li>
+        <li><strong>Quyền sửa</strong> — sửa thông tin sai.</li>
+        <li><strong>Quyền phản đối</strong> — phản đối xử lý dữ liệu cho mục đích marketing.</li>
+        <li><strong>Quyền rút lại đồng ý</strong> — rút lại đồng ý bất cứ lúc nào.</li>
+      </ul>
+      <h2>3. Cách thực hiện quyền</h2>
+      <p>Gửi email đến <a href="mailto:privacy@hamicodeviet.com">privacy@hamicodeviet.com</a> với tiêu đề "GDPR Request". Chúng tôi phản hồi trong vòng 30 ngày.</p>
+      <h2>4. Người dùng dưới 16 tuổi</h2>
+      <p>Người dùng dưới 16 tuổi cần đồng ý của phụ huynh/người giám hộ. Xem <a href="/phap-ly/an-toan-tre-em">chính sách an toàn trẻ em</a>.</p>
+      <h2>5. Liên hệ DPO</h2>
+      <p>Data Protection Officer: <a href="mailto:dpo@hamicodeviet.com">dpo@hamicodeviet.com</a></p>
+    </div>
+  </div>
+</BaseLayout>
+<style>
+  .legal-page { background: #f7fafc; padding: 60px 0; min-height: 60vh; }
+  .legal-container { max-width: 800px; margin: 0 auto; padding: 48px; background: white; border-radius: 12px; }
+  .legal-container h1 { font-size: 2rem; color: #102a43; margin-bottom: 12px; }
+  .legal-intro { color: #64748b; margin-bottom: 32px; }
+  .legal-container h2 { font-size: 1.25rem; color: #102a43; margin: 24px 0 8px; }
+  .legal-container p { color: #334155; line-height: 1.7; margin-bottom: 12px; }
+  .legal-container ul { color: #334155; line-height: 1.8; padding-left: 20px; }
+  @media (max-width: 768px) { .legal-container { padding: 24px; } }
+</style>

@@ -84,9 +84,8 @@ app.use('*', cors({
   credentials: true,
 }));
 
-// Security headers middleware
+// Security headers — set BEFORE next() so they apply to all responses including errors
 app.use('*', async (c, next) => {
-  await next();
   c.header('X-Content-Type-Options', 'nosniff');
   c.header('X-Frame-Options', 'DENY');
   c.header('X-XSS-Protection', '1; mode=block');
@@ -94,6 +93,13 @@ app.use('*', async (c, next) => {
   c.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   c.header('X-Robots-Tag', 'noindex, nofollow, noarchive');
+  await next();
+});
+
+// Error handler — ensures security headers are present even on unhandled errors
+app.onError((err, c) => {
+  console.error('[error] Unhandled:', err);
+  return c.json({ error: 'internal_server_error' }, 500);
 });
 
 // Rate limiting middleware (Durable Object — globally consistent)

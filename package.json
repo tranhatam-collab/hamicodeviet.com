@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/generate-en-pages.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "deploy": "npm run build && npx wrangler pages deploy dist --project-name hamicodeviet-com --branch main --env-file .env.cloudflare"

@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const title = 'Bản quyền & DMCA — HaMi Code Việt';
+const description = 'Chính sách bản quyền và quy trình khiếu nại DMCA.';
+---
+<BaseLayout title={title} description={description}>
+  <div class="legal-page">
+    <div class="legal-container">
+      <h1>Bản quyền & DMCA</h1>
+      <p class="legal-intro">Phiên bản 1.0 — Cập nhật: 2026-07-01</p>
+      <h2>1. Bản quyền nội dung</h2>
+      <p>Toàn bộ nội dung trên hamicodeviet.com (bài học, tài liệu, code mẫu, thiết kế) thuộc bản quyền của HaMi Code Việt và Công ty TNHH Đầu tư Thương mại Thành Tâm Phát, trừ khi ghi rõ nguồn khác.</p>
+      <h2>2. Sản phẩm của người học</h2>
+      <p>Sản phẩm code do người học tạo ra trên nền tảng thuộc bản quyền của người học đó. HaMi Code Việt giữ quyền hiển thị sản phẩm trong portfolio công khai khi được người học đồng ý.</p>
+      <h2>3. Quy trình DMCA</h2>
+      <p>Nếu bạn tin rằng nội dung trên trang vi phạm bản quyền của bạn, gửi khiếu nại đến:</p>
+      <ul>
+        <li>Email: <a href="mailto:dmca@hamicodeviet.com">dmca@hamicodeviet.com</a></li>
+        <li>Tiêu đề: "DMCA Takedown Request"</li>
+        <li>Bao gồm: URL vi phạm, bằng chứng bản quyền, thông tin liên hệ, tuyên bố thiện chí</li>
+      </ul>
+      <p>Chúng tôi phản hồi trong vòng 72 giờ và gỡ nội dung vi phạm trong 5 ngày làm việc nếu khiếu nại hợp lệ.</p>
+      <h2>4. Fair Use</h2>
+      <p>Người học có thể sử dụng code mẫu cho mục đích học tập. Không được bán hoặc phân phối lại dưới tên mình.</p>
+    </div>
+  </div>
+</BaseLayout>
+<style>
+  .legal-page { background: #f7fafc; padding: 60px 0; min-height: 60vh; }
+  .legal-container { max-width: 800px; margin: 0 auto; padding: 48px; background: white; border-radius: 12px; }
+  .legal-container h1 { font-size: 2rem; color: #102a43; margin-bottom: 12px; }
+  .legal-intro { color: #64748b; margin-bottom: 32px; }
+  .legal-container h2 { font-size: 1.25rem; color: #102a43; margin: 24px 0 8px; }
+  .legal-container p { color: #334155; line-height: 1.7; margin-bottom: 12px; }
+  .legal-container ul { color: #334155; line-height: 1.8; padding-left: 20px; }
+  @media (max-width: 768px) { .legal-container { padding: 24px; } }
+</style>
