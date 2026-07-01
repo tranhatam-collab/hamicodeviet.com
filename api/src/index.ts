@@ -34,6 +34,7 @@ import portfolio from './routes/portfolio';
 import certificates from './routes/certificates';
 import notifications from './routes/notifications';
 import features from './routes/features';
+import projects from './routes/projects';
 
 export { RateLimiterDurableObject };
 
@@ -171,6 +172,7 @@ app.route('/portfolio', portfolio);
 app.route('/certificates', certificates);
 app.route('/notifications', notifications);
 app.route('/features', features);
+app.route('/projects', projects);
 
 // 404
 app.notFound((c) => c.json({ error: 'not_found' }, 404));

@@ -1,0 +1,281 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Xưởng dự án — HaMi Code Việt">
+  <div id="pw-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../../lib/api';
+
+    const root = document.getElementById('pw-root')!;
+
+    const STEPS = [
+      { step: 0, name: 'Quan sát', name_en: 'Observe', icon: '👁' },
+      { step: 1, name: 'Phát hiện vấn đề', name_en: 'Identify Problem', icon: '🔍' },
+      { step: 2, name: 'Nghiên cứu', name_en: 'Research', icon: '📚' },
+      { step: 3, name: 'Gặp người liên quan', name_en: 'Engage Stakeholders', icon: '🤝' },
+      { step: 4, name: 'Đề xuất giải pháp', name_en: 'Propose Solution', icon: '💡' },
+      { step: 5, name: 'Tạo nguyên mẫu', name_en: 'Build Prototype', icon: '🔨' },
+      { step: 6, name: 'Thử nghiệm', name_en: 'Test', icon: '🧪' },
+      { step: 7, name: 'Đo kết quả', name_en: 'Measure Results', icon: '📊' },
+      { step: 8, name: 'Sửa sai', name_en: 'Iterate', icon: '🔄' },
+      { step: 9, name: 'Công bố bằng chứng', name_en: 'Publish Evidence', icon: '📢' },
+    ];
+
+    const DOMAINS: Record<string, { vi: string; en: string; icon: string }> = {
+      agriculture: { vi: 'Nông nghiệp', en: 'Agriculture', icon: '🌾' },
+      tourism: { vi: 'Du lịch', en: 'Tourism', icon: '🗺' },
+      technology: { vi: 'Công nghệ', en: 'Technology', icon: '💻' },
+      education: { vi: 'Giáo dục', en: 'Education', icon: '🎓' },
+      media: { vi: 'Truyền thông', en: 'Media', icon: '📺' },
+      environment: { vi: 'Môi trường', en: 'Environment', icon: '🌱' },
+      health: { vi: 'Sức khỏe', en: 'Health', icon: '🏥' },
+      culture: { vi: 'Văn hóa', en: 'Culture', icon: '🎭' },
+      service: { vi: 'Dịch vụ', en: 'Service', icon: '🛎' },
+      business: { vi: 'Kinh doanh', en: 'Business', icon: '📈' },
+    };
+
+    const STATUS_COLORS: Record<string, string> = {
+      draft: '#6b7280', planning: '#f59e0b', in_progress: '#3b82f6',
+      submitted: '#8b5cf6', reviewed: '#10b981', published: '#20A779', archived: '#6b7280',
+    };
+
+    let currentView: 'list' | 'templates' | 'detail' = 'list';
+    let currentProject: any = null;
+
+    async function init() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+      renderShell();
+      await loadProjects();
+    }
+
+    function renderShell() {
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/projects" class="active">🔧 Xưởng dự án</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/portfolio">🏆 Portfolio</a></li>
+              <li><a href="/certificates">📜 Chứng chỉ</a></li>
+              <li><a href="/privacy">🔒 Quyền riêng tư</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main" id="pw-main">
+            <div class="dashboard-header">
+              <h1 class="dashboard-title">🔧 Xưởng dự án</h1>
+            </div>
+            <div class="dashboard-content" id="pw-content">
+              <p>Đang tải...</p>
+            </div>
+          </main>
+        </div>
+      `;
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+    }
+
+    async function loadProjects() {
+      currentView = 'list';
+      const content = document.getElementById('pw-content')!;
+      try {
+        const data = await apiFetch('/projects');
+        renderProjectList(data.projects || []);
+      } catch (err: any) {
+        content.innerHTML = `<div class="card" style="padding:1.5rem"><p style="color:#e53e3e">Lỗi: ${err.message}</p></div>`;
+      }
+    }
+
+    function renderProjectList(items: any[]) {
+      const content = document.getElementById('pw-content')!;
+      const cards = items.map(p => {
+        const domain = DOMAINS[p.domain] || { vi: p.domain, en: p.domain, icon: '📦' };
+        const statusColor = STATUS_COLORS[p.status] || '#6b7280';
+        const progress = Math.round(((p.current_step + 1) / 10) * 100);
+        return `
+          <div class="card" style="padding:1.25rem;cursor:pointer" onclick="window.location.href='/projects/detail?id=${p.id}'">
+            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.5rem">
+              <div>
+                <h3 style="font-size:1rem;margin:0">${domain.icon} ${p.title}</h3>
+                <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0.25rem 0 0">${p.description || ''}</p>
+              </div>
+              <span style="background:${statusColor};color:white;padding:0.2rem 0.6rem;border-radius:4px;font-size:0.7rem;text-transform:uppercase">${p.status}</span>
+            </div>
+            <div style="margin:0.75rem 0">
+              <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--color-text-muted);margin-bottom:0.25rem">
+                <span>Bước ${p.current_step + 1}/10</span>
+                <span>${progress}%</span>
+              </div>
+              <div style="background:var(--color-border);height:6px;border-radius:3px;overflow:hidden">
+                <div style="background:var(--color-primary);height:100%;width:${progress}%"></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;font-size:0.7rem">
+              <span style="background:var(--color-border);padding:0.2rem 0.5rem;border-radius:4px">${domain.vi}</span>
+              <span style="background:var(--color-border);padding:0.2rem 0.5rem;border-radius:4px">${p.age_group}</span>
+              ${p.mentor_name ? `<span style="background:#fef3c7;padding:0.2rem 0.5rem;border-radius:4px">👤 ${p.mentor_name}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      content.innerHTML = `
+        <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap">
+          <button class="btn btn--primary" id="btn-new-project">+ Dự án mới từ mẫu</button>
+          <button class="btn" id="btn-custom-project">+ Dự án tự do</button>
+          <button class="btn" id="btn-mentors">👤 Tìm mentor</button>
+        </div>
+
+        <h3 style="margin:0 0 1rem">Dự án của tôi (${items.length})</h3>
+        <div style="display:flex;flex-direction:column;gap:0.75rem">
+          ${cards || '<div class="card" style="padding:1.5rem"><p style="color:var(--color-text-muted)">Chưa có dự án. Bắt đầu dự án đầu tiên từ mẫu hoặc tự tạo!</p></div>'}
+        </div>
+
+        <div id="modal-root"></div>
+      `;
+
+      document.getElementById('btn-new-project')?.addEventListener('click', showTemplates);
+      document.getElementById('btn-custom-project')?.addEventListener('click', showCustomForm);
+      document.getElementById('btn-mentors')?.addEventListener('click', showMentors);
+    }
+
+    async function showTemplates() {
+      const modal = document.getElementById('modal-root')!;
+      modal.innerHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem"><div class="card" style="padding:1.5rem;max-width:700px;max-height:80vh;overflow:auto;width:100%"><h3 style="margin:0 0 1rem">Chọn mẫu dự án</h3><p id="tpl-loading">Đang tải...</p><button class="btn" onclick="document.getElementById('modal-root').innerHTML=''" style="margin-top:1rem">Đóng</button></div></div>`;
+      try {
+        const data = await apiFetch('/projects/templates');
+        const tpls = data.templates || [];
+        document.getElementById('tpl-loading')!.innerHTML = tpls.length === 0
+          ? '<p>Chưa có mẫu nào. Tạo dự án tự do.</p>'
+          : `<div style="display:flex;flex-direction:column;gap:0.75rem">${tpls.map((t: any) => {
+              const d = DOMAINS[t.domain] || { vi: t.domain, icon: '📦' };
+              return `<div class="card" style="padding:1rem;cursor:pointer;border:2px solid transparent" onmouseover="this.style.borderColor='var(--color-primary)'" onmouseout="this.style.borderColor='transparent'" onclick="window.__startTemplate('${t.id}')">
+                <h4 style="margin:0 0 0.25rem">${d.icon} ${t.title}</h4>
+                <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 0.5rem">${t.description}</p>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;font-size:0.7rem">
+                  <span style="background:var(--color-border);padding:0.15rem 0.4rem;border-radius:3px">${d.vi}</span>
+                  <span style="background:var(--color-border);padding:0.15rem 0.4rem;border-radius:3px">${t.age_group}</span>
+                  <span style="background:var(--color-border);padding:0.15rem 0.4rem;border-radius:3px">${t.duration_weeks} tuần</span>
+                  <span style="background:var(--color-border);padding:0.15rem 0.4rem;border-radius:3px">${t.difficulty}</span>
+                </div>
+              </div>`;
+            }).join('')}</div>`;
+        (window as any).__startTemplate = startTemplate;
+      } catch (err: any) {
+        document.getElementById('tpl-loading')!.innerHTML = `<p style="color:#e53e3e">${err.message}</p>`;
+      }
+    }
+
+    async function startTemplate(templateId: string) {
+      try {
+        const tplData = await apiFetch(`/projects/templates/${templateId}`);
+        const t = tplData.template;
+        const data = await apiFetch('/projects', 'POST', {
+          templateId: t.id,
+          title: t.title,
+          titleEn: t.title_en,
+          description: t.description,
+          descriptionEn: t.description_en,
+          domain: t.domain,
+          ageGroup: t.age_group,
+          budgetVnd: t.budget_vnd,
+          riskLevel: t.difficulty === 'advanced' ? 'medium' : 'low',
+        });
+        await apiFetch(`/projects/${data.project.id}/start`, 'POST');
+        window.location.href = `/projects/detail?id=${data.project.id}`;
+      } catch (err: any) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    function showCustomForm() {
+      const modal = document.getElementById('modal-root')!;
+      const domainOpts = Object.entries(DOMAINS).map(([k, v]) => `<option value="${k}">${v.icon} ${v.vi}</option>`).join('');
+      modal.innerHTML = `
+        <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem">
+          <div class="card" style="padding:1.5rem;max-width:550px;width:100%">
+            <h3 style="margin:0 0 1rem">Tạo dự án tự do</h3>
+            <form id="custom-form" style="display:flex;flex-direction:column;gap:0.75rem">
+              <input type="text" id="c-title" placeholder="Tên dự án / Project title" required style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" />
+              <textarea id="c-desc" rows="3" placeholder="Mô tả vấn đề muốn giải quyết" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px"></textarea>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+                <select id="c-domain" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px">${domainOpts}</select>
+                <select id="c-age" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px">
+                  <option value="8-10">8-10</option><option value="11-13">11-13</option>
+                  <option value="14-17">14-17</option><option value="16-20">16-20</option><option value="18-24">18-24</option>
+                </select>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+                <input type="text" id="c-client" placeholder="Khách hàng (nếu có)" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" />
+                <select id="c-ctype" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px">
+                  <option value="simulated">Mô phỏng</option><option value="real">Khách hàng thật</option><option value="community">Cộng đồng</option>
+                </select>
+              </div>
+              <input type="date" id="c-deadline" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" />
+              <button type="submit" class="btn btn--primary">Tạo dự án</button>
+            </form>
+            <button class="btn" onclick="document.getElementById('modal-root').innerHTML=''" style="margin-top:0.75rem">Hủy</button>
+            <div id="c-msg" style="margin-top:0.5rem"></div>
+          </div>
+        </div>
+      `;
+      document.getElementById('custom-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+          const data = await apiFetch('/projects', 'POST', {
+            title: (document.getElementById('c-title') as HTMLInputElement).value,
+            description: (document.getElementById('c-desc') as HTMLTextAreaElement).value,
+            domain: (document.getElementById('c-domain') as HTMLSelectElement).value,
+            ageGroup: (document.getElementById('c-age') as HTMLSelectElement).value,
+            clientName: (document.getElementById('c-client') as HTMLInputElement).value || null,
+            clientType: (document.getElementById('c-ctype') as HTMLSelectElement).value,
+            deadline: (document.getElementById('c-deadline') as HTMLInputElement).value || null,
+          });
+          await apiFetch(`/projects/${data.project.id}/start`, 'POST');
+          window.location.href = `/projects/detail?id=${data.project.id}`;
+        } catch (err: any) {
+          document.getElementById('c-msg')!.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+        }
+      });
+    }
+
+    async function showMentors() {
+      const modal = document.getElementById('modal-root')!;
+      modal.innerHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem"><div class="card" style="padding:1.5rem;max-width:600px;max-height:80vh;overflow:auto;width:100%"><h3 style="margin:0 0 1rem">👤 Mentors</h3><p id="m-loading">Đang tải...</p><button class="btn" onclick="document.getElementById('modal-root').innerHTML=''" style="margin-top:1rem">Đóng</button></div></div>`;
+      try {
+        const data = await apiFetch('/projects/mentors');
+        const mentors = data.mentors || [];
+        document.getElementById('m-loading')!.innerHTML = mentors.length === 0
+          ? '<p>Chưa có mentor. <a href="/projects/mentors/register" style="color:var(--color-primary)">Đăng ký làm mentor</a></p>'
+          : `<div style="display:flex;flex-direction:column;gap:0.75rem">${mentors.map((m: any) => `
+              <div class="card" style="padding:1rem">
+                <h4 style="margin:0 0 0.25rem">${m.display_name}</h4>
+                <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 0.5rem">${m.bio || ''}</p>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;font-size:0.7rem">
+                  ${(m.expertise || []).map((e: string) => `<span style="background:var(--color-border);padding:0.15rem 0.4rem;border-radius:3px">${e}</span>`).join('')}
+                  <span style="background:#fef3c7;padding:0.15rem 0.4rem;border-radius:3px">⭐ ${m.rating}</span>
+                  <span style="background:#dbeafe;padding:0.15rem 0.4rem;border-radius:3px">${m.total_projects} dự án</span>
+                </div>
+              </div>`).join('')}</div>`;
+      } catch (err: any) {
+        document.getElementById('m-loading')!.innerHTML = `<p style="color:#e53e3e">${err.message}</p>`;
+      }
+    }
+
+    init();
+  </script>
+</AppLayout>

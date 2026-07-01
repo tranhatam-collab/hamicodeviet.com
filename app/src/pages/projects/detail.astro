@@ -1,0 +1,359 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Chi tiết dự án — HaMi Code Việt">
+  <div id="pw-detail-root">
+    <div class="auth-container"><div class="auth-card"><h1 class="auth-title">Đang tải...</h1></div></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentUser, apiFetch } from '../../lib/api';
+
+    const root = document.getElementById('pw-detail-root')!;
+    const projectId = new URLSearchParams(window.location.search).get('id');
+
+    const STEPS = [
+      { step: 0, name: 'Quan sát', name_en: 'Observe', icon: '👁', desc: 'Quan sát môi trường, tình huống, con người. Ghi nhận những gì thấy, nghe, cảm nhận.' },
+      { step: 1, name: 'Phát hiện vấn đề', name_en: 'Identify Problem', icon: '🔍', desc: 'Xác định vấn đề thật sự. Phân biệt triệu chứng và nguyên nhân.' },
+      { step: 2, name: 'Nghiên cứu', name_en: 'Research', icon: '📚', desc: 'Tìm hiểu bối cảnh, dữ liệu, giải pháp tương tự. Kiểm chứng nguồn.' },
+      { step: 3, name: 'Gặp người liên quan', name_en: 'Engage Stakeholders', icon: '🤝', desc: 'Trao đổi với người chịu ảnh hưởng, chuyên gia, khách hàng.' },
+      { step: 4, name: 'Đề xuất giải pháp', name_en: 'Propose Solution', icon: '💡', desc: 'Đưa ra giải pháp, đánh giá tính khả thi, rủi ro, chi phí.' },
+      { step: 5, name: 'Tạo nguyên mẫu', name_en: 'Build Prototype', icon: '🔨', desc: 'Xây dựng nguyên mẫu tối thiểu. Code, mô hình, bản nháp.' },
+      { step: 6, name: 'Thử nghiệm', name_en: 'Test', icon: '🧪', desc: 'Thử nghiệm với người dùng thật hoặc mô phỏng. Thu thập phản hồi.' },
+      { step: 7, name: 'Đo kết quả', name_en: 'Measure Results', icon: '📊', desc: 'Đo lường kết quả theo tiêu chí đã đặt ra. So sánh trước/sau.' },
+      { step: 8, name: 'Sửa sai', name_en: 'Iterate', icon: '🔄', desc: 'Phân tích lỗi, cải tiến, thử lại. Lặp cho đến khi đạt chuẩn.' },
+      { step: 9, name: 'Công bố bằng chứng', name_en: 'Publish Evidence', icon: '📢', desc: 'Công bố kết quả, bằng chứng, bài học. Cho phép xác minh.' },
+    ];
+
+    const EVIDENCE_TYPES: Record<string, { vi: string; color: string }> = {
+      understand: { vi: 'Hiểu', color: '#3b82f6' },
+      do: { vi: 'Làm', color: '#10b981' },
+      transfer: { vi: 'Chuyển giao', color: '#8b5cf6' },
+      critique: { vi: 'Phản biện', color: '#f59e0b' },
+      responsibility: { vi: 'Trách nhiệm', color: '#ef4444' },
+      impact: { vi: 'Tác động', color: '#20A779' },
+    };
+
+    const STATUS_COLORS: Record<string, string> = {
+      pending: '#6b7280', in_progress: '#3b82f6', completed: '#10b981', skipped: '#9ca3af',
+    };
+
+    let projectData: any = null;
+
+    async function init() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login'; return; }
+      await loadProject();
+    }
+
+    async function loadProject() {
+      try {
+        const data = await apiFetch(`/projects/${projectId}`);
+        projectData = data;
+        renderDetail();
+      } catch (err: any) {
+        root.innerHTML = `<div class="dashboard"><main class="dashboard-main"><div class="card" style="padding:1.5rem"><p style="color:#e53e3e">Lỗi: ${err.message}</p><a href="/projects" style="color:var(--color-primary)">← Quay lại</a></div></main></div>`;
+      }
+    }
+
+    function renderDetail() {
+      const { project, milestones, evidence } = projectData;
+      const progress = Math.round(((project.current_step + 1) / 10) * 100);
+      const statusColor = STATUS_COLORS[project.status] || '#6b7280';
+
+      const milestoneList = STEPS.map((s, i) => {
+        const m = milestones.find((x: any) => x.step === s.step);
+        const status = m?.status || 'pending';
+        const isCurrent = project.current_step === s.step;
+        const isCompleted = status === 'completed';
+        const stepEvidence = evidence.filter((e: any) => e.milestone_id === m?.id);
+
+        return `
+          <div class="card" style="padding:1.25rem;margin-bottom:0.75rem;border-left:4px solid ${isCompleted ? '#10b981' : isCurrent ? 'var(--color-primary)' : 'var(--color-border)'}">
+            <div style="display:flex;justify-content:space-between;align-items:start">
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem">
+                  <span style="font-size:1.25rem">${s.icon}</span>
+                  <h4 style="margin:0;font-size:0.95rem">Bước ${s.step + 1}: ${s.name}</h4>
+                  <span style="background:${STATUS_COLORS[status]};color:white;padding:0.1rem 0.4rem;border-radius:3px;font-size:0.65rem;text-transform:uppercase">${status}</span>
+                </div>
+                <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 0.5rem 2rem">${s.desc}</p>
+                ${m?.notes ? `<p style="font-size:0.8rem;margin:0 0 0.5rem 2rem;padding:0.5rem;background:var(--color-bg-light);border-radius:4px">📝 ${m.notes}</p>` : ''}
+                ${stepEvidence.length > 0 ? `<div style="margin:0.5rem 0 0 2rem"><p style="font-size:0.75rem;color:var(--color-text-muted);margin:0 0 0.25rem">Bằng chứng (${stepEvidence.length}):</p>${stepEvidence.map((e: any) => {
+                  const et = EVIDENCE_TYPES[e.evidence_type] || { vi: e.evidence_type, color: '#6b7280' };
+                  return `<div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;margin:0.25rem 0">
+                    <span style="background:${et.color};color:white;padding:0.1rem 0.4rem;border-radius:3px">${et.vi}</span>
+                    <span>${e.title}</span>
+                    ${e.artifact_url ? `<a href="${e.artifact_url}" target="_blank" style="color:var(--color-primary)">↗</a>` : ''}
+                    ${e.ai_used ? '<span style="color:#f59e0b" title="Có dùng AI">🤖</span>' : ''}
+                    ${e.verification_status === 'verified' ? '<span style="color:#10b981" title="Đã xác minh">✓</span>' : ''}
+                  </div>`;
+                }).join('')}</div>` : ''}
+              </div>
+              ${!isCompleted && project.status !== 'submitted' && project.status !== 'reviewed' && project.status !== 'published' ? `
+                <button class="btn btn--primary" style="font-size:0.75rem;padding:0.3rem 0.6rem" onclick="window.__completeStep(${s.step})">Hoàn thành</button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      root.innerHTML = `
+        <div class="dashboard">
+          <aside class="sidebar">
+            <div class="sidebar-logo">HaMi <span class="code">&lt;CODE&gt;</span> Việt</div>
+            <nav><ul class="sidebar-nav">
+              <li><a href="/dashboard">📊 Dashboard</a></li>
+              <li><a href="/courses">📚 Khóa học</a></li>
+              <li><a href="/codelab">💻 CodeLab</a></li>
+              <li><a href="/ai">🤖 AI Chat</a></li>
+              <li><a href="/projects" class="active">🔧 Xưởng dự án</a></li>
+              <li><a href="/marketplace">🛒 Marketplace</a></li>
+              <li><a href="/portfolio">🏆 Portfolio</a></li>
+              <li><a href="/certificates">📜 Chứng chỉ</a></li>
+              <li><a href="/privacy">🔒 Quyền riêng tư</a></li>
+              <li><a href="/settings">⚙️ Cài đặt</a></li>
+              <li><a href="#" id="logout-btn">🚪 Đăng xuất</a></li>
+            </ul></nav>
+          </aside>
+          <main class="dashboard-main" id="pw-main">
+            <div class="dashboard-header">
+              <div>
+                <a href="/projects" style="font-size:0.85rem;color:var(--color-text-muted)">← Tất cả dự án</a>
+                <h1 class="dashboard-title" style="margin:0.25rem 0">${project.title}</h1>
+                <p style="color:var(--color-text-muted);margin:0">${project.description || ''}</p>
+              </div>
+              <span style="background:${statusColor};color:white;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;text-transform:uppercase">${project.status}</span>
+            </div>
+
+            <div class="dashboard-content">
+              <!-- Progress -->
+              <div class="card" style="padding:1.25rem;margin-bottom:1rem">
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem">
+                  <span style="font-size:0.9rem;font-weight:600">Tiến độ: Bước ${project.current_step + 1}/10</span>
+                  <span style="font-size:0.9rem;font-weight:600">${progress}%</span>
+                </div>
+                <div style="background:var(--color-border);height:8px;border-radius:4px;overflow:hidden">
+                  <div style="background:var(--color-primary);height:100%;width:${progress}%;transition:width 0.3s"></div>
+                </div>
+                <div style="display:flex;gap:1rem;margin-top:0.75rem;flex-wrap:wrap;font-size:0.75rem;color:var(--color-text-muted)">
+                  <span>📁 ${project.domain}</span>
+                  <span>👥 ${project.age_group}</span>
+                  <span>👤 ${project.client_type || 'simulated'}</span>
+                  ${project.client_name ? `<span>🏷 ${project.client_name}</span>` : ''}
+                  ${project.deadline ? `<span>⏰ ${new Date(project.deadline).toLocaleDateString('vi-VN')}</span>` : ''}
+                  ${project.mentor_name ? `<span>👨‍🏫 ${project.mentor_name}</span>` : ''}
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap">
+                <button class="btn" id="btn-evidence">+ Thêm bằng chứng</button>
+                <button class="btn" id="btn-mentor">👤 Gán mentor</button>
+                ${project.status === 'in_progress' && project.current_step >= 7 ? '<button class="btn btn--primary" id="btn-submit">📤 Nộp dự án</button>' : ''}
+                ${project.status === 'reviewed' ? '<button class="btn btn--primary" id="btn-publish">🌐 Công bố</button>' : ''}
+              </div>
+
+              ${project.review_score !== null ? `
+                <div class="card" style="padding:1rem;margin-bottom:1rem;background:#f0fdf4">
+                  <h4 style="margin:0 0 0.5rem">📋 Kết quả đánh giá</h4>
+                  <p style="margin:0"><strong>Điểm:</strong> ${project.review_score}/100</p>
+                  ${project.review_feedback ? `<p style="margin:0.5rem 0 0;font-size:0.85rem">${project.review_feedback}</p>` : ''}
+                </div>
+              ` : ''}
+
+              <!-- 10 Steps -->
+              <h3 style="margin:0 0 0.75rem">10 Bước thực hiện</h3>
+              ${milestoneList}
+
+              <div id="modal-root"></div>
+            </div>
+          </main>
+        </div>
+      `;
+
+      document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('hmcv_token');
+        window.location.href = '/login';
+      });
+      document.getElementById('btn-evidence')?.addEventListener('click', showEvidenceForm);
+      document.getElementById('btn-mentor')?.addEventListener('click', showMentorAssign);
+      document.getElementById('btn-submit')?.addEventListener('click', showSubmitForm);
+      document.getElementById('btn-publish')?.addEventListener('click', publishProject);
+      (window as any).__completeStep = completeStep;
+    }
+
+    async function completeStep(step: number) {
+      const notes = prompt(`Ghi chú cho bước "${STEPS[step].name}":`);
+      if (notes === null) return;
+      try {
+        await apiFetch(`/projects/${projectId}/milestone/${step}/complete`, 'POST', { notes });
+        await loadProject();
+      } catch (err: any) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    function showEvidenceForm() {
+      const modal = document.getElementById('modal-root')!;
+      const milestoneOpts = (projectData.milestones || []).map((m: any) => {
+        const s = STEPS[m.step];
+        return `<option value="${m.id}">Bước ${m.step + 1}: ${s?.name || ''}</option>`;
+      }).join('');
+      const evidenceOpts = Object.entries(EVIDENCE_TYPES).map(([k, v]) => `<option value="${k}">${v.vi}</option>`).join('');
+
+      modal.innerHTML = `
+        <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem">
+          <div class="card" style="padding:1.5rem;max-width:550px;width:100%;max-height:85vh;overflow:auto">
+            <h3 style="margin:0 0 1rem">+ Thêm bằng chứng</h3>
+            <form id="ev-form" style="display:flex;flex-direction:column;gap:0.75rem">
+              <div>
+                <label style="font-size:0.8rem;display:block;margin-bottom:0.25rem">Lớp bằng chứng *</label>
+                <select id="ev-type" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:6px">${evidenceOpts}</select>
+              </div>
+              <div>
+                <label style="font-size:0.8rem;display:block;margin-bottom:0.25rem">Bước liên quan</label>
+                <select id="ev-milestone" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:6px"><option value="">— Không —</option>${milestoneOpts}</select>
+              </div>
+              <input type="text" id="ev-title" placeholder="Tiêu đề bằng chứng *" required style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" />
+              <textarea id="ev-desc" rows="2" placeholder="Mô tả: ai làm gì, trong điều kiện nào, kết quả gì?" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px"></textarea>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+                <input type="text" id="ev-url" placeholder="URL artifact (code, doc, video)" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px" />
+                <select id="ev-atype" style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px">
+                  <option value="">Loại artifact</option>
+                  <option value="code">Code</option><option value="document">Document</option>
+                  <option value="image">Image</option><option value="video">Video</option>
+                  <option value="audio">Audio</option><option value="data">Data</option><option value="link">Link</option>
+                </select>
+              </div>
+              <div style="background:#fef3c7;padding:0.75rem;border-radius:6px;font-size:0.8rem">
+                <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer">
+                  <input type="checkbox" id="ev-ai" /> Có sử dụng AI?
+                </label>
+                <div id="ev-ai-detail" style="display:none;margin-top:0.5rem">
+                  <input type="text" id="ev-ai-tools" placeholder="Công cụ AI dùng (vd: ChatGPT, Claude)" style="width:100%;padding:0.4rem;border:1px solid var(--color-border);border-radius:4px;margin-bottom:0.5rem" />
+                  <textarea id="ev-ai-decl" rows="2" placeholder="Phần AI hỗ trợ vs phần con người quyết định" style="width:100%;padding:0.4rem;border:1px solid var(--color-border);border-radius:4px"></textarea>
+                </div>
+              </div>
+              <button type="submit" class="btn btn--primary">Thêm bằng chứng</button>
+            </form>
+            <button class="btn" onclick="document.getElementById('modal-root').innerHTML=''" style="margin-top:0.75rem">Hủy</button>
+            <div id="ev-msg" style="margin-top:0.5rem"></div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('ev-ai')?.addEventListener('change', (e) => {
+        document.getElementById('ev-ai-detail')!.style.display = (e.target as HTMLInputElement).checked ? 'block' : 'none';
+      });
+
+      document.getElementById('ev-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const aiUsed = (document.getElementById('ev-ai') as HTMLInputElement).checked;
+        try {
+          await apiFetch(`/projects/${projectId}/evidence`, 'POST', {
+            evidenceType: (document.getElementById('ev-type') as HTMLSelectElement).value,
+            milestoneId: (document.getElementById('ev-milestone') as HTMLSelectElement).value || null,
+            title: (document.getElementById('ev-title') as HTMLInputElement).value,
+            description: (document.getElementById('ev-desc') as HTMLTextAreaElement).value,
+            artifactUrl: (document.getElementById('ev-url') as HTMLInputElement).value || null,
+            artifactType: (document.getElementById('ev-atype') as HTMLSelectElement).value || null,
+            aiUsed,
+            aiDeclaration: aiUsed ? {
+              tools: (document.getElementById('ev-ai-tools') as HTMLInputElement).value,
+              declaration: (document.getElementById('ev-ai-decl') as HTMLTextAreaElement).value,
+            } : {},
+          });
+          document.getElementById('modal-root')!.innerHTML = '';
+          await loadProject();
+        } catch (err: any) {
+          document.getElementById('ev-msg')!.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+        }
+      });
+    }
+
+    async function showMentorAssign() {
+      const modal = document.getElementById('modal-root')!;
+      modal.innerHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem"><div class="card" style="padding:1.5rem;max-width:500px;width:100%;max-height:80vh;overflow:auto"><h3 style="margin:0 0 1rem">👤 Gán mentor</h3><p id="ma-loading">Đang tải danh sách mentor...</p><button class="btn" onclick="document.getElementById('modal-root').innerHTML=''" style="margin-top:1rem">Đóng</button></div></div>`;
+      try {
+        const data = await apiFetch(`/projects/mentors?domain=${projectData.project.domain}`);
+        const mentors = data.mentors || [];
+        if (mentors.length === 0) {
+          document.getElementById('ma-loading')!.innerHTML = '<p>Chưa có mentor cho lĩnh vực này.</p>';
+          return;
+        }
+        document.getElementById('ma-loading')!.innerHTML = `<div style="display:flex;flex-direction:column;gap:0.5rem">${mentors.map((m: any) => `
+          <div class="card" style="padding:0.75rem;cursor:pointer" onclick="window.__assignMentor('${m.id}')">
+            <strong>${m.display_name}</strong>
+            <p style="font-size:0.75rem;color:var(--color-text-muted);margin:0.25rem 0">${m.bio || ''}</p>
+            <div style="font-size:0.7rem">⭐ ${m.rating} · ${m.total_projects} dự án</div>
+          </div>`).join('')}</div>`;
+        (window as any).__assignMentor = assignMentor;
+      } catch (err: any) {
+        document.getElementById('ma-loading')!.innerHTML = `<p style="color:#e53e3e">${err.message}</p>`;
+      }
+    }
+
+    async function assignMentor(mentorId: string) {
+      try {
+        await apiFetch(`/projects/${projectId}/mentor`, 'POST', { mentorId });
+        document.getElementById('modal-root')!.innerHTML = '';
+        await loadProject();
+      } catch (err: any) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    function showSubmitForm() {
+      const modal = document.getElementById('modal-root')!;
+      modal.innerHTML = `
+        <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem">
+          <div class="card" style="padding:1.5rem;max-width:550px;width:100%">
+            <h3 style="margin:0 0 1rem">📤 Nộp dự án để đánh giá</h3>
+            <form id="submit-form" style="display:flex;flex-direction:column;gap:0.75rem">
+              <textarea id="s-report" rows="4" placeholder="Báo cáo cuối cùng: vấn đề, giải pháp, kết quả, bài học" required style="padding:0.5rem;border:1px solid var(--color-border);border-radius:6px"></textarea>
+              <div style="background:#fef3c7;padding:0.75rem;border-radius:6px;font-size:0.8rem">
+                <strong>Khai báo AI:</strong>
+                <input type="text" id="s-ai-tools" placeholder="Công cụ AI đã dùng (vd: ChatGPT, Claude, Copilot)" style="width:100%;padding:0.4rem;border:1px solid var(--color-border);border-radius:4px;margin:0.5rem 0" />
+                <textarea id="s-ai-decl" rows="2" placeholder="Phần AI hỗ trợ vs phần con người quyết định. Cách kiểm chứng." style="width:100%;padding:0.4rem;border:1px solid var(--color-border);border-radius:4px"></textarea>
+              </div>
+              <button type="submit" class="btn btn--primary">Nộp dự án</button>
+            </form>
+            <button class="btn" onclick="document.getElementById('modal-root').innerHTML=''" style="margin-top:0.75rem">Hủy</button>
+            <div id="s-msg" style="margin-top:0.5rem"></div>
+          </div>
+        </div>
+      `;
+      document.getElementById('submit-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+          await apiFetch(`/projects/${projectId}/submit`, 'POST', {
+            finalReport: (document.getElementById('s-report') as HTMLTextAreaElement).value,
+            aiDeclaration: {
+              tools: (document.getElementById('s-ai-tools') as HTMLInputElement).value,
+              declaration: (document.getElementById('s-ai-decl') as HTMLTextAreaElement).value,
+            },
+          });
+          document.getElementById('modal-root')!.innerHTML = '';
+          await loadProject();
+        } catch (err: any) {
+          document.getElementById('s-msg')!.innerHTML = `<span style="color:#e53e3e">${err.message}</span>`;
+        }
+      });
+    }
+
+    async function publishProject() {
+      if (!confirm('Công bố dự án công khai? Bất kỳ ai cũng có thể xem bằng chứng của bạn.')) return;
+      try {
+        await apiFetch(`/projects/${projectId}/publish`, 'POST');
+        await loadProject();
+      } catch (err: any) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    init();
+  </script>
+</AppLayout>

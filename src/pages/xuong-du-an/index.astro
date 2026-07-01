@@ -1,0 +1,245 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = 'Xưởng dự án / Project Workshop';
+const description = 'Hệ sinh thái giáo dục thực chứng — học qua 10 bước: quan sát, phát hiện vấn đề, nghiên cứu, gặp người liên quan, đề xuất, tạo nguyên mẫu, thử nghiệm, đo kết quả, sửa sai, công bố bằng chứng.';
+
+const domains = [
+  { icon: '🌾', vi: 'Nông nghiệp', en: 'Agriculture', color: '#20A779' },
+  { icon: '🗺', vi: 'Du lịch', en: 'Tourism', color: '#00A8CC' },
+  { icon: '💻', vi: 'Công nghệ', en: 'Technology', color: '#102A43' },
+  { icon: '🎓', vi: 'Giáo dục', en: 'Education', color: '#FFC857' },
+  { icon: '📺', vi: 'Truyền thông', en: 'Media', color: '#8b5cf6' },
+  { icon: '🌱', vi: 'Môi trường', en: 'Environment', color: '#10b981' },
+  { icon: '🏥', vi: 'Sức khỏe', en: 'Health', color: '#ef4444' },
+  { icon: '🎭', vi: 'Văn hóa', en: 'Culture', color: '#f59e0b' },
+  { icon: '🛎', vi: 'Dịch vụ', en: 'Service', color: '#6366f1' },
+  { icon: '📈', vi: 'Kinh doanh', en: 'Business', color: '#081826' },
+];
+
+const steps = [
+  { icon: '👁', vi: 'Quan sát', en: 'Observe', desc_vi: 'Quan sát môi trường, tình huống, con người. Ghi nhận những gì thấy, nghe, cảm nhận.', desc_en: 'Observe environment, situations, people. Record what you see, hear, feel.' },
+  { icon: '🔍', vi: 'Phát hiện vấn đề', en: 'Identify Problem', desc_vi: 'Xác định vấn đề thật sự. Phân biệt triệu chứng và nguyên nhân.', desc_en: 'Identify the real problem. Distinguish symptoms from root causes.' },
+  { icon: '📚', vi: 'Nghiên cứu', en: 'Research', desc_vi: 'Tìm hiểu bối cảnh, dữ liệu, giải pháp tương tự. Kiểm chứng nguồn.', desc_en: 'Study context, data, similar solutions. Verify sources.' },
+  { icon: '🤝', vi: 'Gặp người liên quan', en: 'Engage Stakeholders', desc_vi: 'Trao đổi với người chịu ảnh hưởng, chuyên gia, khách hàng.', desc_en: 'Talk to those affected, experts, customers.' },
+  { icon: '💡', vi: 'Đề xuất giải pháp', en: 'Propose Solution', desc_vi: 'Đưa ra giải pháp, đánh giá tính khả thi, rủi ro, chi phí.', desc_en: 'Propose solution, assess feasibility, risks, costs.' },
+  { icon: '🔨', vi: 'Tạo nguyên mẫu', en: 'Build Prototype', desc_vi: 'Xây dựng nguyên mẫu tối thiểu. Code, mô hình, bản nháp.', desc_en: 'Build minimum prototype. Code, model, draft.' },
+  { icon: '🧪', vi: 'Thử nghiệm', en: 'Test', desc_vi: 'Thử nghiệm với người dùng thật hoặc mô phỏng. Thu thập phản hồi.', desc_en: 'Test with real users or simulation. Collect feedback.' },
+  { icon: '📊', vi: 'Đo kết quả', en: 'Measure Results', desc_vi: 'Đo lường kết quả theo tiêu chí đã đặt ra. So sánh trước/sau.', desc_en: 'Measure results against set criteria. Compare before/after.' },
+  { icon: '🔄', vi: 'Sửa sai', en: 'Iterate', desc_vi: 'Phân tích lỗi, cải tiến, thử lại. Lặp cho đến khi đạt chuẩn.', desc_en: 'Analyze errors, improve, retry. Loop until standard met.' },
+  { icon: '📢', vi: 'Công bố bằng chứng', en: 'Publish Evidence', desc_vi: 'Công bố kết quả, bằng chứng, bài học. Cho phép xác minh.', desc_en: 'Publish results, evidence, lessons. Allow verification.' },
+];
+
+const evidenceLayers = [
+  { icon: '🧠', vi: 'Hiểu', en: 'Understand', desc_vi: 'Giải thích bằng lời của mình', desc_en: 'Explain in your own words' },
+  { icon: '✋', vi: 'Làm', en: 'Do', desc_vi: 'Thực hiện nhiệm vụ', desc_en: 'Perform the task' },
+  { icon: '🔀', vi: 'Chuyển giao', en: 'Transfer', desc_vi: 'Làm được trong bối cảnh khác', desc_en: 'Do it in a different context' },
+  { icon: '🔎', vi: 'Phản biện', en: 'Critique', desc_vi: 'Nhận ra lỗi và giới hạn', desc_en: 'Identify errors and limits' },
+  { icon: '⚖️', vi: 'Trách nhiệm', en: 'Responsibility', desc_vi: 'Giải trình quyết định', desc_en: 'Explain your decisions' },
+  { icon: '🌍', vi: 'Tác động', en: 'Impact', desc_vi: 'Kết quả đối với người dùng/cộng đồng', desc_en: 'Results for users/community' },
+];
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="hero">
+    <div class="container text-center">
+      <p class="eyebrow" style="color: var(--color-primary);">
+        <span data-vi>Hệ sinh thái giáo dục thực chứng</span>
+        <span data-en>Evidence-based education ecosystem</span>
+      </p>
+      <h1>
+        <span data-vi>Xưởng dự án</span>
+        <span data-en>Project Workshop</span>
+      </h1>
+      <p class="hero-subtitle">
+        <span data-vi>Trường học dạy kiến thức. Xưởng dự án dạy cách tạo giá trị thật — qua 10 bước, có mentor, deadline, khách hàng và bằng chứng có thể xác minh.</span>
+        <span data-en>Schools teach knowledge. Project Workshop teaches how to create real value — through 10 steps, with mentors, deadlines, clients and verifiable evidence.</span>
+      </p>
+      <div style="margin-top: 1.5rem;">
+        <a href="https://app.hamicodeviet.com/projects" class="btn btn--primary" style="margin-right: 0.5rem;">
+          <span data-vi>Bắt đầu dự án</span>
+          <span data-en>Start a project</span>
+        </a>
+        <a href="#10-buoc" class="btn">
+          <span data-vi>Xem 10 bước</span>
+          <span data-en>See 10 steps</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why -->
+  <section class="section">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: 2rem;">
+        <h2>
+          <span data-vi>Tại sao cần xưởng dự án?</span>
+          <span data-en>Why a project workshop?</span>
+        </h2>
+        <p style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto;">
+          <span data-vi>Trường lớp khó tạo ra thường xuyên 5 việc quyết định tương lai: tình huống thật, cập nhật năng lực nhanh, cá nhân hóa sâu, xác minh năng lực thật, đồng hành suốt đời.</span>
+          <span data-en>Schools struggle to regularly create 5 things that shape the future: real situations, fast skill updates, deep personalization, true skill verification, lifelong companionship.</span>
+        </p>
+      </div>
+      <div class="grid grid--3">
+        {[
+          { icon: '🎯', vi: 'Tình huống thật', en: 'Real situations', desc_vi: 'Dự án có khách hàng, deadline, ngân sách, rủi ro — không phải bài tập giả.', desc_en: 'Projects with clients, deadlines, budget, risk — not fake exercises.' },
+          { icon: '⚡', vi: 'Cập nhật nhanh', en: 'Fast updates', desc_vi: 'Nội dung cập nhật theo công nghệ và thị trường, không theo kỳ học.', desc_en: 'Content updates with tech and market, not academic cycles.' },
+          { icon: '👤', vi: 'Cá nhân hóa sâu', en: 'Deep personalization', desc_vi: 'Mỗi người học theo tốc độ, năng lực, mục tiêu riêng với AI tutor.', desc_en: 'Each learner at their own pace, skill, goals with AI tutor.' },
+          { icon: '✅', vi: 'Xác minh năng lực', en: 'Skill verification', desc_vi: '6 lớp bằng chứng: hiểu, làm, chuyển giao, phản biện, trách nhiệm, tác động.', desc_en: '6 evidence layers: understand, do, transfer, critique, responsibility, impact.' },
+          { icon: '♾️', vi: 'Đồng hành suốt đời', en: 'Lifelong companion', desc_vi: 'Tài khoản năng lực không đóng khi tốt nghiệp. Tích lũy suốt đời.', desc_en: 'Competence account that does not close at graduation. Lifelong.' },
+          { icon: '🤖', vi: 'AI minh bạch', en: 'Transparent AI', desc_vi: 'Mọi bài nộp khai báo mức độ sử dụng AI. Con người suy nghĩ trước, AI sau.', desc_en: 'Every submission declares AI usage. Humans think first, AI second.' },
+        ].map((item) => (
+          <div class="card" style="padding: 1.5rem;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">{item.icon}</div>
+            <h3 style="font-size: 1.05rem; margin: 0 0 0.5rem;">
+              <span data-vi>{item.vi}</span>
+              <span data-en>{item.en}</span>
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0;">
+              <span data-vi>{item.desc_vi}</span>
+              <span data-en>{item.desc_en}</span>
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 Steps -->
+  <section class="section" id="10-buoc" style="background: var(--color-bg-light);">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: 2rem;">
+        <h2>
+          <span data-vi>10 bước thực hiện</span>
+          <span data-en>10 implementation steps</span>
+        </h2>
+        <p style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto;">
+          <span data-vi>Mỗi dự án đi qua 10 bước — từ quan sát đến công bố bằng chứng. Mentor đồng hành, AI hỗ trợ, con người quyết định.</span>
+          <span data-en>Each project goes through 10 steps — from observation to publishing evidence. Mentors guide, AI assists, humans decide.</span>
+        </p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 800px; margin: 0 auto;">
+        {steps.map((s, i) => (
+          <div class="card" style="padding: 1rem 1.25rem; display: flex; align-items: start; gap: 1rem; border-left: 4px solid var(--color-primary);">
+            <div style="font-size: 1.5rem; flex-shrink: 0;">{s.icon}</div>
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span style="background: var(--color-primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">{i + 1}</span>
+                <h3 style="font-size: 1rem; margin: 0;">
+                  <span data-vi>{s.vi}</span>
+                  <span data-en>{s.en}</span>
+                </h3>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0;">
+                <span data-vi>{s.desc_vi}</span>
+                <span data-en>{s.desc_en}</span>
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 Domains -->
+  <section class="section">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: 2rem;">
+        <h2>
+          <span data-vi>10 lĩnh vực thực tế</span>
+          <span data-en>10 real-world domains</span>
+        </h2>
+        <p style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto;">
+          <span data-vi>Dự án không chỉ là code. Dự án giải quyết vấn đề thật trong nông nghiệp, du lịch, giáo dục, môi trường và hơn thế nữa.</span>
+          <span data-en>Projects are not just code. Projects solve real problems in agriculture, tourism, education, environment and more.</span>
+        </p>
+      </div>
+      <div class="grid grid--5" style="gap: 0.75rem;">
+        {domains.map((d) => (
+          <div class="card" style="padding: 1.25rem; text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">{d.icon}</div>
+            <h3 style="font-size: 0.9rem; margin: 0;">
+              <span data-vi>{d.vi}</span>
+              <span data-en>{d.en}</span>
+            </h3>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 Evidence Layers -->
+  <section class="section" style="background: var(--color-bg-light);">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: 2rem;">
+        <h2>
+          <span data-vi>6 lớp bằng chứng</span>
+          <span data-en>6 evidence layers</span>
+        </h2>
+        <p style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto;">
+          <span data-vi>Không chỉ có điểm số. Mỗi năng lực được chứng minh qua 6 lớp — từ hiểu đến tác động thật.</span>
+          <span data-en>Not just grades. Each skill is proven through 6 layers — from understanding to real impact.</span>
+        </p>
+      </div>
+      <div class="grid grid--3">
+        {evidenceLayers.map((e) => (
+          <div class="card" style="padding: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <span style="font-size: 1.5rem;">{e.icon}</span>
+              <h3 style="font-size: 1rem; margin: 0;">
+                <span data-vi>{e.vi}</span>
+                <span data-en>{e.en}</span>
+              </h3>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0;">
+              <span data-vi>{e.desc_vi}</span>
+              <span data-en>{e.desc_en}</span>
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- AI Declaration -->
+  <section class="section">
+    <div class="container">
+      <div style="max-width: 700px; margin: 0 auto; text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🤖</div>
+        <h2>
+          <span data-vi>Khai báo AI bắt buộc</span>
+          <span data-en>Mandatory AI declaration</span>
+        </h2>
+        <p style="color: var(--color-text-muted); margin: 1rem 0;">
+          <span data-vi>Mọi bài nộp phải khai báo: công cụ AI nào đã dùng, phần AI hỗ trợ, phần con người quyết định, cách kiểm chứng. Con người suy nghĩ trước, AI sau. Tốc độ hoàn thành không đồng nhất với năng lực.</span>
+          <span data-en>Every submission must declare: which AI tools were used, what AI assisted, what humans decided, how it was verified. Humans think first, AI second. Speed of completion does not equal skill.</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" style="background: var(--color-navy); color: white;">
+    <div class="container text-center">
+      <h2 style="color: white;">
+        <span data-vi>Sẵn sàng tạo giá trị thật?</span>
+        <span data-en>Ready to create real value?</span>
+      </h2>
+      <p style="color: rgba(255,255,255,0.8); max-width: 600px; margin: 1rem auto;">
+        <span data-vi>Bắt đầu dự án đầu tiên hôm nay. Chọn từ mẫu hoặc tự tạo. Mentor đồng hành, AI hỗ trợ, bằng chứng của bạn.</span>
+        <span data-en>Start your first project today. Choose a template or create your own. Mentors guide, AI assists, evidence is yours.</span>
+      </p>
+      <div style="margin-top: 1.5rem;">
+        <a href="https://app.hamicodeviet.com/projects" class="btn btn--primary" style="margin-right: 0.5rem;">
+          <span data-vi>Bắt đầu dự án</span>
+          <span data-en>Start a project</span>
+        </a>
+        <a href="https://app.hamicodeviet.com/projects/mentors/register" class="btn" style="background: rgba(255,255,255,0.15); color: white;">
+          <span data-vi>Đăng ký làm mentor</span>
+          <span data-en>Become a mentor</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
