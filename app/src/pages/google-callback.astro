@@ -1,0 +1,48 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Google callback — HaMi Code Việt">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <a href="/">HaMi <span class="code">&lt;CODE&gt;</span> Việt</a>
+      </div>
+      <h1 class="auth-title">Đang xử lý...</h1>
+      <p class="auth-subtitle" id="cb-status">Vui lòng đợi.</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { setToken } from '../lib/api';
+
+    const status = document.getElementById('cb-status')!;
+
+    // Token comes in URL fragment (after #) to keep it out of server logs
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const token = params.get('token');
+    const error = new URLSearchParams(window.location.search).get('error');
+
+    if (error) {
+      const errorMessages: Record<string, string> = {
+        google_auth_cancelled: 'Bạn đã hủy đăng nhập Google.',
+        google_no_code: 'Không nhận được mã từ Google.',
+        google_not_configured: 'Đăng nhập Google chưa được cấu hình.',
+        google_token_exchange_failed: 'Không thể trao đổi token với Google.',
+        google_userinfo_failed: 'Không thể lấy thông tin từ Google.',
+        google_no_email: 'Tài khoản Google không có email.',
+      };
+      status.textContent = errorMessages[error] || 'Lỗi đăng nhập Google.';
+      status.className = 'auth-subtitle';
+      setTimeout(() => { window.location.href = '/login'; }, 3000);
+    } else if (token) {
+      setToken(token);
+      status.textContent = 'Đăng nhập thành công! Đang chuyển hướng...';
+      setTimeout(() => { window.location.href = '/dashboard'; }, 500);
+    } else {
+      status.textContent = 'Không tìm thấy token. Vui lòng đăng nhập lại.';
+      setTimeout(() => { window.location.href = '/login'; }, 2000);
+    }
+  </script>
+</AppLayout>

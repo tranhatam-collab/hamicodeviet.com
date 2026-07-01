@@ -111,11 +111,20 @@ auth.post('/signup', async (c) => {
     token: verifyToken,
     lang: language,
   }, c.env);
-
-  // SECURITY: Never log verification tokens. Fail closed — if email fails,
-  // user must request resend later. Do NOT expose token in response or logs.
   if (!emailSent) {
     console.error('[email] Verification email enqueue failed for user_id:', user.id);
+  }
+
+  // Send welcome email (separate from verification)
+  const welcomeSent = await enqueueEmail({
+    type: 'welcome',
+    to: email,
+    token: '',
+    lang: language,
+    displayName,
+  }, c.env);
+  if (!welcomeSent) {
+    console.error('[email] Welcome email enqueue failed for user_id:', user.id);
   }
 
   // Create session
@@ -459,6 +468,168 @@ auth.post('/logout-all', async (c) => {
   await sql`UPDATE sessions SET revoked_at = now() WHERE user_id = ${payload.sub} AND revoked_at IS NULL`;
 
   return c.json({ success: true });
+});
+
+// ===== GOOGLE OAUTH =====
+
+// GET /auth/google — redirect to Google OAuth consent screen
+auth.get('/google', async (c) => {
+  const clientId = c.env.GOOGLE_CLIENT_ID;
+  const redirectUri = c.env.GOOGLE_REDIRECT_URI;
+  if (!clientId || !redirectUri) {
+    return c.json({ error: 'google_oauth_not_configured' }, 503);
+  }
+  const state = generateToken().substring(0, 32);
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    response_type: 'code',
+    scope: 'openid email profile',
+    state,
+    prompt: 'select_account',
+  });
+  return c.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
+});
+
+// GET /auth/google/callback — handle Google OAuth callback
+auth.get('/google/callback', async (c) => {
+  const code = c.req.query('code');
+  const error = c.req.query('error');
+
+  if (error) {
+    return c.redirect(`${c.env.APP_URL}/login?error=google_auth_cancelled`);
+  }
+  if (!code) {
+    return c.redirect(`${c.env.APP_URL}/login?error=google_no_code`);
+  }
+
+  const clientId = c.env.GOOGLE_CLIENT_ID;
+  const clientSecret = c.env.GOOGLE_CLIENT_SECRET;
+  const redirectUri = c.env.GOOGLE_REDIRECT_URI;
+
+  if (!clientId || !clientSecret || !redirectUri) {
+    return c.redirect(`${c.env.APP_URL}/login?error=google_not_configured`);
+  }
+
+  // Exchange code for tokens
+  let googleTokens: any;
+  try {
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code',
+      }),
+      signal: AbortSignal.timeout(10000),
+    });
+    googleTokens = await tokenRes.json();
+    if (!googleTokens.access_token) {
+      return c.redirect(`${c.env.APP_URL}/login?error=google_token_exchange_failed`);
+    }
+  } catch (err: any) {
+    console.error('[google] Token exchange failed:', err.cause?.code || err.message);
+    return c.redirect(`${c.env.APP_URL}/login?error=google_token_exchange_failed`);
+  }
+
+  // Get user info from Google
+  let googleUser: any;
+  try {
+    const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: { Authorization: `Bearer ${googleTokens.access_token}` },
+      signal: AbortSignal.timeout(10000),
+    });
+    googleUser = await userRes.json();
+    if (!googleUser.email) {
+      return c.redirect(`${c.env.APP_URL}/login?error=google_no_email`);
+    }
+  } catch (err: any) {
+    console.error('[google] Userinfo fetch failed:', err.cause?.code || err.message);
+    return c.redirect(`${c.env.APP_URL}/login?error=google_userinfo_failed`);
+  }
+
+  const email = googleUser.email.toLowerCase().trim();
+  const displayName = googleUser.name || googleUser.given_name || email.split('@')[0];
+  const googleSub = googleUser.id;
+  const language = 'vi';
+  const sql = getDb(c.env);
+
+  // Check if user exists by email
+  let [user] = await sql`SELECT id, email, email_verified, status FROM users WHERE email = ${email}`;
+  let isNewUser = false;
+
+  if (!user) {
+    isNewUser = true;
+    [user] = await sql`
+      INSERT INTO users (email, password_hash, status, email_verified)
+      VALUES (${email}, ${'oauth:google:' + googleSub}, 'active', true)
+      RETURNING id, email, email_verified, status
+    `;
+
+    await sql`
+      INSERT INTO profiles (user_id, display_name, language, avatar_url)
+      VALUES (${user.id}, ${displayName}, ${language}, ${googleUser.picture || null})
+    `;
+
+    await sql`INSERT INTO user_roles (user_id, role_id) VALUES (${user.id}, 'learner')`;
+
+    await logAuditEvent(c.env, {
+      actor_id: user.id,
+      actor_type: 'user',
+      action: 'user.signup.google',
+      resource_type: 'user',
+      resource_id: user.id,
+      changes: { email, displayName, provider: 'google' },
+      ip: c.req.header('cf-connecting-ip'),
+      user_agent: c.req.header('user-agent'),
+    });
+  } else {
+    if (googleUser.picture) {
+      await sql`UPDATE profiles SET avatar_url = ${googleUser.picture} WHERE user_id = ${user.id} AND avatar_url IS NULL`;
+    }
+    await logAuditEvent(c.env, {
+      actor_id: user.id,
+      actor_type: 'user',
+      action: 'user.login.google',
+      resource_type: 'user',
+      resource_id: user.id,
+      ip: c.req.header('cf-connecting-ip'),
+      user_agent: c.req.header('user-agent'),
+    });
+  }
+
+  // Send welcome email for new users
+  if (isNewUser) {
+    const welcomeSent = await enqueueEmail({
+      type: 'welcome',
+      to: email,
+      token: '',
+      lang: language,
+      displayName,
+    }, c.env);
+    if (!welcomeSent) {
+      console.error('[email] Welcome email enqueue failed for user_id:', user.id);
+    }
+  }
+
+  // Create session
+  const sessionToken = await signJwt(
+    { sub: user.id, email: user.email },
+    c.env.JWT_SECRET,
+    7 * 24 * 3600,
+  );
+  const sessionTokenHash = await hashToken(sessionToken);
+  await sql`
+    INSERT INTO sessions (user_id, token_hash, expires_at, ip, user_agent)
+    VALUES (${user.id}, ${sessionTokenHash}, now() + interval '7 days', ${c.req.header('cf-connecting-ip') || null}, ${c.req.header('user-agent') || null})
+  `;
+
+  // Redirect to app with token in fragment (not query — keeps it out of server logs)
+  const redirectUrl = `${c.env.APP_URL}/google-callback#token=${encodeURIComponent(sessionToken)}`;
+  return c.redirect(redirectUrl);
 });
 
 export default auth;

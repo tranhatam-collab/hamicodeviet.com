@@ -12,10 +12,13 @@ interface Env {
   EMAIL_DLQ: Queue<EmailQueueMessage>;
   AI: Ai;
   AI_DAILY_LIMIT?: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  GOOGLE_REDIRECT_URI: string;
 }
 
 interface EmailQueueMessage {
-  type: 'verification' | 'password_reset' | 'guardian_verification';
+  type: 'verification' | 'password_reset' | 'guardian_verification' | 'welcome';
   to: string;
   token: string;
   lang: 'vi' | 'en';
@@ -23,6 +26,7 @@ interface EmailQueueMessage {
   guardianCode?: string;
   guardianName?: string;
   childEmail?: string;
+  displayName?: string;
 }
 
 interface AuthUser {

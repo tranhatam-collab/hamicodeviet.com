@@ -81,6 +81,14 @@ export async function sendEmailDirect(
     text = msg.lang === 'en'
       ? `Your guardian verification code is: ${msg.guardianCode}`
       : `Mã xác nhận người giám hộ của bạn là: ${msg.guardianCode}`;
+  } else if (msg.type === 'welcome') {
+    subject = msg.lang === 'en'
+      ? 'Welcome to HaMi Code Việt! 🎉'
+      : 'Chào mừng bạn đến HaMi Code Việt! 🎉';
+    html = welcomeEmailHtml(msg.displayName || '', msg.lang);
+    text = msg.lang === 'en'
+      ? `Welcome to HaMi Code Việt, ${msg.displayName}! Your account is ready. Start learning at https://app.hamicodeviet.com/dashboard`
+      : `Chào mừng ${msg.displayName} đến HaMi Code Việt! Tài khoản của bạn đã sẵn sàng. Bắt đầu học tại https://app.hamicodeviet.com/dashboard`;
   } else {
     const link =
       msg.type === 'verification'
@@ -240,5 +248,84 @@ export function guardianVerificationHtml(code: string, guardianName: string, chi
         </span>
       </div>
       <p style="color:#64748B;font-size:14px">Nhập mã này vào ứng dụng để xác nhận quyền giám hộ. Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>
+    </div>`;
+}
+
+export function welcomeEmailHtml(displayName: string, lang: 'vi' | 'en'): string {
+  const appUrl = 'https://app.hamicodeviet.com';
+  const publicUrl = 'https://hamicodeviet.com';
+  if (lang === 'en') {
+    return `
+      <div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px">
+        <div style="text-align:center;margin-bottom:24px">
+          <h1 style="color:#00A8CC;font-size:28px;margin:0">HaMi <span style="color:#102A43">&lt;CODE&gt;</span> Việt</h1>
+        </div>
+        <h2 style="color:#102A43">Welcome, ${displayName}! 🎉</h2>
+        <p style="color:#334155;font-size:16px;line-height:1.6">
+          Your HaMi Code Việt account is ready. You now have access to:
+        </p>
+        <ul style="color:#334155;font-size:15px;line-height:1.8;padding-left:20px">
+          <li><strong>Free Learning</strong> — bilingual programming lessons (Vietnamese-English)</li>
+          <li><strong>CodeLab</strong> — write and run code directly in your browser</li>
+          <li><strong>15 real code products</strong> — build story makers, beat makers, websites, APIs</li>
+          <li><strong>Project Workshop</strong> — 10-step real-world projects with mentors</li>
+          <li><strong>AI Chat</strong> — bilingual AI tutor powered by Cloudflare Workers AI</li>
+          <li><strong>Portfolio & Certificates</strong> — evidence-based skill verification</li>
+        </ul>
+        <a href="${appUrl}/dashboard" style="display:inline-block;background:#00A8CC;color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;margin:16px 0">
+          Go to Dashboard
+        </a>
+        <a href="${publicUrl}/bat-dau" style="display:inline-block;background:#20A779;color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;margin:16px 0 16px 12px">
+          Getting Started Guide
+        </a>
+        <div style="background:#F0F9FF;padding:16px;border-radius:8px;margin:24px 0">
+          <p style="color:#102A43;font-size:14px;margin:0"><strong>Quick start:</strong></p>
+          <ol style="color:#334155;font-size:14px;line-height:1.6;margin:8px 0 0;padding-left:20px">
+            <li>Take the <a href="${publicUrl}/danh-gia-dau-vao" style="color:#00A8CC">input assessment</a> to find your level</li>
+            <li>Pick a <a href="${publicUrl}/lo-trinh" style="color:#00A8CC">learning track</a> for your age group</li>
+            <li>Try a <a href="${publicUrl}/san-pham" style="color:#00A8CC">code product</a> right away</li>
+            <li>Start a <a href="${publicUrl}/xuong-du-an" style="color:#00A8CC">project</a> with a mentor</li>
+          </ol>
+        </div>
+        <p style="color:#64748B;font-size:14px">If you have questions, reply to this email or visit our <a href="${publicUrl}/lien-he" style="color:#00A8CC">contact page</a>.</p>
+        <hr style="border:none;border-top:1px solid #E2E8F0;margin:24px 0">
+        <p style="color:#94A3B8;font-size:12px;text-align:center">HaMi Code Việt — Học ngôn ngữ. Học lập trình. Làm ra sản phẩm thật.</p>
+      </div>`;
+  }
+  return `
+    <div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px">
+      <div style="text-align:center;margin-bottom:24px">
+        <h1 style="color:#00A8CC;font-size:28px;margin:0">HaMi <span style="color:#102A43">&lt;CODE&gt;</span> Việt</h1>
+      </div>
+      <h2 style="color:#102A43">Chào mừng, ${displayName}! 🎉</h2>
+      <p style="color:#334155;font-size:16px;line-height:1.6">
+        Tài khoản HaMi Code Việt của bạn đã sẵn sàng. Bạn có thể truy cập:
+      </p>
+      <ul style="color:#334155;font-size:15px;line-height:1.8;padding-left:20px">
+        <li><strong>Học miễn phí</strong> — bài học lập trình song ngữ Việt-Anh</li>
+        <li><strong>CodeLab</strong> — viết và chạy code trực tiếp trên trình duyệt</li>
+        <li><strong>15 sản phẩm code thật</strong> — tạo truyện, nhạc, website, API</li>
+        <li><strong>Xưởng dự án</strong> — dự án thật 10 bước cùng mentor</li>
+        <li><strong>AI Chat</strong> — gia sư AI song ngữ (Cloudflare Workers AI)</li>
+        <li><strong>Portfolio & Chứng chỉ</strong> — xác minh năng lực bằng bằng chứng</li>
+      </ul>
+      <a href="${appUrl}/dashboard" style="display:inline-block;background:#00A8CC;color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;margin:16px 0">
+        Vào Dashboard
+      </a>
+      <a href="${publicUrl}/bat-dau" style="display:inline-block;background:#20A779;color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;margin:16px 0 16px 12px">
+        Hướng dẫn bắt đầu
+      </a>
+      <div style="background:#F0F9FF;padding:16px;border-radius:8px;margin:24px 0">
+        <p style="color:#102A43;font-size:14px;margin:0"><strong>Bắt đầu nhanh:</strong></p>
+        <ol style="color:#334155;font-size:14px;line-height:1.6;margin:8px 0 0;padding-left:20px">
+          <li>Làm <a href="${publicUrl}/danh-gia-dau-vao" style="color:#00A8CC">bài đánh giá đầu vào</a> để biết trình độ</li>
+          <li>Chọn <a href="${publicUrl}/lo-trinh" style="color:#00A8CC">lộ trình học</a> theo độ tuổi</li>
+          <li>Thử một <a href="${publicUrl}/san-pham" style="color:#00A8CC">sản phẩm code</a> ngay</li>
+          <li>Bắt đầu một <a href="${publicUrl}/xuong-du-an" style="color:#00A8CC">dự án</a> cùng mentor</li>
+        </ol>
+      </div>
+      <p style="color:#64748B;font-size:14px">Nếu bạn có câu hỏi, hãy trả lời email này hoặc vào trang <a href="${publicUrl}/lien-he" style="color:#00A8CC">liên hệ</a>.</p>
+      <hr style="border:none;border-top:1px solid #E2E8F0;margin:24px 0">
+      <p style="color:#94A3B8;font-size:12px;text-align:center">HaMi Code Việt — Học ngôn ngữ. Học lập trình. Làm ra sản phẩm thật.</p>
     </div>`;
 }

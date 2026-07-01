@@ -1,0 +1,226 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = 'Hướng dẫn bắt đầu / Getting Started — HaMi Code Việt';
+const description = '6 bước để bắt đầu hành trình học lập trình song ngữ tại HaMi Code Việt: tạo tài khoản, đánh giá đầu vào, chọn lộ trình, học miễn phí, làm sản phẩm thật, xây portfolio.';
+
+const steps = [
+  {
+    num: 1,
+    icon: '👤',
+    vi: { title: 'Tạo tài khoản miễn phí', desc: 'Đăng ký bằng email hoặc Google — miễn phí, không cần thẻ tín dụng.', time: '2 phút', link: 'https://app.hamicodeviet.com/signup', linkText: 'Đăng ký ngay' },
+    en: { title: 'Create a free account', desc: 'Sign up with email or Google — free, no credit card required.', time: '2 minutes', link: 'https://app.hamicodeviet.com/signup', linkText: 'Sign up now' },
+  },
+  {
+    num: 2,
+    icon: '📝',
+    vi: { title: 'Làm bài đánh giá đầu vào', desc: 'Trả lời vài câu hỏi để chúng tôi biết trình độ hiện tại và gợi ý lộ trình phù hợp.', time: '5 phút', link: '/danh-gia-dau-vao', linkText: 'Làm đánh giá' },
+    en: { title: 'Take the input assessment', desc: 'Answer a few questions so we know your current level and suggest a suitable track.', time: '5 minutes', link: '/danh-gia-dau-vao', linkText: 'Take assessment' },
+  },
+  {
+    num: 3,
+    icon: '🛤️',
+    vi: { title: 'Chọn lộ trình theo độ tuổi', desc: '5 lộ trình từ 8-24 tuổi: Creative Explorer, Junior Builder, Young Creator, Product Developer, Builder & Entrepreneur.', time: '3 phút', link: '/lo-trinh', linkText: 'Xem lộ trình' },
+    en: { title: 'Pick a track for your age', desc: '5 tracks from ages 8-24: Creative Explorer, Junior Builder, Young Creator, Product Developer, Builder & Entrepreneur.', time: '3 minutes', link: '/lo-trinh', linkText: 'View tracks' },
+  },
+  {
+    num: 4,
+    icon: '📚',
+    vi: { title: 'Học 30 bài miễn phí', desc: 'Bài học lập trình, công nghệ và AI song ngữ Việt-Anh. Mỗi bài có ví dụ, bài tập và giải thích.', time: 'Bắt đầu ngay', link: '/hoc-mien-phi', linkText: 'Học miễn phí' },
+    en: { title: 'Learn 30 free lessons', desc: 'Bilingual programming, tech and AI lessons. Each lesson has examples, exercises and explanations.', time: 'Start now', link: '/hoc-mien-phi', linkText: 'Learn free' },
+  },
+  {
+    num: 5,
+    icon: '🔨',
+    vi: { title: 'Làm sản phẩm code thật', desc: '15 sản phẩm thật: Story Maker, Beat Maker, Site Builder, API Studio, Invoice Generator... Chạy trực tiếp trên trình duyệt, tải xuống được.', time: '30-60 phút/sản phẩm', link: '/san-pham', linkText: 'Thử sản phẩm' },
+    en: { title: 'Build real code products', desc: '15 real products: Story Maker, Beat Maker, Site Builder, API Studio, Invoice Generator... Run in browser, download source.', time: '30-60 min/product', link: '/san-pham', linkText: 'Try products' },
+  },
+  {
+    num: 6,
+    icon: '🏆',
+    vi: { title: 'Xây portfolio & chứng chỉ', desc: 'Tích lũy bằng chứng năng lực qua dự án, CodeLab, và bài đánh giá. Nhận chứng chỉ có thể xác minh.', time: 'Liên tục', link: 'https://app.hamicodeviet.com/portfolio', linkText: 'Xem portfolio' },
+    en: { title: 'Build portfolio & certificates', desc: 'Accumulate skill evidence through projects, CodeLab, and assessments. Earn verifiable certificates.', time: 'Ongoing', link: 'https://app.hamicodeviet.com/portfolio', linkText: 'View portfolio' },
+  },
+];
+
+const features = [
+  { icon: '🤖', vi: { title: 'AI Chat song ngữ', desc: 'Gia sư AI 24/7, trả lời bằng tiếng Việt và tiếng Anh' }, en: { title: 'Bilingual AI Chat', desc: '24/7 AI tutor, answers in Vietnamese and English' } },
+  { icon: '💻', vi: { title: 'CodeLab chạy code', desc: 'Viết và chạy Python, JavaScript trực tiếp trên trình duyệt' }, en: { title: 'CodeLab runs code', desc: 'Write and run Python, JavaScript directly in browser' } },
+  { icon: '🔧', vi: { title: 'Xưởng dự án thực tế', desc: '10 bước dự án thật, có mentor, deadline, bằng chứng' }, en: { title: 'Project Workshop', desc: '10-step real projects with mentors, deadlines, evidence' } },
+  { icon: '🌍', vi: { title: 'Song ngữ Việt-Anh', desc: 'Học lập trình và tiếng Anh cùng lúc, trong bối cảnh thực hành' }, en: { title: 'Vietnamese-English bilingual', desc: 'Learn programming and English at the same time, in practice' } },
+  { icon: '👨‍👩‍👧', vi: { title: 'An toàn cho trẻ em', desc: 'Guardian consent, privacy by default, không quảng cáo hành vi' }, en: { title: 'Child safety', desc: 'Guardian consent, privacy by default, no behavioral ads' } },
+  { icon: '📜', vi: { title: 'Chứng chỉ xác minh được', desc: 'Mỗi chứng chỉ có link xác minh công khai, dựa trên bằng chứng' }, en: { title: 'Verifiable certificates', desc: 'Each certificate has public verification link, evidence-based' } },
+];
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="hero">
+    <div class="container text-center">
+      <p class="eyebrow" style="color: var(--color-success);">
+        <span data-vi>Bắt đầu trong 6 bước</span>
+        <span data-en>Start in 6 steps</span>
+      </p>
+      <h1>
+        <span data-vi>Hướng dẫn bắt đầu</span>
+        <span data-en>Getting Started Guide</span>
+      </h1>
+      <p class="hero-subtitle">
+        <span data-vi>Từ chưa biết code đến có sản phẩm thật — chỉ 6 bước. Miễn phí, song ngữ, có mentor.</span>
+        <span data-en>From no code to real products — just 6 steps. Free, bilingual, with mentors.</span>
+      </p>
+      <div style="margin-top: 1.5rem;">
+        <a href="https://app.hamicodeviet.com/signup" class="btn btn--primary" style="margin-right: 0.5rem;">
+          <span data-vi>Tạo tài khoản miễn phí</span>
+          <span data-en>Create free account</span>
+        </a>
+        <a href="#6-buoc" class="btn">
+          <span data-vi>Xem 6 bước</span>
+          <span data-en>See 6 steps</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 Steps -->
+  <section class="section" id="6-buoc">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: 2rem;">
+        <h2>
+          <span data-vi>6 bước để bắt đầu</span>
+          <span data-en>6 steps to get started</span>
+        </h2>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 800px; margin: 0 auto;">
+        {steps.map((s) => (
+          <div class="card" style="padding: 1.5rem; display: flex; align-items: start; gap: 1.25rem; border-left: 4px solid var(--color-primary);">
+            <div style="flex-shrink: 0; width: 48px; height: 48px; background: var(--color-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700;">
+              {s.num}
+            </div>
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span style="font-size: 1.25rem;">{s.icon}</span>
+                <h3 style="font-size: 1.1rem; margin: 0;">
+                  <span data-vi>{s.vi.title}</span>
+                  <span data-en>{s.en.title}</span>
+                </h3>
+              </div>
+              <p style="font-size: 0.9rem; color: var(--color-text-muted); margin: 0 0 0.5rem;">
+                <span data-vi>{s.vi.desc}</span>
+                <span data-en>{s.en.desc}</span>
+              </p>
+              <div style="display: flex; gap: 1rem; align-items: center; font-size: 0.8rem;">
+                <span style="color: var(--color-text-muted);">
+                  <span data-vi>⏱ {s.vi.time}</span>
+                  <span data-en>⏱ {s.en.time}</span>
+                </span>
+                <a href={s.vi.link} class="btn btn--primary btn--sm">
+                  <span data-vi>{s.vi.linkText}</span>
+                  <span data-en>{s.en.linkText}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" style="background: var(--color-bg-light);">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: 2rem;">
+        <h2>
+          <span data-vi>Bạn sẽ có gì?</span>
+          <span data-en>What you get</span>
+        </h2>
+      </div>
+      <div class="grid grid--3">
+        {features.map((f) => (
+          <div class="card" style="padding: 1.25rem;">
+            <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">{f.icon}</div>
+            <h3 style="font-size: 1rem; margin: 0 0 0.25rem;">
+              <span data-vi>{f.vi.title}</span>
+              <span data-en>{f.en.title}</span>
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0;">
+              <span data-vi>{f.vi.desc}</span>
+              <span data-en>{f.en.desc}</span>
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: 2rem;">
+        <h2>
+          <span data-vi>Câu hỏi thường gặp</span>
+          <span data-en>FAQ</span>
+        </h2>
+      </div>
+      <div style="max-width: 700px; margin: 0 auto;">
+        <details style="border: 1px solid var(--color-border); border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem;">
+          <summary style="font-weight: 600; cursor: pointer;">
+            <span data-vi>Có mất tiền không?</span>
+            <span data-en>Does it cost money?</span>
+          </summary>
+          <p style="margin: 0.75rem 0 0; color: var(--color-text-muted); font-size: 0.9rem;">
+            <span data-vi>Không. Tài khoản miễn phí, 30 bài học miễn phí, CodeLab miễn phí, 15 sản phẩm miễn phí. Các gói trả phí (Personal, Family, Creator) có mentor, đánh giá và chứng chỉ.</span>
+            <span data-en>No. Free account, 30 free lessons, free CodeLab, 15 free products. Paid plans (Personal, Family, Creator) include mentors, assessments and certificates.</span>
+          </p>
+        </details>
+        <details style="border: 1px solid var(--color-border); border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem;">
+          <summary style="font-weight: 600; cursor: pointer;">
+            <span data-vi>Tôi cần biết gì trước khi bắt đầu?</span>
+            <span data-en>What do I need to know before starting?</span>
+          </summary>
+          <p style="margin: 0.75rem 0 0; color: var(--color-text-muted); font-size: 0.9rem;">
+            <span data-vi>Không cần biết gì trước. Bài học bắt đầu từ zero. Chỉ cần biết dùng máy tính và có Internet.</span>
+            <span data-en>Nothing. Lessons start from zero. You just need to know how to use a computer and have Internet.</span>
+          </p>
+        </details>
+        <details style="border: 1px solid var(--color-border); border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem;">
+          <summary style="font-weight: 600; cursor: pointer;">
+            <span data-vi>Tôi dưới 13 tuổi, có dùng được không?</span>
+            <span data-en>I'm under 13, can I use it?</span>
+          </summary>
+          <p style="margin: 0.75rem 0 0; color: var(--color-text-muted); font-size: 0.9rem;">
+            <span data-vi>Có. Khi đăng ký, bạn cần nhập email phụ huynh. Phụ huynh sẽ nhận email xác nhận giám hộ.</span>
+            <span data-en>Yes. When signing up, you need to enter a parent's email. The parent will receive a guardian verification email.</span>
+          </p>
+        </details>
+        <details style="border: 1px solid var(--color-border); border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem;">
+          <summary style="font-weight: 600; cursor: pointer;">
+            <span data-vi>Sản phẩm code là gì?</span>
+            <span data-en>What are code products?</span>
+          </summary>
+          <p style="margin: 0.75rem 0 0; color: var(--color-text-muted); font-size: 0.9rem;">
+            <span data-vi>15 ứng dụng web thật chạy được trên trình duyệt: tạo truyện, nhạc, meme, QR, website, API, hóa đơn... Bạn có thể tải source code về.</span>
+            <span data-en>15 real web apps that run in browser: story maker, beat maker, meme generator, QR studio, website builder, API studio, invoice generator... You can download the source code.</span>
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" style="background: var(--color-navy); color: white;">
+    <div class="container text-center">
+      <h2 style="color: white;">
+        <span data-vi>Sẵn sàng bắt đầu?</span>
+        <span data-en>Ready to start?</span>
+      </h2>
+      <p style="color: rgba(255,255,255,0.8); max-width: 600px; margin: 1rem auto;">
+        <span data-vi>Tạo tài khoản miễn phí ngay. 2 phút để có mọi thứ.</span>
+        <span data-en>Create a free account now. 2 minutes to get everything.</span>
+      </p>
+      <a href="https://app.hamicodeviet.com/signup" class="btn btn--primary" style="margin-top: 1rem;">
+        <span data-vi>Tạo tài khoản miễn phí</span>
+        <span data-en>Create free account</span>
+      </a>
+    </div>
+  </section>
+</BaseLayout>

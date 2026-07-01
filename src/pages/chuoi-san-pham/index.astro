@@ -1,0 +1,230 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = 'Chuỗi sản phẩm thật / Product Chain — HaMi Code Việt';
+const description = 'Hành trình 15 sản phẩm code thật từ 8-24 tuổi: từ Story Maker đến Analytics Dashboard. Mỗi sản phẩm là một kỹ năng mới, chạy được, tải xuống được.';
+
+const chain = [
+  {
+    age: '8-10',
+    ageLabel: { vi: 'Khám phá sáng tạo', en: 'Creative Explorer' },
+    color: '#FFC857',
+    products: [
+      { slug: 'story-maker', icon: '📖', name: 'Story Maker', skill: { vi: 'Kể chuyện + logic', en: 'Storytelling + logic' }, order: 1 },
+      { slug: 'color-symphony', icon: '🎨', name: 'Color Symphony', skill: { vi: 'Âm thanh + hình ảnh', en: 'Sound + visuals' }, order: 2 },
+      { slug: 'animation-studio', icon: '✨', name: 'Animation Studio', skill: { vi: 'Hoạt hình + thời gian', en: 'Animation + timing' }, order: 3 },
+    ],
+  },
+  {
+    age: '11-13',
+    ageLabel: { vi: 'Builder nhí', en: 'Junior Builder' },
+    color: '#00A8CC',
+    products: [
+      { slug: 'meme-generator', icon: '😂', name: 'Meme Generator', skill: { vi: 'Ảnh + chữ + canvas', en: 'Image + text + canvas' }, order: 4 },
+      { slug: 'beat-maker', icon: '🥁', name: 'Beat Maker', skill: { vi: 'Sequencer + âm thanh', en: 'Sequencer + audio' }, order: 5 },
+      { slug: 'site-builder', icon: '🌐', name: 'Site Builder', skill: { vi: 'HTML + CSS + template', en: 'HTML + CSS + template' }, order: 6 },
+    ],
+  },
+  {
+    age: '14-17',
+    ageLabel: { vi: 'Creator trẻ', en: 'Young Creator' },
+    color: '#20A779',
+    products: [
+      { slug: 'data-viz', icon: '📊', name: 'Data Visualizer', skill: { vi: 'Dữ liệu + biểu đồ', en: 'Data + charts' }, order: 7 },
+      { slug: 'qr-studio', icon: '🔳', name: 'QR Studio', skill: { vi: 'QR + tùy chỉnh', en: 'QR + customization' }, order: 8 },
+      { slug: 'chatbot-builder', icon: '🤖', name: 'Chatbot Builder', skill: { vi: 'Chatbot + quy tắc', en: 'Chatbot + rules' }, order: 9 },
+    ],
+  },
+  {
+    age: '16-20',
+    ageLabel: { vi: 'Product Developer', en: 'Product Developer' },
+    color: '#6C5CE7',
+    products: [
+      { slug: 'api-studio', icon: '🔌', name: 'API Studio', skill: { vi: 'REST API + test', en: 'REST API + testing' }, order: 10 },
+      { slug: 'pixel-art', icon: '👾', name: 'Pixel Art Editor', skill: { vi: 'Pixel art + export', en: 'Pixel art + export' }, order: 11 },
+      { slug: 'markdown-to-pdf', icon: '📄', name: 'Markdown → PDF', skill: { vi: 'Markdown + PDF', en: 'Markdown + PDF' }, order: 12 },
+    ],
+  },
+  {
+    age: '18-24',
+    ageLabel: { vi: 'Builder & Doanh nghiệp', en: 'Builder & Entrepreneur' },
+    color: '#E17055',
+    products: [
+      { slug: 'landing-gen', icon: '🚀', name: 'Landing Page Gen', skill: { vi: 'Landing page + marketing', en: 'Landing page + marketing' }, order: 13 },
+      { slug: 'invoice-gen', icon: '🧾', name: 'Invoice Generator', skill: { vi: 'Hóa đơn + PDF + kinh doanh', en: 'Invoice + PDF + business' }, order: 14 },
+      { slug: 'analytics-dash', icon: '📈', name: 'Analytics Dashboard', skill: { vi: 'Dashboard + real-time', en: 'Dashboard + real-time' }, order: 15 },
+    ],
+  },
+];
+
+const allProducts = chain.flatMap(g => g.products);
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="hero">
+    <div class="container text-center">
+      <p class="eyebrow" style="color: var(--color-primary);">
+        <span data-vi>15 sản phẩm • 5 độ tuổi • 1 hành trình</span>
+        <span data-en>15 products • 5 age groups • 1 journey</span>
+      </p>
+      <h1>
+        <span data-vi>Chuỗi sản phẩm thật</span>
+        <span data-en>Product Chain</span>
+      </h1>
+      <p class="hero-subtitle">
+        <span data-vi>Từ Story Maker (8 tuổi) đến Analytics Dashboard (24 tuổi) — 15 sản phẩm code thật, mỗi sản phẩm dạy một kỹ năng mới. Chạy được, tải xuống được, dùng được.</span>
+        <span data-en>From Story Maker (age 8) to Analytics Dashboard (age 24) — 15 real code products, each teaching a new skill. Runnable, downloadable, usable.</span>
+      </p>
+      <div style="margin-top: 1.5rem;">
+        <a href="/san-pham" class="btn btn--primary" style="margin-right: 0.5rem;">
+          <span data-vi>Xem tất cả sản phẩm</span>
+          <span data-en>View all products</span>
+        </a>
+        <a href="/bat-dau" class="btn">
+          <span data-vi>Hướng dẫn bắt đầu</span>
+          <span data-en>Getting started</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chain visualization -->
+  <section class="section">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: 2rem;">
+        <h2>
+          <span data-vi>Hành trình 15 sản phẩm</span>
+          <span data-en>The 15-product journey</span>
+        </h2>
+        <p style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto;">
+          <span data-vi>Mỗi sản phẩm xây trên sản phẩm trước. Kỹ năng cộng dồn — không bắt lại từ đầu.</span>
+          <span data-en>Each product builds on the previous. Skills compound — no starting over.</span>
+        </p>
+      </div>
+
+      <!-- Progress bar -->
+      <div style="max-width: 900px; margin: 0 auto 2rem; background: var(--color-border); height: 8px; border-radius: 4px; overflow: hidden; display: flex;">
+        {chain.map((g) => (
+          <div style={`flex: 1; background: ${g.color};`} title={g.age}></div>
+        ))}
+      </div>
+
+      {chain.map((group) => (
+        <div style="margin-bottom: 2rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+            <span style={`background: ${group.color}; color: white; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600;`}>{group.age}</span>
+            <h3 style="margin: 0; font-size: 1.1rem;">
+              <span data-vi>{group.ageLabel.vi}</span>
+              <span data-en>{group.ageLabel.en}</span>
+            </h3>
+          </div>
+          <div class="grid grid--3" style="gap: 0.75rem;">
+            {group.products.map((p) => (
+              <a href={`/san-pham/${p.slug}`} class="card" style="padding: 1.25rem; text-decoration: none; color: inherit; border-top: 4px solid ${group.color};">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                  <span style="font-size: 1.75rem;">{p.icon}</span>
+                  <span style="background: var(--color-border); color: var(--color-text-muted); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">{p.order}</span>
+                </div>
+                <h4 style="margin: 0 0 0.25rem; font-size: 0.95rem;">{p.name}</h4>
+                <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 0;">
+                  <span data-vi>{p.skill.vi}</span>
+                  <span data-en>{p.skill.en}</span>
+                </p>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Skill progression -->
+  <section class="section" style="background: var(--color-bg-light);">
+    <div class="container">
+      <div class="text-center" style="margin-bottom: 2rem;">
+        <h2>
+          <span data-vi>Kỹ năng cộng dồn</span>
+          <span data-en>Skills compound</span>
+        </h2>
+      </div>
+      <div style="max-width: 800px; margin: 0 auto;">
+        <div class="card" style="padding: 1.5rem;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--color-border);">
+                <th style="text-align: left; padding: 0.5rem;">
+                  <span data-vi>Sản phẩm</span>
+                  <span data-en>Product</span>
+                </th>
+                <th style="text-align: left; padding: 0.5rem;">
+                  <span data-vi>Kỹ năng học được</span>
+                  <span data-en>Skill learned</span>
+                </th>
+                <th style="text-align: left; padding: 0.5rem;">
+                  <span data-vi>Dùng để làm gì</span>
+                  <span data-en>What it's for</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding: 0.5rem;">📖 Story Maker</td>
+                <td style="padding: 0.5rem;"><span data-vi>Logic, biến, chuỗi</span><span data-en>Logic, variables, strings</span></td>
+                <td style="padding: 0.5rem;"><span data-vi>Tạo truyện tương tác</span><span data-en>Create interactive stories</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding: 0.5rem;">🥁 Beat Maker</td>
+                <td style="padding: 0.5rem;"><span data-vi>Mảng, vòng lặp, âm thanh</span><span data-en>Arrays, loops, audio</span></td>
+                <td style="padding: 0.5rem;"><span data-vi>Tạo nhạc, hiểu thuật toán</span><span data-en>Make music, understand algorithms</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding: 0.5rem;">🌐 Site Builder</td>
+                <td style="padding: 0.5rem;"><span data-vi>HTML, CSS, layout</span><span data-en>HTML, CSS, layout</span></td>
+                <td style="padding: 0.5rem;"><span data-vi>Tạo website cá nhân</span><span data-en>Build personal website</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding: 0.5rem;">🤖 Chatbot Builder</td>
+                <td style="padding: 0.5rem;"><span data-vi>Điều kiện, state, API</span><span data-en>Conditionals, state, API</span></td>
+                <td style="padding: 0.5rem;"><span data-vi>Tạo chatbot, hiểu AI</span><span data-en>Build chatbot, understand AI</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding: 0.5rem;">🔌 API Studio</td>
+                <td style="padding: 0.5rem;"><span data-vi>REST, JSON, HTTP</span><span data-en>REST, JSON, HTTP</span></td>
+                <td style="padding: 0.5rem;"><span data-vi>Thiết kế backend</span><span data-en>Design backend</span></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem;">📈 Analytics Dashboard</td>
+                <td style="padding: 0.5rem;"><span data-vi>Real-time, charts, data</span><span data-en>Real-time, charts, data</span></td>
+                <td style="padding: 0.5rem;"><span data-vi>Xây sản phẩm SaaS</span><span data-en>Build SaaS product</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" style="background: var(--color-navy); color: white;">
+    <div class="container text-center">
+      <h2 style="color: white;">
+        <span data-vi>Bắt đầu với sản phẩm đầu tiên</span>
+        <span data-en>Start with the first product</span>
+      </h2>
+      <p style="color: rgba(255,255,255,0.8); max-width: 600px; margin: 1rem auto;">
+        <span data-vi>Không cần biết gì trước. Story Maker dành cho người 8 tuổi — hoặc bất kỳ ai mới bắt đầu.</span>
+        <span data-en>No prior knowledge needed. Story Maker is for 8-year-olds — or anyone just starting.</span>
+      </p>
+      <div style="margin-top: 1.5rem;">
+        <a href="/san-pham/story-maker" class="btn btn--primary" style="margin-right: 0.5rem;">
+          <span data-vi>Thử Story Maker</span>
+          <span data-en>Try Story Maker</span>
+        </a>
+        <a href="https://app.hamicodeviet.com/signup" class="btn" style="background: rgba(255,255,255,0.15); color: white;">
+          <span data-vi>Tạo tài khoản</span>
+          <span data-en>Create account</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
